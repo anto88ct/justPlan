@@ -21,7 +21,7 @@ import { BusinessPlanService } from '../../services/business-plan.service';
     <div class="flex flex-col h-full overflow-y-auto scrollbar-thin">
 
       <!-- Page header -->
-      <div class="px-8 pt-8 pb-5 border-b border-zinc-100 flex items-center justify-between flex-shrink-0">
+      <div class="px-4 md:px-8 pt-5 md:pt-8 pb-4 md:pb-5 border-b border-zinc-100 flex items-center justify-between gap-3 flex-shrink-0">
         <div>
           <p class="text-xs font-medium text-brand-600 uppercase tracking-widest mb-1 font-body">Dashboard</p>
           <h1 class="text-2xl font-bold text-zinc-900 font-display">Business Plan 2025–2027</h1>
@@ -34,10 +34,10 @@ import { BusinessPlanService } from '../../services/business-plan.service';
         }
       </div>
 
-      <div class="flex-1 px-8 py-6 space-y-6">
+      <div class="flex-1 px-4 md:px-8 py-4 md:py-6 space-y-6">
 
         <!-- KPI Cards -->
-        <div class="grid grid-cols-2 xl:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
           @for (kpi of kpiCards(); track kpi.id) {
             <div [ngClass]="[
                 'bg-white rounded-2xl border p-5 shadow-card hover:shadow-card-hover transition-all duration-300',
@@ -65,8 +65,8 @@ import { BusinessPlanService } from '../../services/business-plan.service';
         </div>
 
         <!-- Cash Flow Chart -->
-        <div class="bg-white rounded-2xl border border-zinc-100 shadow-card p-6">
-          <div class="flex items-center justify-between mb-5">
+        <div class="bg-white rounded-2xl border border-zinc-100 shadow-card p-4 md:p-6">
+          <div class="flex flex-wrap items-start justify-between gap-2 mb-4 md:mb-5">
             <div>
               <h3 class="text-sm font-semibold text-zinc-800 font-display">Flusso di Cassa</h3>
               <p class="text-xs text-zinc-400 font-body mt-0.5">Proiezione mensile — Anno 1</p>
@@ -124,7 +124,7 @@ import { BusinessPlanService } from '../../services/business-plan.service';
 
         <!-- Income Statement Table — editable -->
         <div class="bg-white rounded-2xl border border-zinc-100 shadow-card overflow-hidden">
-          <div class="px-6 py-4 border-b border-zinc-100 flex items-center justify-between">
+          <div class="px-4 md:px-6 py-3 md:py-4 border-b border-zinc-100 flex items-center justify-between gap-2">
             <div>
               <h3 class="text-sm font-semibold text-zinc-800 font-display">Conto Economico Sintetico</h3>
               <p class="text-xs text-zinc-400 font-body mt-0.5">Proiezione triennale</p>

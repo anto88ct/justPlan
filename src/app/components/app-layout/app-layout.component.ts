@@ -59,8 +59,19 @@ interface SettingItem {
     .float-anim    { animation: floatAnim 3s ease-in-out infinite; }
   `],
   template: `
+    <!-- Mobile backdrop -->
+      @if (sidebarOpen()) {
+        <div class="fixed inset-0 bg-black/60 z-40 lg:hidden"
+             (click)="sidebarOpen.set(false)"></div>
+      }
+
     <!-- ═══════════════════ LEFT SIDEBAR ═══════════════════ -->
-    <aside class="flex flex-col w-52 flex-shrink-0 bg-zinc-950 overflow-hidden relative">
+    <aside [ngClass]="[
+        'flex flex-col w-56 flex-shrink-0 bg-zinc-950 overflow-y-auto overflow-x-hidden',
+        'fixed inset-y-0 left-0 z-50 transition-transform duration-300 ease-in-out',
+        'lg:relative lg:translate-x-0 lg:inset-auto lg:z-auto',
+        sidebarOpen() ? 'translate-x-0' : '-translate-x-full'
+      ]">
 
       <!-- Ambient glow -->
       <div class="absolute top-0 right-0 w-40 h-40 pointer-events-none"
@@ -159,7 +170,14 @@ interface SettingItem {
     <main class="flex-1 flex flex-col overflow-hidden bg-zinc-50 min-w-0">
 
       <!-- Topbar -->
-      <header class="h-12 bg-white border-b border-zinc-100 flex items-center px-5 gap-3 flex-shrink-0 shadow-sm">
+      <header class="h-12 bg-white border-b border-zinc-100 flex items-center px-3 md:px-5 gap-2 flex-shrink-0 shadow-sm">
+        <!-- Hamburger (mobile only) -->
+        <button (click)="sidebarOpen.set(true)"
+                class="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-zinc-100 transition-colors flex-shrink-0">
+          <svg class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
         <div class="flex items-center gap-1.5 text-xs font-body">
           <span class="text-zinc-400">AirPlan</span>
           <svg class="w-3 h-3 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -221,7 +239,7 @@ interface SettingItem {
       </header>
 
       <!-- View + AI split -->
-      <div class="flex-1 overflow-hidden flex min-h-0">
+      <div class="flex-1 overflow-hidden flex flex-col lg:flex-row min-h-0">
 
         <!-- ── VIEWS ── -->
         <div class="flex-1 min-w-0 overflow-hidden">
@@ -528,7 +546,7 @@ interface SettingItem {
 
         <!-- AI Panel -->
         @if (aiOpen()) {
-          <div class="ai-enter w-80 flex-shrink-0 border-l border-zinc-100 overflow-hidden">
+          <div class="ai-enter lg:w-80 w-full flex-shrink-0 lg:border-l border-t lg:border-t-0 border-zinc-100 overflow-hidden lg:h-auto" style="height: 45vh;">
             <app-ai-chatbot/>
           </div>
         }
@@ -540,6 +558,7 @@ interface SettingItem {
 export class AppLayoutComponent {
   readonly planService = inject(BusinessPlanService);
 
+  sidebarOpen = signal(false);
   currentView = signal<View>('panoramica');
   aiOpen = signal(false);
   hasPlan = signal(false);
@@ -651,10 +670,12 @@ export class AppLayoutComponent {
     } else {
       this.currentView.set(item.view);
     }
+    this.sidebarOpen.set(false);
   }
 
   goToWizard(): void {
     this.currentView.set('wizard');
+    this.sidebarOpen.set(false);
   }
 
   onPlanGenerated(): void {

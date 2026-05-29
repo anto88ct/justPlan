@@ -161,7 +161,7 @@ interface LoanItem {
   `],
   template: `
     <!-- ═══ STEPPER ══════════════════════════════════════════════════════════ -->
-    <div class="flex-shrink-0 px-8 pt-6 pb-0 bg-white">
+    <div class="flex-shrink-0 px-4 md:px-8 pt-4 md:pt-6 pb-0 bg-white">
       <div class="relative flex items-center justify-between mb-1">
         <div class="absolute top-4 left-0 right-0 h-0.5 bg-zinc-100"></div>
         <div class="absolute top-4 left-0 h-0.5 bg-brand-500 step-track-fill"
@@ -187,7 +187,7 @@ interface LoanItem {
                 {{ step.id }}
               }
             </div>
-            <span class="text-xs font-medium whitespace-nowrap font-body transition-colors duration-200"
+            <span class="hidden sm:block text-xs font-medium whitespace-nowrap font-body transition-colors duration-200"
                   [ngClass]="{
                     'text-brand-700': currentStep() === step.id,
                     'text-brand-500': currentStep() > step.id,
@@ -203,7 +203,7 @@ interface LoanItem {
     <div class="flex-1 flex overflow-hidden min-h-0">
 
       <!-- FORM COLUMN -->
-      <div class="flex-1 overflow-y-auto scrollbar-thin px-8 py-7 min-w-0">
+      <div class="flex-1 overflow-y-auto scrollbar-thin px-4 md:px-8 py-5 md:py-7 min-w-0">
 
         <!-- ── Step 1: Setup ─────────────────────────────────────────────── -->
         @if (currentStep() === 1) {
@@ -1104,7 +1104,7 @@ interface LoanItem {
       </div>
 
       <!-- ═══ LIVE PREVIEW ══════════════════════════════════════════════════ -->
-      <div class="w-72 flex-shrink-0 border-l border-zinc-100 bg-zinc-50/50 overflow-y-auto scrollbar-thin p-5 flex flex-col gap-4">
+      <div class="hidden xl:flex w-72 flex-shrink-0 border-l border-zinc-100 bg-zinc-50/50 overflow-y-auto scrollbar-thin p-5 flex-col gap-4">
 
         <div class="flex items-center gap-2">
           <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
@@ -1217,7 +1217,7 @@ interface LoanItem {
     </div>
 
     <!-- ═══ FOOTER NAV ══════════════════════════════════════════════════════ -->
-    <div class="flex-shrink-0 px-8 py-4 border-t border-zinc-100 bg-white flex items-center justify-between">
+    <div class="flex-shrink-0 px-4 md:px-8 py-3 md:py-4 border-t border-zinc-100 bg-white flex items-center justify-between gap-3">
 
       <button (click)="prevStep()" [disabled]="currentStep() === 1"
               [ngClass]="['flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 font-body',

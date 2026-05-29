@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { AppLayoutComponent } from './components/app-layout/app-layout.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [AppLayoutComponent],
+  imports: [RouterOutlet],
   host: { class: 'block h-full w-full' },
-  template: `<app-layout/>`
+  template: `<router-outlet/>`,
 })
 export class AppComponent {}
