@@ -75,7 +75,7 @@ interface SettingItem {
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
             </svg>
           </div>
-          <span class="text-base font-bold text-white tracking-tight font-display">JustPlan</span>
+          <span class="text-base font-bold text-white tracking-tight font-display">AirPlan</span>
         </div>
       </div>
 
@@ -161,7 +161,7 @@ interface SettingItem {
       <!-- Topbar -->
       <header class="h-12 bg-white border-b border-zinc-100 flex items-center px-5 gap-3 flex-shrink-0 shadow-sm">
         <div class="flex items-center gap-1.5 text-xs font-body">
-          <span class="text-zinc-400">JustPlan</span>
+          <span class="text-zinc-400">AirPlan</span>
           <svg class="w-3 h-3 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>

@@ -7,7 +7,8 @@
       "PowerShell(cd \"C:\\\\Users\\\\anton\\\\OneDrive\\\\Desktop\\\\PROGETTI\\\\justPlan\"; Start-Process powershell -ArgumentList \"-NoExit\", \"-Command\", \"cd 'C:\\\\Users\\\\anton\\\\OneDrive\\\\Desktop\\\\PROGETTI\\\\justPlan'; npx ng serve --open\" -WindowStyle Normal)",
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\anton\\\\OneDrive\\\\Desktop\\\\PROGETTI\\\\justPlan\" -Recurse -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
-      "Bash(Sort-Object)"
+      "Bash(Sort-Object)",
+      "Bash(npx ng *)"
     ]
   }
 }
