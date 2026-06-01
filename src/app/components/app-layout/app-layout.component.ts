@@ -408,16 +408,16 @@ interface SettingItem {
                 <!-- ─── LIVE KPIS (only if plan exists) ─── -->
                 @if (hasPlan()) {
                   <div>
-                    <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-[0.16em] font-body mb-3">
+                    <p class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.16em] font-body mb-3">
                       Piano corrente
                     </p>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                       @for (kpi of liveKpis(); track kpi.label; let i = $index) {
-                        <div class="animate-kpi-in bg-white rounded-2xl border border-zinc-100 shadow-card
+                        <div class="animate-kpi-in bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-card
                                      hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 p-4"
                              [style.animation-delay]="(i * 55 + 40) + 'ms'">
-                          <p class="text-[11px] text-zinc-400 font-medium font-body truncate mb-0.5">{{ kpi.label }}</p>
-                          <p class="text-lg font-bold font-mono text-zinc-900 number-highlight">{{ kpi.value }}</p>
+                          <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium font-body truncate mb-0.5">{{ kpi.label }}</p>
+                          <p class="text-lg font-bold font-mono text-zinc-900 dark:text-zinc-100 number-highlight">{{ kpi.value }}</p>
                         </div>
                       }
                     </div>
@@ -431,10 +431,10 @@ interface SettingItem {
                       <p class="text-[10px] font-semibold text-brand-500 uppercase tracking-[0.18em] font-body mb-0.5">
                         Come funziona
                       </p>
-                      <h2 class="text-base font-bold text-zinc-900 font-display">Guida rapida</h2>
+                      <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-display">Guida rapida</h2>
                     </div>
                     @if (!hasPlan()) {
-                      <span class="text-[10px] text-zinc-400 font-body hidden sm:block">
+                      <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body hidden sm:block">
                         Clicca un passo per iniziare
                       </span>
                     }
@@ -444,7 +444,7 @@ interface SettingItem {
                   <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     @for (step of tutorialSteps(); track step.num; let i = $index) {
                       <button
-                        class="step-card animate-kpi-in bg-white rounded-2xl border shadow-card
+                        class="step-card animate-kpi-in bg-white dark:bg-zinc-900 rounded-2xl border shadow-card
                                hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200
                                p-4 text-left cursor-pointer group relative overflow-hidden"
                         [ngClass]="step.done ? 'border-emerald-100 ring-1 ring-emerald-50' : 'border-zinc-100'"
@@ -465,7 +465,7 @@ interface SettingItem {
 
                         <!-- Large muted step number as bg decoration -->
                         <span class="absolute bottom-1 right-2 text-5xl font-bold select-none leading-none font-display"
-                              [ngClass]="step.done ? 'text-emerald-50' : 'text-zinc-50'">
+                              [ngClass]="step.done ? 'text-emerald-50 dark:text-emerald-900/20' : 'text-zinc-50 dark:text-zinc-800'">
                           {{ step.num }}
                         </span>
 
@@ -480,10 +480,10 @@ interface SettingItem {
                         </div>
 
                         <!-- Title + description -->
-                        <p class="text-[12px] font-bold text-zinc-900 font-display mb-1 leading-snug relative z-10">
+                        <p class="text-[12px] font-bold text-zinc-900 dark:text-zinc-100 font-display mb-1 leading-snug relative z-10">
                           {{ step.title }}
                         </p>
-                        <p class="text-[10px] text-zinc-400 font-body leading-relaxed relative z-10 line-clamp-2">
+                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body leading-relaxed relative z-10 line-clamp-2">
                           {{ step.desc }}
                         </p>
 
@@ -504,7 +504,7 @@ interface SettingItem {
                   </div>
 
                   <!-- AI tip banner -->
-                  <div class="mt-3 flex items-center gap-3 px-4 py-3 bg-brand-50 rounded-2xl border border-brand-100 animate-fade-in"
+                  <div class="mt-3 flex items-center gap-3 px-4 py-3 bg-brand-50 dark:bg-brand-950/40 rounded-2xl border border-brand-100 dark:border-brand-900/50 animate-fade-in"
                        style="animation-delay: 560ms">
                     <div class="w-8 h-8 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
                       <svg class="w-4 h-4 text-brand-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
@@ -512,14 +512,14 @@ interface SettingItem {
                       </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="text-xs font-semibold text-brand-700 font-body">Suggerimento</p>
-                      <p class="text-[11px] text-brand-600 font-body leading-relaxed">
+                      <p class="text-xs font-semibold text-brand-700 dark:text-brand-300 font-body">Suggerimento</p>
+                      <p class="text-[11px] text-brand-600 dark:text-brand-400 font-body leading-relaxed">
                         Dopo il wizard, usa l'AI Copilot per simulare scenari what-if in pochi secondi.
                       </p>
                     </div>
                     <button (click)="toggleAi()"
-                            class="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-semibold text-brand-600
-                                   hover:text-brand-800 px-3 py-1.5 bg-white rounded-xl border border-brand-200
+                            class="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-semibold text-brand-600 dark:text-brand-400
+                                   hover:text-brand-800 dark:hover:text-brand-200 px-3 py-1.5 bg-white dark:bg-zinc-900 rounded-xl border border-brand-200 dark:border-brand-800
                                    hover:border-brand-300 transition-all font-body whitespace-nowrap">
                       Apri AI
                       <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
