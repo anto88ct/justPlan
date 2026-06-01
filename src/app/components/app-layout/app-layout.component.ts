@@ -242,13 +242,13 @@ interface SettingItem {
       <header class="h-12 bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800 flex items-center px-3 md:px-5 gap-1 md:gap-2 flex-shrink-0 shadow-sm overflow-hidden">
         <button (click)="sidebarOpen.set(true)"
                 class="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex-shrink-0">
-          <svg class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg class="w-4 h-4 text-zinc-600 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
         <div class="flex items-center gap-1.5 text-xs font-body">
           <span class="text-zinc-400 dark:text-zinc-500">AirPlan</span>
-          <svg class="w-3 h-3 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg class="w-3 h-3 text-zinc-300 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>
           <span class="text-zinc-700 dark:text-zinc-300 font-semibold">{{ currentTitle() }}</span>
@@ -777,7 +777,7 @@ interface SettingItem {
                   <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                   </svg>
-                  <span class="text-sm font-semibold text-zinc-800 font-body">AI Copilot</span>
+                  <span class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body">AI Copilot</span>
                 </div>
                 <button (click)="toggleAi()"
                         class="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
@@ -806,7 +806,7 @@ interface SettingItem {
                   <svg class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                   </svg>
-                  <span class="text-xs font-semibold text-zinc-600 font-body">AI Copilot</span>
+                  <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body">AI Copilot</span>
                 </div>
                 <div class="flex items-center gap-0.5">
                   @if (chatDesktopFullscreen()) {
