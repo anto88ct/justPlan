@@ -552,13 +552,13 @@ interface SettingItem {
             <div class="view-enter h-full overflow-y-auto scrollbar-thin p-8">
               <div class="max-w-xl mx-auto">
                 <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">Scenari</p>
-                <h1 class="text-2xl font-bold text-zinc-900 font-display mb-1">What-If Simulator</h1>
-                <p class="text-sm text-zinc-500 font-body mb-7">Clicca uno scenario per aprirlo nell'AI Copilot.</p>
+                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display mb-1">What-If Simulator</h1>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mb-7">Clicca uno scenario per aprirlo nell'AI Copilot.</p>
                 <div class="space-y-3">
                   @for (s of scenariExamples; track s.q; let i = $index) {
                     <button
-                      class="w-full bg-white rounded-2xl border border-zinc-100 p-4 shadow-card text-left
-                             hover:border-brand-200 hover:shadow-card-hover hover:-translate-y-0.5
+                      class="w-full bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-4 shadow-card text-left
+                             hover:border-brand-200 dark:hover:border-brand-800 hover:shadow-card-hover hover:-translate-y-0.5
                              transition-all duration-200 group"
                       [style.animation-delay]="(i * 65 + 50) + 'ms'"
                       style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;"
@@ -573,10 +573,10 @@ interface SettingItem {
                           </svg>
                         </div>
                         <div class="flex-1 min-w-0">
-                          <p class="text-sm font-semibold text-zinc-800 font-body group-hover:text-brand-700 transition-colors">
+                          <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body group-hover:text-brand-700 dark:group-hover:text-brand-400 transition-colors">
                             {{ s.title }}
                           </p>
-                          <p class="text-xs text-zinc-400 font-body mt-0.5 italic truncate">"{{ s.q }}"</p>
+                          <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5 italic truncate">"{{ s.q }}"</p>
                         </div>
                         <svg class="w-4 h-4 text-zinc-300 group-hover:text-brand-500 group-hover:translate-x-0.5
                                     transition-all flex-shrink-0"
@@ -588,9 +588,9 @@ interface SettingItem {
                   }
                 </div>
                 @if (!hasPlan()) {
-                  <div class="mt-6 p-4 bg-amber-50 rounded-2xl border border-amber-100"
+                  <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-100 dark:border-amber-900/40"
                        style="animation: viewEnter 0.5s 0.3s cubic-bezier(0.16,1,0.3,1) both;">
-                    <p class="text-sm text-amber-700 font-body">
+                    <p class="text-sm text-amber-700 dark:text-amber-400 font-body">
                       <strong>Prima</strong> genera un Business Plan.
                       <button (click)="goToWizard()" class="ml-1 underline font-bold hover:text-amber-900 transition-colors">
                         Vai al wizard →
@@ -609,8 +609,8 @@ interface SettingItem {
                 <div class="flex items-start justify-between mb-7">
                   <div>
                     <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">Archivio</p>
-                    <h1 class="text-2xl font-bold text-zinc-900 font-display">I Miei Piani</h1>
-                    <p class="text-sm text-zinc-500 font-body mt-1">{{ planService.savedPlans().length }} piani salvati</p>
+                    <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display">I Miei Piani</h1>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mt-1">{{ planService.savedPlans().length }} piani salvati</p>
                   </div>
                   <button (click)="goToWizard()"
                           class="flex items-center gap-2 px-4 py-2.5 bg-brand-600 hover:bg-brand-500
@@ -624,26 +624,26 @@ interface SettingItem {
                 </div>
                 @if (planService.savedPlans().length === 0) {
                   <div class="text-center py-20">
-                    <div class="w-16 h-16 rounded-2xl bg-zinc-100 flex items-center justify-center mx-auto mb-4 float-anim">
-                      <svg class="w-7 h-7 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                    <div class="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4 float-anim">
+                      <svg class="w-7 h-7 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12l1-12"/>
                       </svg>
                     </div>
-                    <p class="text-sm font-semibold text-zinc-600 font-display mb-1">Nessun piano salvato</p>
-                    <p class="text-xs text-zinc-400 font-body">Genera un piano e premi "Salva Business Plan".</p>
+                    <p class="text-sm font-semibold text-zinc-600 dark:text-zinc-400 font-display mb-1">Nessun piano salvato</p>
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Genera un piano e premi "Salva Business Plan".</p>
                   </div>
                 } @else {
                   <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     @for (plan of planService.savedPlans(); track plan.id; let i = $index) {
-                      <div class="bg-white rounded-2xl border border-zinc-100 shadow-card hover:shadow-card-hover
+                      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-card hover:shadow-card-hover
                                   hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
                            [style.animation-delay]="(i * 60) + 'ms'"
                            style="animation: viewEnter 0.4s cubic-bezier(0.16,1,0.3,1) both;">
-                        <div class="px-5 pt-5 pb-4 border-b border-zinc-50">
+                        <div class="px-5 pt-5 pb-4 border-b border-zinc-50 dark:border-zinc-800">
                           <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
-                              <p class="text-sm font-bold text-zinc-900 font-display truncate">{{ plan.name }}</p>
-                              <p class="text-xs text-zinc-400 font-body mt-0.5">{{ formatDate(plan.savedAt) }}</p>
+                              <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-display truncate">{{ plan.name }}</p>
+                              <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ formatDate(plan.savedAt) }}</p>
                             </div>
                             <button (click)="planService.deletePlan(plan.id)"
                                     class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0
@@ -656,24 +656,24 @@ interface SettingItem {
                         </div>
                         <div class="px-5 py-4 grid grid-cols-2 gap-3">
                           <div>
-                            <p class="text-xs text-zinc-400 font-body">Fatturato Y1</p>
-                            <p class="text-sm font-bold text-zinc-800 font-mono mt-0.5">{{ formatK(plan.kpi.fatturatoTotale) }}</p>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Fatturato Y1</p>
+                            <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">{{ formatK(plan.kpi.fatturatoTotale) }}</p>
                           </div>
                           <div>
-                            <p class="text-xs text-zinc-400 font-body">EBITDA Y1</p>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">EBITDA Y1</p>
                             <p [ngClass]="['text-sm font-bold font-mono mt-0.5', plan.kpi.ebitda >= 0 ? 'text-emerald-600' : 'text-rose-500']">
                               {{ formatK(plan.kpi.ebitda) }}
                             </p>
                           </div>
                           <div>
-                            <p class="text-xs text-zinc-400 font-body">Utile Netto</p>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Utile Netto</p>
                             <p [ngClass]="['text-sm font-bold font-mono mt-0.5', plan.kpi.utileNetto >= 0 ? 'text-zinc-800' : 'text-rose-500']">
                               {{ formatK(plan.kpi.utileNetto) }}
                             </p>
                           </div>
                           <div>
-                            <p class="text-xs text-zinc-400 font-body">Cash Runway</p>
-                            <p class="text-sm font-bold text-zinc-800 font-mono mt-0.5">{{ plan.kpi.cashRunway }} mesi</p>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Cash Runway</p>
+                            <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">{{ plan.kpi.cashRunway }} mesi</p>
                           </div>
                         </div>
                         <div class="px-5 pb-4">
@@ -688,7 +688,7 @@ interface SettingItem {
                         <div class="px-5 pb-5">
                           <button (click)="loadAndNavigate(plan)"
                                   class="w-full flex items-center justify-center gap-2 px-4 py-2.5
-                                         bg-zinc-950 hover:bg-zinc-800 text-white text-xs font-semibold
+                                         bg-zinc-950 dark:bg-zinc-800 hover:bg-zinc-800 dark:hover:bg-zinc-700 text-white text-xs font-semibold
                                          rounded-xl transition-all duration-200 font-body">
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
