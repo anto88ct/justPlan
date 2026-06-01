@@ -723,25 +723,25 @@ interface SettingItem {
             <div class="view-enter h-full overflow-y-auto scrollbar-thin p-8">
               <div class="max-w-lg mx-auto">
                 <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">Config</p>
-                <h1 class="text-2xl font-bold text-zinc-900 font-display mb-7">Impostazioni</h1>
+                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display mb-7">Impostazioni</h1>
                 <div class="space-y-4">
                   @for (section of settingSections; track section.label; let i = $index) {
-                    <div class="bg-white rounded-2xl border border-zinc-100 p-5 shadow-card"
+                    <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-card"
                          [style.animation-delay]="(i * 70 + 50) + 'ms'"
                          style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;">
-                      <p class="text-xs font-bold text-zinc-400 uppercase tracking-widest font-body mb-4">{{ section.label }}</p>
+                      <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-4">{{ section.label }}</p>
                       <div class="space-y-4">
                         @for (item of section.items; track item.key) {
                           <div class="flex items-center justify-between">
                             <div class="flex-1 pr-4">
-                              <p class="text-sm font-medium text-zinc-700 font-body">{{ item.label }}</p>
-                              <p class="text-xs text-zinc-400 font-body mt-0.5">{{ item.desc }}</p>
+                              <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300 font-body">{{ item.label }}</p>
+                              <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ item.desc }}</p>
                             </div>
                             <button
                               (click)="toggleSettingItem(item)"
                               [ngClass]="[
                                 'relative w-11 h-6 rounded-full transition-all duration-300 flex-shrink-0',
-                                item.enabled ? 'bg-brand-600' : 'bg-zinc-200'
+                                item.enabled ? 'bg-brand-600' : 'bg-zinc-200 dark:bg-zinc-700'
                               ]">
                               <div [ngClass]="[
                                 'absolute top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all duration-300',
