@@ -8,7 +8,28 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\anton\\\\OneDrive\\\\Desktop\\\\PROGETTI\\\\justPlan\" -Recurse -Directory)",
       "Bash(Select-Object -ExpandProperty FullName)",
       "Bash(Sort-Object)",
-      "Bash(npx ng *)"
+      "Bash(npx ng *)",
+      "Bash(npm install *)",
+      "Bash(node -e \"require\\('ng-apexcharts'\\); console.log\\('ok'\\)\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/@angular/core/package.json'\\).version\\)\")",
+      "Bash(node -e \"console.log\\(require\\('./node_modules/ng-apexcharts/package.json'\\).version\\)\")",
+      "Bash(npx tsc *)",
+      "Bash(findstr /i \"material\")",
+      "Bash(findstr \"angular\")",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('@angular/core:', p.dependencies['@angular/core']\\); console.log\\('@angular/material:', p.dependencies['@angular/material']\\); console.log\\('@angular/cdk:', p.dependencies['@angular/cdk']\\);\")",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\('@angular/material:', p.dependencies['@angular/material']\\);\")",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(node -c tailwind.config.js)",
+      "Bash(npm test *)",
+      "Bash(git stash *)",
+      "Bash(npm start *)",
+      "Bash(npm list *)",
+      "Bash(curl -s http://localhost:4200/)",
+      "Bash(node test-dark-settings.js)",
+      "Bash(cat)",
+      "Read(//tmp/**)",
+      "Bash(npm run *)"
     ]
   }
 }

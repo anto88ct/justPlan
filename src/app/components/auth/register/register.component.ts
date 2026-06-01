@@ -1,7 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -26,6 +26,7 @@ import { RouterLink } from '@angular/router';
     .auth-enter-d4 { animation: authEnter 0.55s 0.28s cubic-bezier(0.16,1,0.3,1) both; }
     .auth-enter-d5 { animation: authEnter 0.55s 0.35s cubic-bezier(0.16,1,0.3,1) both; }
     .auth-enter-d6 { animation: authEnter 0.55s 0.42s cubic-bezier(0.16,1,0.3,1) both; }
+    .auth-enter-d7 { animation: authEnter 0.55s 0.49s cubic-bezier(0.16,1,0.3,1) both; }
 
     .orb-1 { animation: floatOrb 7s ease-in-out infinite; }
     .orb-2 { animation: floatOrb 9s ease-in-out 2s infinite; }
@@ -193,8 +194,19 @@ import { RouterLink } from '@angular/router';
                             border border-zinc-800 bg-zinc-900" />
             </div>
 
-            <!-- Email -->
+            <!-- Nome azienda (opzionale) -->
             <div class="auth-enter-d3">
+              <label class="block text-xs font-semibold text-zinc-400 font-body mb-1.5 uppercase tracking-wide">
+                Nome azienda <span class="text-zinc-600 font-normal normal-case">(opzionale)</span>
+              </label>
+              <input type="text" [(ngModel)]="companyName" name="companyName"
+                     placeholder="La tua startup"
+                     class="field-input w-full px-4 py-3 rounded-xl text-sm font-body text-white placeholder-zinc-600
+                            border border-zinc-800 bg-zinc-900" />
+            </div>
+
+            <!-- Email -->
+            <div class="auth-enter-d4">
               <label class="block text-xs font-semibold text-zinc-400 font-body mb-1.5 uppercase tracking-wide">
                 Email
               </label>
@@ -205,7 +217,7 @@ import { RouterLink } from '@angular/router';
             </div>
 
             <!-- Password -->
-            <div class="auth-enter-d4">
+            <div class="auth-enter-d5">
               <label class="block text-xs font-semibold text-zinc-400 font-body mb-1.5 uppercase tracking-wide">
                 Password
               </label>
@@ -247,7 +259,7 @@ import { RouterLink } from '@angular/router';
             </div>
 
             <!-- Confirm Password -->
-            <div class="auth-enter-d5">
+            <div class="auth-enter-d6">
               <label class="block text-xs font-semibold text-zinc-400 font-body mb-1.5 uppercase tracking-wide">
                 Conferma password
               </label>
@@ -266,7 +278,7 @@ import { RouterLink } from '@angular/router';
             </div>
 
             <!-- Submit -->
-            <div class="pt-2 auth-enter-d6">
+            <div class="pt-2 auth-enter-d7">
               <button type="submit"
                       [disabled]="loading() || (!!confirmPassword && password !== confirmPassword)"
                       class="btn-primary w-full py-3 px-4 rounded-xl text-sm font-bold font-body text-white
@@ -287,7 +299,7 @@ import { RouterLink } from '@angular/router';
             </div>
           </form>
 
-          <p class="mt-6 text-xs text-zinc-700 font-body text-center auth-enter-d6">
+          <p class="mt-6 text-xs text-zinc-700 font-body text-center auth-enter-d7">
             Creando un account accetti i nostri
             <a href="#" class="text-zinc-500 hover:text-zinc-300 underline transition-colors">Termini di servizio</a>
             e la
@@ -299,8 +311,11 @@ import { RouterLink } from '@angular/router';
   `,
 })
 export class RegisterComponent {
+  private readonly router = inject(Router);
+
   name = '';
   email = '';
+  companyName = '';
   password = '';
   confirmPassword = '';
 
@@ -354,11 +369,15 @@ export class RegisterComponent {
     this.loading.set(true);
     console.log('Registrazione con:', this.name, this.email, this.password);
     // TODO: chiamata API di registrazione → replace setTimeout con HTTP call
-    setTimeout(() => this.loading.set(false), 1200);
+    setTimeout(() => {
+      this.loading.set(false);
+      this.router.navigate(['/app']);
+    }, 1000);
   }
 
   onGoogleRegister(): void {
     console.log('Registrazione con Google avviata');
     // TODO: integrare Google OAuth provider
+    this.router.navigate(['/app']);
   }
 }

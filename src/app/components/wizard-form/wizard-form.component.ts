@@ -158,6 +158,92 @@ interface LoanItem {
       background: white; border: 1.5px solid #e4e4e7; border-radius: 7px; outline: none;
     }
     .month-inp:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99,102,241,0.1); }
+
+    .tt-wrap { position: relative; display: inline-flex; align-items: center; }
+
+    .help-btn {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #f4f4f6; color: #8b8b9e;
+      border: 1.5px solid #dddde8; cursor: help;
+      font-size: 11px; font-weight: 800;
+      display: inline-flex; align-items: center; justify-content: center;
+      flex-shrink: 0; padding: 0; line-height: 1;
+      font-family: 'Outfit', sans-serif;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+    .help-btn:hover, .help-btn:focus {
+      background: #ede9fe; color: #6366f1; border-color: #c4b5fd;
+      transform: scale(1.15); box-shadow: 0 2px 10px rgba(99,102,241,0.22);
+      outline: none;
+    }
+
+    .tt-box {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%) translateY(6px);
+      width: 270px;
+      padding: 13px 15px;
+      background: #1a1a2e;
+      color: #dcdcef;
+      font-size: 12.5px;
+      font-weight: 400;
+      line-height: 1.62;
+      border-radius: 13px;
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s cubic-bezier(0.16,1,0.3,1),
+                  visibility 0.2s,
+                  transform 0.2s cubic-bezier(0.16,1,0.3,1);
+      z-index: 300;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.32), 0 2px 8px rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.07);
+      font-family: 'Outfit', sans-serif;
+      text-transform: none;
+      letter-spacing: normal;
+      white-space: normal;
+    }
+    .tt-box::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1a1a2e;
+    }
+    .tt-wrap:hover .tt-box,
+    .tt-wrap:focus-within .tt-box {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Mobile: flip downward + anchor left to avoid viewport overflow */
+    @media (max-width: 640px) {
+      .tt-box {
+        bottom: auto;
+        top: calc(100% + 8px);
+        left: 0;
+        transform: translateY(6px);
+        width: min(270px, calc(100vw - 40px));
+        max-width: calc(100vw - 40px);
+        font-size: 12px;
+      }
+      .tt-box::after {
+        top: auto;
+        bottom: 100%;
+        left: 8px;
+        transform: none;
+        border-top-color: transparent;
+        border-bottom-color: #1a1a2e;
+      }
+      .tt-wrap:hover .tt-box,
+      .tt-wrap:focus-within .tt-box {
+        transform: translateY(0);
+      }
+    }
   `],
   template: `
     <!-- ═══ STEPPER ══════════════════════════════════════════════════════════ -->
@@ -242,8 +328,9 @@ interface LoanItem {
               <!-- IRES + IRAP -->
               <div class="grid grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide">
+                  <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide w-full">
                     IRES — <span class="text-brand-600 font-bold normal-case">{{ config.iresRate }}%</span>
+                    <span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info IRES">?</button><span class="tt-box">Imposta sul Reddito delle Società. Aliquota standard italiana: 24%. Calcolata sull'utile imponibile al netto delle deduzioni fiscali di legge.</span></span>
                   </label>
                   <input type="range" [(ngModel)]="config.iresRate" name="iresRate"
                          min="0" max="50" step="0.5" class="w-full mt-1"
@@ -253,8 +340,9 @@ interface LoanItem {
                   </div>
                 </div>
                 <div>
-                  <label class="block text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide">
+                  <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide w-full">
                     IRAP — <span class="text-brand-600 font-bold normal-case">{{ config.irapRate }}%</span>
+                    <span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info IRAP">?</button><span class="tt-box">Imposta Regionale sulle Attività Produttive. Aliquota base: 4% (varia per regione e settore). Si calcola sul valore della produzione netta, non sull'utile.</span></span>
                   </label>
                   <input type="range" [(ngModel)]="config.irapRate" name="irapRate"
                          min="0" max="10" step="0.1" class="w-full mt-1"
@@ -267,7 +355,7 @@ interface LoanItem {
 
               <!-- Accantonamento Rischi Crediti -->
               <div>
-                <label class="block text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide">Accantonamento Rischi Crediti</label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide w-full">Accantonamento Rischi Crediti<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Accantonamento">?</button><span class="tt-box">Percentuale dei ricavi accantonata come riserva per crediti non incassabili (clienti insolventi). Tipicamente 0.1%–1% per PMI. Deduce dall'utile imponibile.</span></span></label>
                 <div class="flex items-center gap-3">
                   <div class="relative" style="width: 160px;">
                     <input type="number" [(ngModel)]="config.badDebtPct" name="badDebtPct"
@@ -372,7 +460,7 @@ interface LoanItem {
                              placeholder="es. Piano SaaS Pro" class="inp"/>
                     </div>
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Prezzo Unitario</label>
+                      <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Prezzo Unitario<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Prezzo Unitario">?</button><span class="tt-box">Prezzo di vendita netto IVA per singola unità, abbonamento o servizio. Moltiplicato per i volumi mensili dà il fatturato di quel mese.</span></span></label>
                       <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-brand-500 font-bold text-sm pointer-events-none">€</span>
                         <input type="number" [(ngModel)]="products[pi].unitPrice" [name]="'pPrice_' + p.id"
@@ -404,7 +492,7 @@ interface LoanItem {
                   @if (products[pi].volumeMode === 'linear') {
                     <div class="grid grid-cols-2 gap-3 mb-3">
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Volume Iniziale (mese 1)</label>
+                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Volume Iniziale (mese 1)<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Volume Iniziale">?</button><span class="tt-box">Numero di unità vendute nel primo mese del piano. È il punto di partenza da cui si applica la crescita mensile percentuale per i mesi successivi.</span></span></label>
                         <div class="flex items-center gap-1.5">
                           <button type="button" (click)="products[pi].linearStart = Math.max(1, products[pi].linearStart - 10)"
                                   class="w-8 h-8 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 flex items-center justify-center text-zinc-500 transition-all font-mono flex-shrink-0">−</button>
@@ -415,7 +503,7 @@ interface LoanItem {
                         </div>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Crescita Mensile</label>
+                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Crescita Mensile<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Crescita Mensile">?</button><span class="tt-box">Tasso % di crescita dei volumi mese su mese. Es. 10% = ogni mese vendi il 10% in più del mese precedente. Inserisci 0% per volumi costanti.</span></span></label>
                         <div class="relative">
                           <input type="number" [(ngModel)]="products[pi].linearGrowthPct" [name]="'pGrowth_' + p.id"
                                  min="0" max="200" step="0.5" class="inp inp-suffix font-mono font-semibold"/>
@@ -456,7 +544,7 @@ interface LoanItem {
 
                   <!-- Dilazione incassi -->
                   <div class="mt-3">
-                    <label class="block text-xs font-semibold text-zinc-500 mb-1.5 font-body">Dilazione Incassi Clienti</label>
+                    <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1.5 font-body">Dilazione Incassi Clienti<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Dilazione Incassi">?</button><span class="tt-box">Giorni medi tra la data di fattura e l'effettivo incasso dal cliente. Influenza il cash flow: più alta la dilazione, maggiore il fabbisogno di cassa.</span></span></label>
                     <div class="flex gap-1.5">
                       @for (d of collectionDelays; track d.value) {
                         <button type="button"
@@ -573,7 +661,7 @@ interface LoanItem {
 
                     <div class="grid grid-cols-2 gap-3">
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">RAL (€/anno)</label>
+                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">RAL (€/anno)<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info RAL">?</button><span class="tt-box">Retribuzione Annua Lorda: importo annuo lordo del dipendente prima delle tasse. Il costo aziendale effettivo è maggiore, includendo INPS, INAIL e TFR.</span></span></label>
                         <div class="relative">
                           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                           <input type="number" [(ngModel)]="employees[ei].ral" [name]="'eRal_' + e.id"
@@ -581,7 +669,7 @@ interface LoanItem {
                         </div>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">FTE</label>
+                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">FTE<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info FTE">?</button><span class="tt-box">Full-Time Equivalent. 1.0 = tempo pieno. 0.5 = part-time al 50%. Scala proporzionalmente la RAL e tutti i contributi a carico azienda.</span></span></label>
                         <div class="flex items-center gap-1.5">
                           <button type="button"
                                   (click)="employees[ei].fte = +(Math.max(0.1, employees[ei].fte - 0.5)).toFixed(1)"
@@ -667,7 +755,7 @@ interface LoanItem {
 
                     <div class="grid grid-cols-2 gap-3 mb-3">
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Tipo</label>
+                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Tipo<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Tipo">?</button><span class="tt-box">Scegli come esprimere il costo: "% Fatt." lo calcola come percentuale del fatturato; "€/Anno" usa un importo fisso annuo indipendente dai ricavi.</span></span></label>
                         <div class="flex bg-zinc-100 p-0.5 rounded-lg gap-0.5">
                           <button type="button"
                                   (click)="variableCosts[ci].valueType = 'pct'"
@@ -684,8 +772,8 @@ interface LoanItem {
                         </div>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">
-                          {{ variableCosts[ci].valueType === 'pct' ? 'Percentuale' : 'Importo annuo' }}
+                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">
+                          {{ variableCosts[ci].valueType === 'pct' ? 'Percentuale' : 'Importo annuo' }}<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Valore">?</button><span class="tt-box">Se "% Fatt.": percentuale del fatturato destinata a questo costo (es. 5% = €5 ogni €100 incassati). Se "€/Anno": importo fisso annuo in euro.</span></span>
                         </label>
                         <div class="relative">
                           @if (variableCosts[ci].valueType === 'abs') {
@@ -705,7 +793,7 @@ interface LoanItem {
 
                     <div class="grid grid-cols-2 gap-3">
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Aliquota IVA</label>
+                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Aliquota IVA<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info IVA">?</button><span class="tt-box">Percentuale IVA applicata a questo costo. 22% per la maggior parte di beni/servizi, 10% o 4% per categorie agevolate, 0% se esente.</span></span></label>
                         <select [(ngModel)]="variableCosts[ci].vatRate" [name]="'vcVat_' + c.id" class="inp text-sm">
                           <option [value]="0">0% — Esente</option>
                           <option [value]="4">4% — Ridotta</option>
@@ -714,7 +802,7 @@ interface LoanItem {
                         </select>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Dilazione Fornitori</label>
+                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Dilazione Fornitori<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Dilazione Fornitori">?</button><span class="tt-box">Giorni medi prima di pagare il fornitore dopo la ricezione della merce/servizio. Una dilazione più lunga migliora il capitale circolante (working capital).</span></span></label>
                         <select [(ngModel)]="variableCosts[ci].paymentDelay" [name]="'vcDel_' + c.id" class="inp text-sm">
                           <option [value]="0">Immediato (0 gg)</option>
                           <option [value]="30">30 giorni</option>
@@ -943,7 +1031,7 @@ interface LoanItem {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
                 </div>
-                <p class="text-xs font-bold text-zinc-700 font-body uppercase tracking-wide">Capitale Sociale / Equity</p>
+                <p class="flex items-center gap-1.5 text-xs font-bold text-zinc-700 font-body uppercase tracking-wide">Capitale Sociale / Equity<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Equity">?</button><span class="tt-box">Capitale versato dai soci o da investitori. Aumenta il patrimonio netto senza creare debito. Inserisci ogni round di investimento come iniezione separata con mese e anno.</span></span></p>
               </div>
 
               <div class="space-y-3">

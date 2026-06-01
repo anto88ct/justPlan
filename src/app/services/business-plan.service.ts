@@ -176,6 +176,8 @@ export class BusinessPlanService {
   readonly cashFlow = signal<CashFlowPoint[]>(this.baseCashFlow.map(p => ({ ...p })));
   readonly incomeStatement = signal<IncomeRow[]>(this.baseIncome.map(r => ({ ...r })));
   readonly isAiUpdated = signal(false);
+  readonly currentProjectName = signal<string>('');
+  readonly currentStartYear = signal<number>(new Date().getFullYear());
 
   readonly kpiDelta = computed(() => {
     if (!this.isAiUpdated()) return null;
@@ -524,6 +526,10 @@ export class BusinessPlanService {
       cashRunway,
     };
 
+    // ── Store project metadata ────────────────────────────────────────────
+    this.currentProjectName.set(config.projectName || 'Business Plan');
+    this.currentStartYear.set(config.startYear);
+
     // ── Persist as base for reset/AI scenario ──────────────────────────────
     this._computedBase = {
       kpi:            { ...kpiResult },
@@ -540,7 +546,7 @@ export class BusinessPlanService {
   // ── Existing helpers ─────────────────────────────────────────────────────
 
   savePlan(name?: string): void {
-    const planName = name ?? `Business Plan ${new Date().toLocaleDateString('it-IT')}`;
+    const planName = name || this.currentProjectName() || `Business Plan ${new Date().toLocaleDateString('it-IT')}`;
     const newPlan: SavedPlan = {
       id: `plan-${Date.now()}`,
       name: planName,
