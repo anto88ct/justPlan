@@ -578,7 +578,7 @@ interface SettingItem {
                           </p>
                           <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5 italic truncate">"{{ s.q }}"</p>
                         </div>
-                        <svg class="w-4 h-4 text-zinc-300 group-hover:text-brand-500 group-hover:translate-x-0.5
+                        <svg class="w-4 h-4 text-zinc-300 dark:text-zinc-600 group-hover:text-brand-500 dark:group-hover:text-brand-400 group-hover:translate-x-0.5
                                     transition-all flex-shrink-0"
                              fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
@@ -592,7 +592,7 @@ interface SettingItem {
                        style="animation: viewEnter 0.5s 0.3s cubic-bezier(0.16,1,0.3,1) both;">
                     <p class="text-sm text-amber-700 dark:text-amber-400 font-body">
                       <strong>Prima</strong> genera un Business Plan.
-                      <button (click)="goToWizard()" class="ml-1 underline font-bold hover:text-amber-900 transition-colors">
+                      <button (click)="goToWizard()" class="ml-1 underline font-bold hover:text-amber-900 dark:hover:text-amber-200 transition-colors">
                         Vai al wizard →
                       </button>
                     </p>
@@ -625,7 +625,7 @@ interface SettingItem {
                 @if (planService.savedPlans().length === 0) {
                   <div class="text-center py-20">
                     <div class="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4 float-anim">
-                      <svg class="w-7 h-7 text-zinc-400 dark:text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                      <svg class="w-7 h-7 text-zinc-400 dark:text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12l1-12"/>
                       </svg>
                     </div>
@@ -647,7 +647,7 @@ interface SettingItem {
                             </div>
                             <button (click)="planService.deletePlan(plan.id)"
                                     class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0
-                                           text-zinc-300 hover:text-rose-500 hover:bg-rose-50 transition-all">
+                                           text-zinc-300 dark:text-zinc-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all">
                               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                               </svg>
