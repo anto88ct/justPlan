@@ -236,35 +236,35 @@ interface SettingItem {
     </aside>
 
     <!-- ═══════════════════ MAIN ═══════════════════ -->
-    <main class="flex-1 flex flex-col overflow-hidden bg-zinc-50 min-w-0">
+    <main class="flex-1 flex flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-950 min-w-0">
 
       <!-- Topbar -->
-      <header class="h-12 bg-white border-b border-zinc-100 flex items-center px-3 md:px-5 gap-1 md:gap-2 flex-shrink-0 shadow-sm overflow-hidden">
+      <header class="h-12 bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800 flex items-center px-3 md:px-5 gap-1 md:gap-2 flex-shrink-0 shadow-sm overflow-hidden">
         <button (click)="sidebarOpen.set(true)"
-                class="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-zinc-100 transition-colors flex-shrink-0">
+                class="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex-shrink-0">
           <svg class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
         <div class="flex items-center gap-1.5 text-xs font-body">
-          <span class="text-zinc-400">AirPlan</span>
+          <span class="text-zinc-400 dark:text-zinc-500">AirPlan</span>
           <svg class="w-3 h-3 text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>
-          <span class="text-zinc-700 font-semibold">{{ currentTitle() }}</span>
+          <span class="text-zinc-700 dark:text-zinc-300 font-semibold">{{ currentTitle() }}</span>
         </div>
 
         <div class="flex-1"></div>
 
         @if (currentView() === 'dashboard') {
           <button (click)="goToWizard()"
-                  class="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-800 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-zinc-100 transition-all font-body flex-shrink-0">
+                  class="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all font-body flex-shrink-0">
             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
             </svg>
             <span class="hidden sm:inline">Modifica</span>
           </button>
-          <button (click)="exportPdf()" class="flex items-center gap-1.5 text-xs text-zinc-600 px-2 sm:px-3 py-1.5 rounded-lg border border-zinc-200 hover:border-zinc-300 bg-white transition-all font-body flex-shrink-0">
+          <button (click)="exportPdf()" class="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400 px-2 sm:px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 bg-white dark:bg-zinc-800 transition-all font-body flex-shrink-0">
             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
@@ -772,7 +772,7 @@ interface SettingItem {
 
             <!-- Mobile header with close button -->
             @if (!isLargeScreen()) {
-              <div class="flex items-center justify-between px-4 h-12 border-b border-zinc-100 flex-shrink-0 bg-white">
+              <div class="flex items-center justify-between px-4 h-12 border-b border-zinc-100 dark:border-zinc-800 flex-shrink-0 bg-white dark:bg-zinc-900">
                 <div class="flex items-center gap-2">
                   <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
@@ -780,7 +780,7 @@ interface SettingItem {
                   <span class="text-sm font-semibold text-zinc-800 font-body">AI Copilot</span>
                 </div>
                 <button (click)="toggleAi()"
-                        class="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 hover:bg-zinc-100 transition-colors">
+                        class="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                   </svg>
@@ -791,17 +791,17 @@ interface SettingItem {
             <!-- Desktop resize handle (only when docked) -->
             @if (!chatDesktopFullscreen()) {
               <div class="hidden lg:flex w-2 flex-shrink-0 items-center justify-center
-                          cursor-col-resize group border-l border-zinc-100 hover:border-brand-300
+                          cursor-col-resize group border-l border-zinc-100 dark:border-zinc-800 hover:border-brand-300
                           transition-colors select-none"
                    (mousedown)="onResizeStart($event)">
-                <div class="w-0.5 h-8 rounded-full bg-zinc-200 group-hover:bg-brand-400 transition-colors"></div>
+                <div class="w-0.5 h-8 rounded-full bg-zinc-200 dark:bg-zinc-700 group-hover:bg-brand-400 transition-colors"></div>
               </div>
             }
 
             <div class="flex-1 overflow-hidden min-w-0 flex flex-col">
 
               <!-- Desktop toolbar with dock/fullscreen toggle -->
-              <div class="hidden lg:flex items-center justify-between px-3 h-10 border-b border-zinc-100 flex-shrink-0 bg-white">
+              <div class="hidden lg:flex items-center justify-between px-3 h-10 border-b border-zinc-100 dark:border-zinc-800 flex-shrink-0 bg-white dark:bg-zinc-900">
                 <div class="flex items-center gap-2">
                   <svg class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
@@ -813,8 +813,8 @@ interface SettingItem {
                     <!-- Dock back to side panel -->
                     <button (click)="chatDesktopFullscreen.set(false)"
                             title="Aggancia a destra"
-                            class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400
-                                   hover:text-zinc-700 hover:bg-zinc-100 transition-colors">
+                            class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 dark:text-zinc-500
+                                   hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M9 3H5a2 2 0 00-2 2v14a2 2 0 002 2h4M9 3v18M21 3h-4M21 21h-4M21 3v18"/>
@@ -824,8 +824,8 @@ interface SettingItem {
                     <!-- Expand to fullscreen -->
                     <button (click)="chatDesktopFullscreen.set(true)"
                             title="Schermo intero"
-                            class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400
-                                   hover:text-zinc-700 hover:bg-zinc-100 transition-colors">
+                            class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 dark:text-zinc-500
+                                   hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round"
                               d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
@@ -835,8 +835,8 @@ interface SettingItem {
                   <!-- Close -->
                   <button (click)="toggleAi()"
                           title="Chiudi"
-                          class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400
-                                 hover:text-zinc-700 hover:bg-zinc-100 transition-colors">
+                          class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 dark:text-zinc-500
+                                 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
