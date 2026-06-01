@@ -295,7 +295,7 @@ interface SettingItem {
                 [ngClass]="[
                   'flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border transition-all duration-200 font-body flex-shrink-0',
                   aiOpen() ? 'bg-brand-600 text-white border-brand-600 shadow-md shadow-brand-500/25'
-                           : 'bg-white text-zinc-600 border-zinc-200 hover:border-brand-300 hover:text-brand-600'
+                           : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-brand-300 hover:text-brand-600'
                 ]">
           <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
@@ -667,7 +667,7 @@ interface SettingItem {
                           </div>
                           <div>
                             <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Utile Netto</p>
-                            <p [ngClass]="['text-sm font-bold font-mono mt-0.5', plan.kpi.utileNetto >= 0 ? 'text-zinc-800' : 'text-rose-500']">
+                            <p [ngClass]="['text-sm font-bold font-mono mt-0.5', plan.kpi.utileNetto >= 0 ? 'text-zinc-800 dark:text-zinc-200' : 'text-rose-500']">
                               {{ formatK(plan.kpi.utileNetto) }}
                             </p>
                           </div>
@@ -679,7 +679,7 @@ interface SettingItem {
                         <div class="px-5 pb-4">
                           <div [ngClass]="[
                             'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-body',
-                            plan.kpi.ebitda >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'
+                            plan.kpi.ebitda >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
                           ]">
                             <div [ngClass]="['w-1.5 h-1.5 rounded-full', plan.kpi.ebitda >= 0 ? 'bg-emerald-500' : 'bg-amber-500']"></div>
                             {{ plan.kpi.ebitda >= 0 ? 'Piano sostenibile' : 'Rivedere i costi' }}
@@ -764,10 +764,10 @@ interface SettingItem {
         @if (aiOpen()) {
           <div [ngClass]="
                   isLargeScreen() && chatDesktopFullscreen()
-                    ? 'fixed inset-0 z-50 flex bg-white overflow-hidden'
+                    ? 'fixed inset-0 z-50 flex bg-white dark:bg-zinc-900 overflow-hidden'
                     : isLargeScreen()
-                      ? 'ai-enter flex-shrink-0 h-full flex border-l border-zinc-100 overflow-hidden'
-                      : 'fixed inset-0 z-50 flex flex-col bg-white overflow-hidden'"
+                      ? 'ai-enter flex-shrink-0 h-full flex border-l border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden'
+                      : 'fixed inset-0 z-50 flex flex-col bg-white dark:bg-zinc-900 overflow-hidden'"
                [style.width]="isLargeScreen() && !chatDesktopFullscreen() ? chatWidth() + 'px' : null">
 
             <!-- Mobile header with close button -->
@@ -904,25 +904,25 @@ export class AppLayoutComponent implements OnInit {
   scenariExamples = [
     {
       iconPath: 'M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-      iconBg: 'bg-blue-50', iconColor: 'text-blue-500',
+      iconBg: 'bg-blue-50 dark:bg-blue-900/30', iconColor: 'text-blue-500 dark:text-blue-400',
       title: 'Variazione Prezzo',
       q: 'Cosa succede se alzo il prezzo a 59€?',
     },
     {
       iconPath: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
-      iconBg: 'bg-violet-50', iconColor: 'text-violet-500',
+      iconBg: 'bg-violet-50 dark:bg-violet-900/30', iconColor: 'text-violet-500 dark:text-violet-400',
       title: 'Espansione Team',
       q: 'Simula 2 dipendenti in più dal Q3',
     },
     {
       iconPath: 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6',
-      iconBg: 'bg-emerald-50', iconColor: 'text-emerald-500',
+      iconBg: 'bg-emerald-50 dark:bg-emerald-900/30', iconColor: 'text-emerald-500 dark:text-emerald-400',
       title: 'Riduzione Costi',
       q: 'Quanto runway guadagno tagliando il marketing 20%?',
     },
     {
       iconPath: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-      iconBg: 'bg-amber-50', iconColor: 'text-amber-500',
+      iconBg: 'bg-amber-50 dark:bg-amber-900/30', iconColor: 'text-amber-500 dark:text-amber-400',
       title: 'Nuovo Mercato',
       q: 'Proiezione se lancio in UK con volume +30%',
     },
@@ -961,8 +961,8 @@ export class AppLayoutComponent implements OnInit {
       desc: 'Inserisci ricavi, costi e team con il wizard guidato.',
       cta: 'Vai al Wizard',
       iconPath: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
-      iconBg:    'bg-brand-50',
-      iconColor: 'text-brand-500',
+      iconBg:    'bg-brand-50 dark:bg-brand-900/30',
+      iconColor: 'text-brand-500 dark:text-brand-400',
       targetView: 'wizard' as View,
       done: this.hasPlan(),
     },
@@ -972,8 +972,8 @@ export class AppLayoutComponent implements OnInit {
       desc: 'Visualizza fatturato, EBITDA e cash flow in tempo reale.',
       cta: 'Vedi Dashboard',
       iconPath: 'M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z',
-      iconBg:    'bg-violet-50',
-      iconColor: 'text-violet-500',
+      iconBg:    'bg-violet-50 dark:bg-violet-900/30',
+      iconColor: 'text-violet-500 dark:text-violet-400',
       targetView: 'dashboard' as View,
       done: false,
     },
@@ -983,8 +983,8 @@ export class AppLayoutComponent implements OnInit {
       desc: "Chiedi all'AI Copilot cosa succede se cambi strategia.",
       cta: 'Apri Scenari',
       iconPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
-      iconBg:    'bg-emerald-50',
-      iconColor: 'text-emerald-500',
+      iconBg:    'bg-emerald-50 dark:bg-emerald-900/30',
+      iconColor: 'text-emerald-500 dark:text-emerald-400',
       targetView: 'scenari' as View,
       done: false,
     },
@@ -994,8 +994,8 @@ export class AppLayoutComponent implements OnInit {
       desc: 'Genera un PDF professionale per investitori e stakeholder.',
       cta: 'Vedi Report',
       iconPath: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
-      iconBg:    'bg-amber-50',
-      iconColor: 'text-amber-500',
+      iconBg:    'bg-amber-50 dark:bg-amber-900/30',
+      iconColor: 'text-amber-500 dark:text-amber-400',
       targetView: 'report' as View,
       done: false,
     },
