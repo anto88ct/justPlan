@@ -27,6 +27,13 @@
     background-color: #e5e7eb;
     border-radius: 2px;
   }
+  /* Dark mode scrollbar */
+  .dark .scrollbar-thin {
+    scrollbar-color: #3f3f46 transparent;
+  }
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #3f3f46;
+  }
 }
 
 @layer utilities {
