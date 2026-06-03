@@ -1,4 +1,4 @@
-import { Component, output, signal, computed, inject } from '@angular/core';
+import { Component, output, signal, computed, inject, HostListener } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BusinessPlanService, WizardInput } from '../../services/business-plan.service';
@@ -220,30 +220,47 @@ interface LoanItem {
       transform: translateX(-50%) translateY(0);
     }
 
-    /* Mobile: flip downward + anchor left to avoid viewport overflow */
+    /* Mobile: disable inline tooltip, use centered modal instead */
     @media (max-width: 640px) {
-      .tt-box {
-        bottom: auto;
-        top: calc(100% + 8px);
-        left: 0;
-        transform: translateY(6px);
-        width: min(270px, calc(100vw - 40px));
-        max-width: calc(100vw - 40px);
-        font-size: 12px;
-      }
-      .tt-box::after {
-        top: auto;
-        bottom: 100%;
-        left: 8px;
-        transform: none;
-        border-top-color: transparent;
-        border-bottom-color: #1a1a2e;
-      }
-      .tt-wrap:hover .tt-box,
-      .tt-wrap:focus-within .tt-box {
-        transform: translateY(0);
-      }
+      .tt-box { display: none !important; }
     }
+
+    .tip-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      backdrop-filter: blur(3px);
+      animation: fadeInOverlay 0.18s ease both;
+    }
+    @keyframes fadeInOverlay {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    .tip-card {
+      background: #1a1a2e; color: #dcdcef;
+      border-radius: 18px; padding: 20px 20px 16px;
+      max-width: 320px; width: 100%;
+      font-size: 13.5px; line-height: 1.65;
+      font-family: 'Outfit', sans-serif;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+      animation: slideUpCard 0.22s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes slideUpCard {
+      from { opacity: 0; transform: translateY(12px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .tip-close {
+      display: block; margin-top: 14px; width: 100%;
+      padding: 9px; background: rgba(255,255,255,0.08);
+      border: none; border-radius: 10px;
+      color: #a0a0c0; font-size: 13px; font-weight: 600;
+      font-family: 'Outfit', sans-serif; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .tip-close:hover { background: rgba(255,255,255,0.14); }
   `],
   template: `
     <!-- ═══ STEPPER ══════════════════════════════════════════════════════════ -->
@@ -1352,6 +1369,16 @@ interface LoanItem {
         </button>
       }
     </div>
+
+    <!-- Mobile tooltip modal (centered, no overflow) -->
+    @if (showTip()) {
+      <div class="tip-overlay" (click)="closeTip()">
+        <div class="tip-card" (click)="$event.stopPropagation()">
+          <p>{{ activeTipText() }}</p>
+          <button type="button" class="tip-close" (click)="closeTip()">Chiudi</button>
+        </div>
+      </div>
+    }
   `,
 })
 export class WizardFormComponent {
@@ -1364,6 +1391,25 @@ export class WizardFormComponent {
   currentStep = signal(1);
   maxReachedStep = signal(1);
   animDir = signal<'fwd' | 'bwd'>('fwd');
+
+  activeTipText = signal('');
+  showTip = signal(false);
+
+  closeTip(): void { this.showTip.set(false); }
+
+  @HostListener('click', ['$event'])
+  onHelpClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+    const btn = target.closest?.('.help-btn') as HTMLElement | null;
+    if (!btn) return;
+    if (window.innerWidth > 640) return;
+    event.stopPropagation();
+    const box = btn.nextElementSibling as HTMLElement;
+    if (box?.classList.contains('tt-box')) {
+      this.activeTipText.set(box.textContent?.trim() ?? '');
+      this.showTip.set(true);
+    }
+  }
 
   readonly stepClass = computed(() =>
     this.animDir() === 'fwd' ? 'step-fwd' : 'step-bwd'
