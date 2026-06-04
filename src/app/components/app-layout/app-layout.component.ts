@@ -7,9 +7,25 @@ import { DashboardCruscottoComponent } from '../dashboard-cruscotto/dashboard-cr
 import { AiChatbotComponent } from '../ai-chatbot/ai-chatbot.component';
 import { ReportComponent } from '../report/report.component';
 import { ProfileComponent } from '../profile/profile.component';
+import { UploadBusinessPlanComponent } from '../upload-business-plan/upload-business-plan.component';
 import { BusinessPlanService, SavedPlan } from '../../services/business-plan.service';
 
-type View = 'panoramica' | 'wizard' | 'dashboard' | 'scenari' | 'report' | 'impostazioni' | 'piani-salvati' | 'profilo';
+type View = 'panoramica' | 'wizard' | 'dashboard' | 'scenari' | 'report' | 'impostazioni' | 'piani-salvati' | 'profilo' | 'caricamenti' | 'co-work';
+
+interface CoworkMember {
+  id: string;
+  name: string;
+  email: string;
+  role: 'editor' | 'reader';
+  status: 'pending' | 'joined';
+  avatarColor: string;
+  initials: string;
+}
+
+interface NetworkNode extends CoworkMember {
+  x: number;
+  y: number;
+}
 
 interface NavItem {
   id: string;
@@ -29,7 +45,7 @@ interface SettingItem {
   selector: 'app-layout',
   standalone: true,
   host: { class: 'flex h-full w-full overflow-hidden' },
-  imports: [CommonModule, NgClass, MatTooltipModule, WizardFormComponent, DashboardCruscottoComponent, AiChatbotComponent, ReportComponent, ProfileComponent],
+  imports: [CommonModule, NgClass, MatTooltipModule, WizardFormComponent, DashboardCruscottoComponent, AiChatbotComponent, ReportComponent, ProfileComponent, UploadBusinessPlanComponent],
   styles: [`
     :host { display: flex; height: 100%; width: 100%; overflow: hidden; }
 
@@ -82,6 +98,111 @@ interface SettingItem {
     .step-cta-arrow { transition: transform 0.2s ease; }
 
     :host.resizing { cursor: col-resize; user-select: none; }
+
+    @keyframes networkNodeEnter {
+      from { opacity: 0; transform: scale(0.3); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    @keyframes memberRowEnter {
+      from { opacity: 0; transform: translateX(18px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes svgPendingRing {
+      0%   { opacity: 0.7; transform: scale(1); }
+      100% { opacity: 0;   transform: scale(1.8); }
+    }
+    @keyframes svgJoinedPulse {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50%      { opacity: 0.7; transform: scale(1.15); }
+    }
+    @keyframes statusBadgeIn {
+      from { opacity: 0; transform: scale(0.7) translateY(-4px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    @keyframes orbitPulse {
+      0%   { stroke-dashoffset: 200; opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+
+    .network-node-enter { animation: networkNodeEnter 0.45s cubic-bezier(0.16,1,0.3,1) both; }
+    .member-row-enter   { animation: memberRowEnter 0.35s cubic-bezier(0.16,1,0.3,1) both; }
+    .status-badge-in    { animation: statusBadgeIn 0.3s cubic-bezier(0.16,1,0.3,1) both; }
+
+    .pending-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: svgPendingRing 2s ease-out infinite;
+    }
+    .pending-ring-2 {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: svgPendingRing 2s ease-out 0.9s infinite;
+    }
+    .joined-glow {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: svgJoinedPulse 2.5s ease-in-out infinite;
+    }
+    .orbit-line {
+      animation: orbitPulse 2.2s cubic-bezier(0.4,0,0.6,1) infinite;
+    }
+    .orbit-line-2 { animation: orbitPulse 2.2s cubic-bezier(0.4,0,0.6,1) 1.1s infinite; }
+
+    @keyframes solarOrbitCw {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes solarOrbitCcw {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+    @keyframes solarCenterBreathe {
+      0%, 100% { transform: scale(1);    opacity: 0.38; }
+      50%       { transform: scale(1.28); opacity: 0.14; }
+    }
+
+    .solar-orbit-group {
+      transform-box: view-box;
+      transform-origin: 50% 50%;
+      animation-name: solarOrbitCw;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      will-change: transform;
+    }
+    .solar-orbit-ccw {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation-name: solarOrbitCcw;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+      will-change: transform;
+    }
+    .solar-center-ring {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: solarCenterBreathe 3.5s ease-in-out infinite;
+    }
+    .solar-center-ring-2 {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: solarCenterBreathe 3.5s ease-in-out -1.75s infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .network-node-enter, .member-row-enter, .status-badge-in { animation: none; opacity: 1; transform: none; }
+      .pending-ring, .pending-ring-2, .joined-glow, .orbit-line, .orbit-line-2 { animation: none; }
+      .solar-orbit-group, .solar-orbit-ccw, .solar-center-ring, .solar-center-ring-2 { animation: none !important; }
+      .comment-bubble-anim { animation: none !important; opacity: 1; }
+    }
+
+    @keyframes commentPop {
+      0%, 100% { opacity: 0; transform: translateY(8px) scale(0.82); }
+      14%, 74%  { opacity: 1; transform: translateY(0) scale(1); }
+      90%       { opacity: 0; transform: translateY(-4px) scale(0.94); }
+    }
+    .comment-bubble-anim { animation: commentPop 9s ease-in-out infinite; }
   `],
   template: `
     <!-- Mobile backdrop -->
@@ -288,6 +409,14 @@ interface SettingItem {
               </svg>
               <span class="hidden sm:inline">Salva Business Plan</span>
             }
+          </button>
+          <button (click)="openShareDialog()"
+                  class="flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border transition-all duration-200 font-body flex-shrink-0
+                         bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-violet-300 hover:text-violet-600 dark:hover:text-violet-400">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+            </svg>
+            <span class="hidden sm:inline">Condividi</span>
           </button>
         }
 
@@ -635,11 +764,34 @@ interface SettingItem {
                 } @else {
                   <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
                     @for (plan of planService.savedPlans(); track plan.id; let i = $index) {
-                      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-card hover:shadow-card-hover
-                                  hover:-translate-y-0.5 transition-all duration-200 overflow-hidden"
+                      <div [ngClass]="[
+                              'bg-white dark:bg-zinc-900 rounded-2xl border shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 overflow-hidden',
+                              i === 0 ? 'border-violet-200 dark:border-violet-800/50' : 'border-zinc-100 dark:border-zinc-800'
+                           ]"
                            [style.animation-delay]="(i * 60) + 'ms'"
                            style="animation: viewEnter 0.4s cubic-bezier(0.16,1,0.3,1) both;">
                         <div class="px-5 pt-5 pb-4 border-b border-zinc-50 dark:border-zinc-800">
+                          <!-- Shared badge + collaborator avatars (demo on first plan) -->
+                          @if (i === 0) {
+                            <div class="flex items-center justify-between mb-3">
+                              <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-violet-50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-800/50">
+                                <svg class="w-3 h-3 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                                </svg>
+                                <span class="text-[10px] font-semibold text-violet-700 dark:text-violet-400 font-body">Condiviso</span>
+                              </div>
+                              <!-- Overlapping avatar stack -->
+                              <div class="flex items-center -space-x-2">
+                                @for (collab of demoCollaborators; track collab.initials) {
+                                  <div class="w-6 h-6 rounded-full border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
+                                       [style.background]="collab.color"
+                                       [title]="collab.name + ' (' + collab.role + ')'">{{ collab.initials }}</div>
+                                }
+                                <!-- Active indicator -->
+                                <div class="ml-2 w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" title="Online"></div>
+                              </div>
+                            </div>
+                          }
                           <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
                               <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-display truncate">{{ plan.name }}</p>
@@ -701,6 +853,370 @@ interface SettingItem {
                   </div>
                 }
               </div>
+            </div>
+          }
+
+          <!-- CO-WORK -->
+          @if (currentView() === 'co-work') {
+            <div class="view-enter relative h-full overflow-hidden flex flex-col lg:flex-row"
+                 (mousemove)="onCoworkMouseMove($event)">
+
+              <!-- ── BACKGROUND: full-screen animated network ── -->
+              <div class="absolute inset-0 overflow-hidden" aria-hidden="true">
+                <div class="absolute inset-0 bg-zinc-50 dark:bg-zinc-950"></div>
+                <div class="absolute inset-0"
+                     [style.background]="themeService.dark()
+                       ? 'radial-gradient(ellipse 80% 70% at 58% 50%, rgba(99,102,241,0.18) 0%, transparent 70%)'
+                       : 'radial-gradient(ellipse 80% 70% at 58% 50%, rgba(99,102,241,0.08) 0%, transparent 70%)'">
+                </div>
+                <svg viewBox="0 0 700 700" preserveAspectRatio="xMidYMid meet"
+                     class="absolute inset-0 w-full h-full" style="pointer-events: none;">
+                  <defs>
+                    <radialGradient id="cw-owner-grad2" cx="40%" cy="35%">
+                      <stop offset="0%" stop-color="#f59e0b"/>
+                      <stop offset="100%" stop-color="#ef4444"/>
+                    </radialGradient>
+                    <radialGradient id="cw-core-glow2" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#6366f1"
+                            [attr.stop-opacity]="themeService.dark() ? '0.38' : '0.22'"/>
+                      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+                    </radialGradient>
+                    <filter id="cw-node-glow2" x="-60%" y="-60%" width="220%" height="220%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="b"/>
+                      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                    </filter>
+                    <filter id="cw-blur2" x="-80%" y="-80%" width="260%" height="260%">
+                      <feGaussianBlur in="SourceGraphic" stdDeviation="5"/>
+                    </filter>
+                  </defs>
+
+                  <!-- Center ambient glow -->
+                  <ellipse cx="350" cy="350" rx="95" ry="85" fill="url(#cw-core-glow2)" opacity="0.9"/>
+
+                  <!-- Orbit rings: solid, clean -->
+                  <circle cx="350" cy="350" r="145" fill="none"
+                          [attr.stroke]="themeService.dark() ? 'rgba(99,102,241,0.12)' : 'rgba(99,102,241,0.08)'"
+                          stroke-width="1"/>
+                  <circle cx="350" cy="350" r="248" fill="none"
+                          [attr.stroke]="themeService.dark() ? 'rgba(99,102,241,0.08)' : 'rgba(99,102,241,0.05)'"
+                          stroke-width="1"/>
+                  <circle cx="350" cy="350" r="340" fill="none"
+                          [attr.stroke]="themeService.dark() ? 'rgba(99,102,241,0.05)' : 'rgba(99,102,241,0.03)'"
+                          stroke-width="0.5"/>
+
+                  <!-- Orbiting member nodes -->
+                  <ng-container *ngFor="let node of orbitalNodes(); let i = index">
+                    <g class="solar-orbit-group"
+                       [style.animation-duration]="node.orbitDuration + 's'"
+                       [style.animation-delay]="node.orbitDelay + 's'">
+
+                      <!-- Single clean connection line -->
+                      <line x1="350" y1="350"
+                            [attr.x2]="350 + node.orbitRadius" y2="350"
+                            [attr.stroke]="node.status === 'joined'
+                              ? (themeService.dark() ? 'rgba(99,102,241,0.28)' : 'rgba(99,102,241,0.18)')
+                              : (themeService.dark() ? 'rgba(245,158,11,0.22)' : 'rgba(245,158,11,0.14)')"
+                            stroke-width="0.8" stroke-linecap="round"/>
+
+                      <!-- Node: translate to orbit position, then counter-rotate -->
+                      <g [attr.transform]="'translate(' + (350 + node.orbitRadius) + ',350)'">
+                        <g class="solar-orbit-ccw"
+                           [style.animation-duration]="node.orbitDuration + 's'"
+                           [style.animation-delay]="node.orbitDelay + 's'"
+                           style="pointer-events: auto; cursor: pointer;"
+                           (mouseenter)="hoveredCoworkNode.set(node)"
+                           (mouseleave)="hoveredCoworkNode.set(null)">
+
+                          <!-- Pending pulse rings -->
+                          <circle r="28" fill="none" stroke="#f59e0b" stroke-width="1.2"
+                                  class="pending-ring"
+                                  [style.display]="node.status === 'pending' ? '' : 'none'"/>
+                          <circle r="28" fill="none" stroke="#f59e0b" stroke-width="0.8"
+                                  class="pending-ring-2"
+                                  [style.display]="node.status === 'pending' ? '' : 'none'"/>
+
+                          <!-- Joined glow ring -->
+                          <circle r="27" fill="none" stroke="#6366f1" stroke-width="1.5"
+                                  class="joined-glow"
+                                  [style.display]="node.status === 'joined' ? '' : 'none'"
+                                  [attr.opacity]="themeService.dark() ? '0.45' : '0.30'"/>
+
+                          <!-- Avatar glow halo -->
+                          <circle r="22" [attr.fill]="node.avatarColor" opacity="0.20"
+                                  filter="url(#cw-blur2)"/>
+
+                          <!-- Avatar bg + initials -->
+                          <circle r="22"
+                                  [attr.fill]="themeService.dark() ? '#18181b' : '#ffffff'"
+                                  [attr.stroke]="node.status === 'joined' ? '#6366f1' : '#f59e0b'"
+                                  stroke-width="2"
+                                  [attr.stroke-opacity]="node.status === 'joined' ? '0.82' : '0.58'"
+                                  filter="url(#cw-node-glow2)"/>
+                          <circle r="20" [attr.fill]="node.avatarColor" opacity="0.95"/>
+                          <text text-anchor="middle" dy="0.38em" font-size="10" font-weight="700" fill="white"
+                                font-family="system-ui,-apple-system,sans-serif">{{ node.initials }}</text>
+
+                          <!-- Status dot -->
+                          <circle cx="15" cy="-15" r="5.5"
+                                  [attr.fill]="node.status === 'joined' ? '#10b981' : '#f59e0b'"
+                                  [attr.stroke]="themeService.dark() ? '#09090b' : '#f8fafc'"
+                                  stroke-width="1.5"/>
+
+                          <!-- Floating comment bubble -->
+                          <g class="comment-bubble-anim"
+                             [style.animation-delay]="(i * 2.8) + 's'"
+                             style="pointer-events: none;">
+                            <rect x="-44" y="-62" width="88" height="22" rx="5.5"
+                                  [attr.fill]="themeService.dark() ? '#1e1b4b' : '#ffffff'"
+                                  fill-opacity="0.97"
+                                  [attr.stroke]="node.status === 'joined' ? '#6366f1' : '#f59e0b'"
+                                  stroke-width="0.8" stroke-opacity="0.55"/>
+                            <polygon points="-4,-40 4,-40 0,-34"
+                                     [attr.fill]="themeService.dark() ? '#1e1b4b' : '#ffffff'"
+                                     fill-opacity="0.97"/>
+                            <circle cx="-32" cy="-51" r="2.8"
+                                    [attr.fill]="node.status === 'joined' ? '#6366f1' : '#f59e0b'"/>
+                            <text x="-22" y="-47" text-anchor="start" font-size="7.5" font-weight="600"
+                                  [attr.fill]="themeService.dark() ? '#c7d2fe' : '#3730a3'"
+                                  font-family="system-ui,-apple-system,sans-serif">{{ coworkCommentTexts[i % coworkCommentTexts.length] }}</text>
+                          </g>
+                        </g>
+                      </g>
+                    </g>
+                  </ng-container>
+
+                  <!-- Owner sun: breathing rings -->
+                  <circle cx="350" cy="350" r="52" fill="none" stroke="#6366f1" stroke-width="1"
+                          [attr.opacity]="themeService.dark() ? '0.20' : '0.13'"
+                          class="solar-center-ring"/>
+                  <circle cx="350" cy="350" r="40" fill="none" stroke="#6366f1" stroke-width="1.5"
+                          [attr.opacity]="themeService.dark() ? '0.28' : '0.18'"
+                          class="solar-center-ring-2"/>
+                  <circle cx="350" cy="350" r="32" fill="url(#cw-owner-grad2)" opacity="0.20"
+                          filter="url(#cw-blur2)"/>
+                  <circle cx="350" cy="350" r="29" fill="url(#cw-owner-grad2)" opacity="0.95"
+                          filter="url(#cw-node-glow2)"/>
+                  <circle cx="350" cy="350" r="29" fill="none" stroke="white" stroke-width="0.75" opacity="0.35"/>
+                  <text x="350" y="355" text-anchor="middle" font-size="14" font-weight="800" fill="white"
+                        font-family="system-ui,-apple-system,sans-serif">F</text>
+                </svg>
+              </div>
+
+              <!-- ── HOVER TOOLTIP ── -->
+              @if (hoveredCoworkNode()) {
+                <div class="fixed z-[100] pointer-events-none select-none rounded-xl shadow-lg border px-3 py-2.5 min-w-[160px] max-w-[220px]
+                            bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-zinc-200/80 dark:border-zinc-700/80"
+                     [style.left.px]="coworkTooltipX()"
+                     [style.top.px]="coworkTooltipY()"
+                     style="animation: viewEnter 0.15s ease both;">
+                  <div class="flex items-center gap-2 mb-1.5">
+                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-[9px] font-bold text-white flex-shrink-0"
+                         [style.background]="hoveredCoworkNode()!.avatarColor">
+                      {{ hoveredCoworkNode()!.initials }}
+                    </div>
+                    <span class="text-[11px] font-bold text-zinc-800 dark:text-zinc-100 font-body truncate">
+                      {{ hoveredCoworkNode()!.name || hoveredCoworkNode()!.email.split('@')[0] }}
+                    </span>
+                  </div>
+                  <p class="text-[10px] text-zinc-500 dark:text-zinc-400 font-body truncate mb-1.5">
+                    {{ hoveredCoworkNode()!.email }}
+                  </p>
+                  <div class="flex items-center gap-1.5">
+                    <span [ngClass]="hoveredCoworkNode()!.role === 'editor'
+                      ? 'bg-violet-50 dark:bg-violet-950/50 text-violet-700 dark:text-violet-400'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'"
+                          class="text-[9px] font-bold px-1.5 py-0.5 rounded-full font-body capitalize">
+                      {{ hoveredCoworkNode()!.role }}
+                    </span>
+                    <div class="w-1.5 h-1.5 rounded-full"
+                         [ngClass]="hoveredCoworkNode()!.status === 'joined' ? 'bg-emerald-400' : 'bg-amber-400'"></div>
+                    <span class="text-[9px] text-zinc-400 dark:text-zinc-500 font-body">
+                      {{ hoveredCoworkNode()!.status === 'joined' ? 'Attivo' : 'In attesa' }}
+                    </span>
+                  </div>
+                </div>
+              }
+
+              <!-- ── FORM PANEL: compact left sidebar ── -->
+              <div class="w-full lg:w-80 xl:w-96 flex-shrink-0 flex flex-col overflow-hidden relative z-10
+                          bg-white/85 dark:bg-zinc-950/85 backdrop-blur-md
+                          border-b lg:border-b-0 lg:border-r border-zinc-200/50 dark:border-zinc-800/50">
+                <div class="flex-1 flex flex-col min-h-0 p-4 gap-3 overflow-hidden">
+
+                  <!-- Header row -->
+                  <div class="flex items-center justify-between flex-shrink-0 pt-1">
+                    <div class="flex items-center gap-2.5">
+                      <h1 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 font-display">Co-Work</h1>
+                      @if (coworkMembers().length > 0) {
+                        <div class="flex items-center gap-1.5">
+                          <div class="flex items-center -space-x-1.5">
+                            @for (m of coworkMembers().slice(0, 4); track m.id) {
+                              <div class="w-5 h-5 rounded-full border border-white dark:border-zinc-900 flex items-center justify-center text-white text-[7px] font-bold flex-shrink-0"
+                                   [style.background]="m.avatarColor">{{ m.initials }}</div>
+                            }
+                          </div>
+                          <span class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 font-body">
+                            {{ coworkJoinedCount() }}/{{ coworkMembers().length + 1 }}
+                          </span>
+                        </div>
+                      }
+                    </div>
+                    <button (click)="goToWizard()"
+                            class="flex items-center gap-1.5 px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white text-xs font-semibold rounded-xl transition-all duration-200 font-body hover:-translate-y-0.5 shadow-sm flex-shrink-0">
+                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                      </svg>
+                      Piano
+                    </button>
+                  </div>
+
+                  <!-- Invite by email -->
+                  <div class="bg-white/90 dark:bg-zinc-900/80 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 p-3 flex-shrink-0">
+                    <p class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-body mb-2">Invita via email</p>
+                    <div class="flex gap-1.5">
+                      <input type="email" placeholder="nome@azienda.com"
+                             [value]="coworkEmailInput()"
+                             (input)="coworkEmailInput.set($any($event.target).value)"
+                             (keydown.enter)="addCoworkMember()"
+                             class="flex-1 min-w-0 px-2.5 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 transition-all"/>
+                      <div class="flex gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg flex-shrink-0">
+                        <button (click)="coworkRoleInput.set('reader')"
+                                [ngClass]="coworkRoleInput() === 'reader' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'text-zinc-400 dark:text-zinc-500'"
+                                class="px-2 py-1 rounded-md text-[9px] font-bold font-body transition-all">R</button>
+                        <button (click)="coworkRoleInput.set('editor')"
+                                [ngClass]="coworkRoleInput() === 'editor' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'text-zinc-400 dark:text-zinc-500'"
+                                class="px-2 py-1 rounded-md text-[9px] font-bold font-body transition-all">E</button>
+                      </div>
+                      <button (click)="addCoworkMember()"
+                              [disabled]="!coworkEmailInput()"
+                              [ngClass]="coworkEmailInput() ? 'bg-brand-600 hover:bg-brand-500 text-white' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed'"
+                              class="flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 flex-shrink-0">
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Invite link: compact single row -->
+                  <div class="bg-white/90 dark:bg-zinc-900/80 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 p-3 flex-shrink-0">
+                    <div class="flex items-center gap-2">
+                      <div class="flex-1 min-w-0 flex items-center gap-1.5">
+                        <p class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-body">Link invito</p>
+                        <span class="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-800/50">
+                          <svg class="w-2 h-2 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                          </svg>
+                          <span class="text-[8px] font-semibold text-amber-700 dark:text-amber-400 font-body">2h</span>
+                        </span>
+                      </div>
+                      <div class="flex items-center gap-1 flex-shrink-0">
+                        <div class="flex gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
+                          <button (click)="inviteLinkRole.set('reader')"
+                                  [ngClass]="inviteLinkRole() === 'reader' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'text-zinc-400 dark:text-zinc-500'"
+                                  class="px-2 py-1 rounded-md text-[9px] font-bold font-body transition-all">R</button>
+                          <button (click)="inviteLinkRole.set('editor')"
+                                  [ngClass]="inviteLinkRole() === 'editor' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'text-zinc-400 dark:text-zinc-500'"
+                                  class="px-2 py-1 rounded-md text-[9px] font-bold font-body transition-all">E</button>
+                        </div>
+                        <button (click)="generateInviteLink()"
+                                class="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 dark:bg-zinc-700 hover:bg-zinc-800 dark:hover:bg-zinc-600 text-white text-[10px] font-semibold rounded-lg font-body transition-all duration-200">
+                          @if (inviteLinkCopied()) {
+                            <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Copiato
+                          } @else {
+                            <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                            Copia
+                          }
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Team list: compact, fills remaining height -->
+                  <div class="bg-white/90 dark:bg-zinc-900/80 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 overflow-hidden flex-1 flex flex-col min-h-0">
+                    <div class="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between flex-shrink-0">
+                      <p class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-body">Team ({{ coworkMembers().length + 1 }})</p>
+                      <div class="flex items-center gap-1">
+                        @if (coworkPendingCount() > 0) {
+                          <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 font-body">{{ coworkPendingCount() }} attesa</span>
+                        }
+                        @if (coworkJoinedCount() > 0) {
+                          <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-body">{{ coworkJoinedCount() }} attivi</span>
+                        }
+                      </div>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                      <!-- Owner row -->
+                      <div class="flex items-center gap-2.5 px-3 py-2.5 border-b border-zinc-50 dark:border-zinc-800/50">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                             style="background: linear-gradient(135deg, #f59e0b, #ef4444);">F</div>
+                        <div class="flex-1 min-w-0">
+                          <p class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 font-body">Founder (tu)</p>
+                          <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body truncate">antonio.darrigoct&#64;gmail.com</p>
+                        </div>
+                        <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-400 font-body flex-shrink-0">Owner</span>
+                      </div>
+                      @for (member of coworkMembers(); track member.id; let i = $index) {
+                        <div class="flex items-center gap-2.5 px-3 py-2.5 border-b border-zinc-50 dark:border-zinc-800/50 last:border-b-0 member-row-enter"
+                             [style.animation-delay]="(i * 60 + 80) + 'ms'">
+                          <div class="relative flex-shrink-0">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white"
+                                 [style.background]="member.avatarColor">{{ member.initials }}</div>
+                            <div [ngClass]="member.status === 'joined' ? 'bg-emerald-400' : 'bg-amber-400'"
+                                 class="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-white dark:border-zinc-900"></div>
+                          </div>
+                          <div class="flex-1 min-w-0">
+                            <p class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 font-body truncate">{{ member.name || member.email.split('@')[0] }}</p>
+                            <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body truncate">{{ member.email }}</p>
+                          </div>
+                          <span [ngClass]="member.role === 'editor' ? 'bg-violet-50 dark:bg-violet-950/40 text-violet-700 dark:text-violet-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'"
+                                class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full font-body flex-shrink-0 capitalize">{{ member.role }}</span>
+                          <div class="flex items-center gap-0.5 flex-shrink-0">
+                            @if (member.status === 'pending') {
+                              <button (click)="acceptMember(member.id)"
+                                      class="w-6 h-6 flex items-center justify-center rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-all"
+                                      title="Accetta">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                </svg>
+                              </button>
+                            }
+                            <button (click)="removeCoworkMember(member.id)"
+                                    class="w-6 h-6 flex items-center justify-center rounded-lg text-zinc-300 dark:text-zinc-600 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all">
+                              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      }
+                      @if (coworkMembers().length === 0) {
+                        <div class="px-3 py-8 text-center">
+                          <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-0.5">Nessun collaboratore</p>
+                          <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body">Invita via email o link.</p>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Spacer: SVG visible on right portion of desktop -->
+              <div class="hidden lg:flex flex-1" aria-hidden="true"></div>
+
+            </div>
+          }
+
+          <!-- CARICAMENTI -->
+          @if (currentView() === 'caricamenti') {
+            <div class="view-enter flex flex-col h-full overflow-hidden">
+              <app-upload-business-plan/>
             </div>
           }
 
@@ -853,6 +1369,196 @@ interface SettingItem {
 
       </div>
     </main>
+
+    <!-- ═══════════════════ SHARE DIALOG ═══════════════════ -->
+    @if (shareDialogOpen()) {
+      <div class="fixed inset-0 z-[60] flex items-center justify-center p-4"
+           style="background: rgba(0,0,0,0.55); backdrop-filter: blur(4px);"
+           (click)="closeShareDialog()">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+             (click)="$event.stopPropagation()"
+             style="animation: viewEnter 0.25s cubic-bezier(0.16,1,0.3,1) both;">
+
+          <!-- Header -->
+          <div class="flex items-center justify-between px-6 pt-6 pb-4">
+            <div>
+              <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-display">Condividi Business Plan</h2>
+              <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ projectDisplayName() }}</p>
+            </div>
+            <button (click)="closeShareDialog()"
+                    class="w-8 h-8 flex items-center justify-center rounded-xl text-zinc-400 dark:text-zinc-500
+                           hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300 transition-all">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Tabs -->
+          <div class="px-6 pb-4">
+            <div class="flex gap-1 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-xl">
+              <button (click)="shareTab.set('link')"
+                      [ngClass]="shareTab() === 'link'
+                        ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
+                      class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold font-body transition-all duration-200">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
+                Genera Link
+              </button>
+              <button (click)="shareTab.set('email')"
+                      [ngClass]="shareTab() === 'email'
+                        ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-sm'
+                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'"
+                      class="flex-1 flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-xs font-semibold font-body transition-all duration-200">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                Invia Email
+              </button>
+            </div>
+          </div>
+
+          <!-- Tab: Link -->
+          @if (shareTab() === 'link') {
+            <div class="px-6 pb-6 space-y-4">
+              <!-- Permission selector -->
+              <div>
+                <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">Permessi accesso</p>
+                <div class="flex gap-2">
+                  <button (click)="sharePermission.set('reader')"
+                          [ngClass]="sharePermission() === 'reader'
+                            ? 'border-brand-500 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300'
+                            : 'border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-zinc-300'"
+                          class="flex-1 flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200 font-body">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold">Reader</span>
+                    <span class="text-[10px] text-center leading-tight opacity-70">Solo lettura</span>
+                  </button>
+                  <button (click)="sharePermission.set('editor')"
+                          [ngClass]="sharePermission() === 'editor'
+                            ? 'border-brand-500 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300'
+                            : 'border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-zinc-300'"
+                          class="flex-1 flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200 font-body">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold">Editor</span>
+                    <span class="text-[10px] text-center leading-tight opacity-70">Può modificare</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Generate / copy link -->
+              @if (!linkGenerated()) {
+                <button (click)="generateLink()"
+                        class="w-full flex items-center justify-center gap-2 py-2.5 bg-brand-600 hover:bg-brand-500 text-white text-sm font-semibold rounded-xl transition-all duration-200 font-body">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                  </svg>
+                  Genera Link
+                </button>
+              } @else {
+                <div>
+                  <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">Link generato</p>
+                  <div class="flex gap-2">
+                    <input type="text" [value]="shareLink()" readonly
+                           class="flex-1 px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-mono text-zinc-600 dark:text-zinc-400 focus:outline-none truncate"/>
+                    <button (click)="copyLink()"
+                            [ngClass]="linkCopied() ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-brand-300'"
+                            class="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold font-body transition-all duration-200 flex-shrink-0">
+                      @if (linkCopied()) {
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Copiato
+                      } @else {
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Copia
+                      }
+                    </button>
+                  </div>
+                  <div class="mt-2 flex items-center gap-1.5">
+                    <div [ngClass]="sharePermission() === 'editor' ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'"
+                         class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold font-body">
+                      <div [ngClass]="sharePermission() === 'editor' ? 'bg-violet-500' : 'bg-zinc-400'" class="w-1.5 h-1.5 rounded-full"></div>
+                      {{ sharePermission() === 'editor' ? 'Accesso Editor' : 'Accesso Reader' }}
+                    </div>
+                    <button (click)="linkGenerated.set(false)" class="text-[10px] text-zinc-400 hover:text-zinc-600 font-body transition-colors">Rigenera</button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- Tab: Email -->
+          @if (shareTab() === 'email') {
+            <div class="px-6 pb-6 space-y-4">
+              <div>
+                <label class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2 block">Indirizzo email</label>
+                <input type="email" placeholder="nome@azienda.com"
+                       [value]="shareEmailInput()"
+                       (input)="shareEmailInput.set($any($event.target).value)"
+                       class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
+              </div>
+              <!-- Permission selector -->
+              <div>
+                <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">Permessi</p>
+                <div class="flex gap-2">
+                  <button (click)="shareEmailPermission.set('reader')"
+                          [ngClass]="shareEmailPermission() === 'reader'
+                            ? 'border-brand-500 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300'
+                            : 'border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-zinc-300'"
+                          class="flex-1 flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all duration-200 font-body">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold">Reader</span>
+                  </button>
+                  <button (click)="shareEmailPermission.set('editor')"
+                          [ngClass]="shareEmailPermission() === 'editor'
+                            ? 'border-brand-500 bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-300'
+                            : 'border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:border-zinc-300'"
+                          class="flex-1 flex items-center justify-center gap-2 p-2.5 rounded-xl border-2 transition-all duration-200 font-body">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                    </svg>
+                    <span class="text-[11px] font-semibold">Editor</span>
+                  </button>
+                </div>
+              </div>
+              <button (click)="sendShareEmail()"
+                      [disabled]="!shareEmailInput()"
+                      [ngClass]="emailSent()
+                        ? 'bg-emerald-500 border-emerald-500 text-white'
+                        : shareEmailInput()
+                          ? 'bg-brand-600 hover:bg-brand-500 text-white border-brand-600'
+                          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600 border-zinc-200 dark:border-zinc-700 cursor-not-allowed'"
+                      class="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl border transition-all duration-200 font-body">
+                @if (emailSent()) {
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Invito inviato!
+                } @else {
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                  </svg>
+                  Invia Invito
+                }
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
   `,
 })
 export class AppLayoutComponent implements OnInit {
@@ -870,6 +1576,78 @@ export class AppLayoutComponent implements OnInit {
   isLargeScreen         = signal(typeof window !== 'undefined' && window.innerWidth >= 1024);
   chatDesktopFullscreen = signal(false);
 
+  // ── Share dialog ────────────────────────────────────────────────────────────
+  shareDialogOpen      = signal(false);
+  shareTab             = signal<'link' | 'email'>('link');
+  sharePermission      = signal<'editor' | 'reader'>('reader');
+  shareEmailPermission = signal<'editor' | 'reader'>('reader');
+  shareEmailInput      = signal('');
+  shareLink            = signal('');
+  linkGenerated        = signal(false);
+  linkCopied           = signal(false);
+  emailSent            = signal(false);
+
+  // ── Co-Work ─────────────────────────────────────────────────────────────────
+  coworkEmailInput  = signal('');
+  coworkRoleInput   = signal<'editor' | 'reader'>('editor');
+  inviteLinkRole    = signal<'editor' | 'reader'>('editor');
+  inviteLinkCopied  = signal(false);
+  coworkMembers     = signal<CoworkMember[]>([
+    { id: 'demo1', name: 'Marco Rossi',      email: 'marco.rossi@startup.io',      role: 'editor', status: 'joined',  avatarColor: 'linear-gradient(135deg, #6366f1, #8b5cf6)', initials: 'MR' },
+    { id: 'demo2', name: 'Anna Lucci',       email: 'anna.lucci@venture.com',       role: 'reader', status: 'joined',  avatarColor: 'linear-gradient(135deg, #f59e0b, #f97316)', initials: 'AL' },
+    { id: 'demo3', name: '',                 email: 'giuseppe.ferrari@gmail.com',   role: 'editor', status: 'pending', avatarColor: 'linear-gradient(135deg, #10b981, #06b6d4)', initials: 'GF' },
+    { id: 'demo4', name: '',                 email: 'sara.bianchi@fintech.it',      role: 'reader', status: 'pending', avatarColor: 'linear-gradient(135deg, #ef4444, #ec4899)', initials: 'SB' },
+  ]);
+
+  readonly coworkJoinedCount  = computed(() => this.coworkMembers().filter(m => m.status === 'joined').length);
+  readonly coworkPendingCount = computed(() => this.coworkMembers().filter(m => m.status === 'pending').length);
+
+  hoveredCoworkNode = signal<(CoworkMember & { orbitRadius: number; orbitDuration: number; orbitDelay: number }) | null>(null);
+  coworkTooltipX    = signal(0);
+  coworkTooltipY    = signal(0);
+
+  readonly orbitalNodes = computed(() => {
+    const members = this.coworkMembers();
+    const orbits = [
+      { r: 145, dur: 24 },
+      { r: 248, dur: 38 },
+      { r: 340, dur: 56 },
+    ];
+    const assign = (i: number) => i < 2 ? 0 : i < 5 ? 1 : 2;
+    return members.map((m, i) => {
+      const orbitIdx = assign(i);
+      const orbit   = orbits[Math.min(orbitIdx, 2)];
+      const peers   = members.filter((_, j) => assign(j) === orbitIdx);
+      const pos     = peers.findIndex(p => p.id === m.id);
+      const start   = (pos / Math.max(peers.length, 1)) * 360;
+      const delay   = parseFloat((-(orbit.dur * start / 360)).toFixed(2));
+      return { ...m, orbitRadius: orbit.r, orbitDuration: orbit.dur, orbitDelay: delay };
+    });
+  });
+
+  demoCollaborators = [
+    { initials: 'MR', color: 'linear-gradient(135deg, #6366f1, #8b5cf6)', name: 'Marco Rossi',      role: 'editor' },
+    { initials: 'AL', color: 'linear-gradient(135deg, #f59e0b, #f97316)', name: 'Anna Lucci',       role: 'reader' },
+    { initials: 'GF', color: 'linear-gradient(135deg, #10b981, #06b6d4)', name: 'Giuseppe Ferrari', role: 'editor' },
+  ];
+
+  coworkCommentTexts = [
+    'EBITDA +12%',
+    'Budget Q3 ↑',
+    '+2 persone',
+    'Prezzo 59€',
+    'Costi -20%',
+    'KPI aggiornati',
+  ];
+
+  private _avatarColors = [
+    'linear-gradient(135deg, #6366f1, #8b5cf6)',
+    'linear-gradient(135deg, #f59e0b, #f97316)',
+    'linear-gradient(135deg, #10b981, #06b6d4)',
+    'linear-gradient(135deg, #ef4444, #ec4899)',
+    'linear-gradient(135deg, #3b82f6, #6366f1)',
+  ];
+
   @HostBinding('class.resizing') private _resizing = false;
   private _resizeStartX = 0;
   private _resizeStartW = 0;
@@ -886,6 +1664,14 @@ export class AppLayoutComponent implements OnInit {
     {
       id: 'piani-salvati', view: 'piani-salvati', label: 'I Miei Piani',
       svgPath: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12l1-12',
+    },
+    {
+      id: 'co-work', view: 'co-work', label: 'Co-Work',
+      svgPath: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
+    },
+    {
+      id: 'caricamenti', view: 'caricamenti', label: 'Caricamenti',
+      svgPath: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5',
     },
     {
       id: 'scenari', view: 'scenari', label: 'Scenari',
@@ -1037,7 +1823,9 @@ export class AppLayoutComponent implements OnInit {
       report:          'Report',
       impostazioni:    'Impostazioni',
       'piani-salvati': 'I Miei Piani',
+      'co-work':       'Co-Work',
       profilo:         'Profilo',
+      caricamenti:     'Caricamenti',
     };
     return map[this.currentView()];
   });
@@ -1154,5 +1942,94 @@ export class AppLayoutComponent implements OnInit {
       window.print();
       this.currentView.set(prevView);
     }, 400);
+  }
+
+  // ── Share dialog ─────────────────────────────────────────────────────────────
+  openShareDialog(): void {
+    this.shareDialogOpen.set(true);
+    this.linkGenerated.set(false);
+    this.linkCopied.set(false);
+    this.emailSent.set(false);
+    this.shareEmailInput.set('');
+  }
+
+  closeShareDialog(): void {
+    this.shareDialogOpen.set(false);
+  }
+
+  generateLink(): void {
+    const perm = this.sharePermission();
+    const id   = Math.random().toString(36).slice(2, 10);
+    this.shareLink.set(`https://app.airplan.io/shared/${id}?role=${perm}`);
+    this.linkGenerated.set(true);
+  }
+
+  copyLink(): void {
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(this.shareLink()).catch(() => {});
+    }
+    this.linkCopied.set(true);
+    setTimeout(() => this.linkCopied.set(false), 2000);
+  }
+
+  sendShareEmail(): void {
+    if (!this.shareEmailInput()) return;
+    this.emailSent.set(true);
+    setTimeout(() => {
+      this.emailSent.set(false);
+      this.shareEmailInput.set('');
+    }, 2200);
+  }
+
+  // ── Co-Work ──────────────────────────────────────────────────────────────────
+  addCoworkMember(): void {
+    const email = this.coworkEmailInput().trim();
+    if (!email) return;
+    const existing = this.coworkMembers().find(m => m.email === email);
+    if (existing) { this.coworkEmailInput.set(''); return; }
+    const parts    = email.split('@')[0].split(/[._-]/);
+    const initials = parts.length >= 2
+      ? (parts[0][0] + parts[1][0]).toUpperCase()
+      : email.slice(0, 2).toUpperCase();
+    const color    = this._avatarColors[this.coworkMembers().length % this._avatarColors.length];
+    const member: CoworkMember = {
+      id:          Math.random().toString(36).slice(2),
+      name:        '',
+      email,
+      role:        this.coworkRoleInput(),
+      status:      'pending',
+      avatarColor: color,
+      initials,
+    };
+    this.coworkMembers.update(list => [...list, member]);
+    this.coworkEmailInput.set('');
+  }
+
+  acceptMember(id: string): void {
+    this.coworkMembers.update(list =>
+      list.map(m => m.id === id ? { ...m, status: 'joined' as const } : m)
+    );
+  }
+
+  removeCoworkMember(id: string): void {
+    this.coworkMembers.update(list => list.filter(m => m.id !== id));
+  }
+
+  generateInviteLink(): void {
+    const role = this.inviteLinkRole();
+    const id   = Math.random().toString(36).slice(2, 10);
+    const link = `https://app.airplan.io/invite/${id}?role=${role}`;
+    if (typeof navigator !== 'undefined') {
+      navigator.clipboard.writeText(link).catch(() => {});
+    }
+    this.inviteLinkCopied.set(true);
+    setTimeout(() => this.inviteLinkCopied.set(false), 2000);
+  }
+
+  onCoworkMouseMove(event: MouseEvent): void {
+    const tipW = 224;
+    const x = event.clientX + 16;
+    this.coworkTooltipX.set(x + tipW > window.innerWidth ? event.clientX - tipW - 8 : x);
+    this.coworkTooltipY.set(Math.max(event.clientY - 92, 8));
   }
 }
