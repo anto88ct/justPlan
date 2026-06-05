@@ -8,7 +8,7 @@ import { Router, RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   styles: [`
-    :host { display: block; min-height: 100vh; }
+    :host { display: block; height: 100vh; overflow: hidden; }
 
     @keyframes authEnter {
       from { opacity: 0; transform: translateY(20px); }
@@ -85,10 +85,10 @@ import { Router, RouterLink } from '@angular/router';
     }
   `],
   template: `
-    <div class="min-h-screen w-full flex bg-zinc-950 overflow-hidden">
+    <div class="h-screen w-full flex bg-zinc-950 overflow-hidden">
 
       <!-- ══ LEFT PANEL — Branding ══ -->
-      <div class="hidden lg:flex lg:w-[52%] xl:w-[55%] relative flex-col justify-between p-12 overflow-hidden flex-shrink-0">
+      <div class="hidden lg:flex lg:w-[48%] xl:w-[50%] relative flex-col justify-between p-6 xl:p-10 overflow-hidden flex-shrink-0">
 
         <!-- Background layers -->
         <div class="absolute inset-0"
@@ -123,24 +123,24 @@ import { Router, RouterLink } from '@angular/router';
 
         <!-- Central hero copy -->
         <div class="relative z-10 max-w-md">
-          <div class="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10">
+          <div class="inline-flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10">
             <div class="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-pulse"></div>
             <span class="text-xs font-semibold text-indigo-300 font-body tracking-wide">Business Planning con AI</span>
           </div>
 
-          <h1 class="text-4xl xl:text-5xl font-bold text-white font-display leading-[1.12] mb-5">
+          <h1 class="text-3xl xl:text-4xl font-bold text-white font-display leading-[1.12] mb-3">
             Il tuo Business<br>Plan,&nbsp;
             <span style="background: linear-gradient(90deg, #a5b4fc, #c084fc);
                          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
                          background-clip: text;">senza limiti.</span>
           </h1>
 
-          <p class="text-zinc-400 font-body text-base leading-relaxed mb-10 max-w-sm">
+          <p class="text-zinc-400 font-body text-sm leading-snug mb-5 max-w-sm">
             Tre minuti per inserire i dati. L'AI CFO genera proiezioni finanziarie, analisi di scenario e report professionali.
           </p>
 
           <!-- Feature list -->
-          <div class="space-y-3.5">
+          <div class="space-y-2">
             @for (f of features; track f.label) {
               <div class="flex items-center gap-3">
                 <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -159,12 +159,12 @@ import { Router, RouterLink } from '@angular/router';
         <div class="relative z-10">
 
           <!-- Card -->
-          <div class="testimonial-wrap p-5 rounded-2xl border border-white/8"
+          <div class="testimonial-wrap p-4 rounded-2xl border border-white/8"
                [class.fading]="isFading()"
                style="background: rgba(255,255,255,0.04); backdrop-filter: blur(12px);">
 
             <!-- Stars -->
-            <div class="flex gap-0.5 mb-3">
+            <div class="flex gap-0.5 mb-2">
               @for (s of [1,2,3,4,5]; track s) {
                 <svg class="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -173,7 +173,7 @@ import { Router, RouterLink } from '@angular/router';
             </div>
 
             <!-- Quote -->
-            <p class="text-sm text-zinc-200 font-body leading-relaxed italic mb-4">
+            <p class="text-sm text-zinc-200 font-body leading-snug italic mb-2">
               "{{ testimonials[activeIdx()].quote }}"
             </p>
 
@@ -191,7 +191,7 @@ import { Router, RouterLink } from '@angular/router';
           </div>
 
           <!-- Progress bar + dots -->
-          <div class="mt-3 flex items-center gap-3">
+          <div class="mt-2 flex items-center gap-3">
 
             <!-- Dots -->
             <div class="flex items-center gap-1.5 flex-1">
@@ -216,7 +216,7 @@ import { Router, RouterLink } from '@angular/router';
       </div>
 
       <!-- ══ RIGHT PANEL — Form ══ -->
-      <div class="flex-1 flex flex-col justify-center items-center px-6 py-10 relative overflow-y-auto"
+      <div class="flex-1 flex flex-col justify-center items-center px-8 sm:px-12 py-6 relative overflow-hidden lg:border-l lg:border-zinc-800/60"
            style="background: #0b0b14;">
 
         <!-- Mobile logo -->
@@ -230,10 +230,10 @@ import { Router, RouterLink } from '@angular/router';
           <span class="text-lg font-bold text-white font-display">AirPlan</span>
         </div>
 
-        <div class="w-full max-w-[380px]">
+        <div class="w-full max-w-[380px] mx-auto">
 
           <!-- Header -->
-          <div class="mb-8 auth-enter">
+          <div class="mb-5 auth-enter">
             <h2 class="text-2xl font-bold text-white font-display mb-1.5">Bentornato</h2>
             <p class="text-sm text-zinc-500 font-body">
               Nessun account?
@@ -261,14 +261,14 @@ import { Router, RouterLink } from '@angular/router';
           </div>
 
           <!-- Divider -->
-          <div class="flex items-center gap-3 my-6 auth-enter-delay-2">
+          <div class="flex items-center gap-3 my-4 auth-enter-delay-2">
             <div class="flex-1 h-px bg-zinc-800"></div>
             <span class="text-xs text-zinc-600 font-body">oppure</span>
             <div class="flex-1 h-px bg-zinc-800"></div>
           </div>
 
           <!-- Form -->
-          <form (ngSubmit)="onSubmit()" class="space-y-4">
+          <form (ngSubmit)="onSubmit()" class="space-y-3">
 
             <!-- Email -->
             <div class="auth-enter-delay-2">
@@ -337,7 +337,7 @@ import { Router, RouterLink } from '@angular/router';
             </div>
 
             <!-- Submit -->
-            <div class="pt-2 auth-enter-delay-5">
+            <div class="pt-1 auth-enter-delay-5">
               <button
                 type="submit"
                 [disabled]="loading()"
@@ -361,7 +361,7 @@ import { Router, RouterLink } from '@angular/router';
           </form>
 
           <!-- Footer note -->
-          <p class="mt-8 text-xs text-zinc-700 font-body text-center auth-enter-delay-5">
+          <p class="mt-5 text-xs text-zinc-700 font-body text-center auth-enter-delay-5">
             Accedendo accetti i nostri
             <a href="#" class="text-zinc-500 hover:text-zinc-300 underline transition-colors">Termini</a>
             e la

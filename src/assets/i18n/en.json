@@ -1,0 +1,198 @@
+{
+  "nav": {
+    "panoramica": "Overview",
+    "wizard": "Wizard",
+    "dashboard": "Dashboard",
+    "scenari": "What-If Scenarios",
+    "report": "Report",
+    "impostazioni": "Settings",
+    "pianiSalvati": "My Plans",
+    "coWork": "Co-Work",
+    "profilo": "Profile",
+    "businessPlan": "Business Plan",
+    "caricamenti": "Uploads",
+    "scenariLabel": "Scenarios",
+    "menu": "Menu"
+  },
+  "sidebar": {
+    "expandTooltip": "Expand sidebar",
+    "collapseTitle": "Collapse sidebar",
+    "pianoCorrente": "Plan",
+    "profiloTooltip": "Profile",
+    "founder": "Founder",
+    "pianostarter": "Starter Plan",
+    "myProject": "My Project"
+  },
+  "topbar": {
+    "modifica": "Edit",
+    "pdf": "PDF",
+    "salva": "Save Business Plan",
+    "salvato": "Saved!",
+    "condividi": "Share",
+    "aiCopilot": "AI Copilot",
+    "aiCopilotDockTitle": "Dock to right",
+    "aiCopilotFullscreenTitle": "Fullscreen",
+    "aiCopilotCloseTitle": "Close"
+  },
+  "panoramica": {
+    "hero": {
+      "subtitle": "Your Virtual CFO",
+      "title": "Business Plan in 3 minutes. Really.",
+      "desc": "Enter your data once. The AI Copilot analyzes, simulates and optimizes your financial plan.",
+      "cta": "Start now",
+      "vediPiano": "View Plan"
+    },
+    "pianoCorrente": "Current plan",
+    "comeFunziona": "How it works",
+    "guidaRapida": "Quick guide",
+    "clicca": "Click a step to get started",
+    "tip": {
+      "title": "Tip",
+      "desc": "After the wizard, use the AI Copilot to simulate what-if scenarios in seconds.",
+      "btn": "Open AI"
+    }
+  },
+  "tutorial": {
+    "step1": {
+      "title": "Configure the Project",
+      "desc": "Enter revenues, costs and team with the guided wizard.",
+      "cta": "Go to Wizard"
+    },
+    "step2": {
+      "title": "Analyze KPIs",
+      "desc": "View revenue, EBITDA and cash flow in real time.",
+      "cta": "View Dashboard"
+    },
+    "step3": {
+      "title": "Simulate Scenarios",
+      "desc": "Ask the AI Copilot what happens if you change strategy.",
+      "cta": "Open Scenarios"
+    },
+    "step4": {
+      "title": "Export the Report",
+      "desc": "Generate a professional PDF for investors and stakeholders.",
+      "cta": "View Report"
+    }
+  },
+  "scenari": {
+    "label": "Scenarios",
+    "title": "What-If Simulator",
+    "desc": "Click a scenario to open it in the AI Copilot.",
+    "noPlan": "generate a Business Plan.",
+    "noPlanStrong": "First",
+    "goToWizard": "Go to wizard →",
+    "variazionePrezzo": "Price Change",
+    "variazionePrezzo_q": "What happens if I raise the price to €59?",
+    "espansioneTeam": "Team Expansion",
+    "espansioneTeam_q": "Simulate 2 more employees from Q3",
+    "riduzioneCosti": "Cost Reduction",
+    "riduzioneCosti_q": "How much runway do I gain by cutting marketing 20%?",
+    "nuovoMercato": "New Market",
+    "nuovoMercato_q": "Projection if I launch in UK with +30% volume"
+  },
+  "pianiSalvati": {
+    "archivio": "Archive",
+    "title": "My Plans",
+    "count": "saved plans",
+    "nuovoPiano": "New Plan",
+    "nessunPiano": "No saved plans",
+    "nessunPianoDesc": "Generate a plan and press \"Save Business Plan\".",
+    "condiviso": "Shared",
+    "fatturatoY1": "Revenue Y1",
+    "ebitdaY1": "EBITDA Y1",
+    "utileNetto": "Net Profit",
+    "cashRunway": "Cash Runway",
+    "mesi": "months",
+    "sostenibile": "Sustainable plan",
+    "rivedere": "Review costs",
+    "caricaPiano": "Load Plan"
+  },
+  "cowork": {
+    "title": "Co-Work",
+    "pianoBtn": "Plan",
+    "invitaEmail": "Invite by email",
+    "linkInvito": "Invite link",
+    "copiato": "Copied",
+    "copia": "Copy",
+    "teamLabel": "Team ({{count}})",
+    "attesa": "pending",
+    "attivi": "active",
+    "founderLabel": "Founder (you)",
+    "nessunCollaboratore": "No collaborators",
+    "nessunCollaboratoreDesc": "Invite by email or link.",
+    "attivo": "Active",
+    "inAttesa": "Pending",
+    "tooltipReader": "Reader — view only",
+    "tooltipEditor": "Editor — can edit",
+    "tooltip2h": "Link expires 2 hours after generation"
+  },
+  "share": {
+    "title": "Share Business Plan",
+    "generaLink": "Generate Link",
+    "inviaEmail": "Send Email",
+    "permessiAccesso": "Access permissions",
+    "permessi": "Permissions",
+    "soloLettura": "Read only",
+    "puoModificare": "Can edit",
+    "generaLinkBtn": "Generate Link",
+    "linkGenerato": "Link generated",
+    "copiato": "Copied",
+    "copia": "Copy",
+    "accessoEditor": "Editor Access",
+    "accessoReader": "Reader Access",
+    "rigenera": "Regenerate",
+    "indirizzoEmail": "Email address",
+    "invitoInviato": "Invitation sent!",
+    "inviaInvito": "Send Invitation"
+  },
+  "kpi": {
+    "fatturatoY1": "Revenue Y1",
+    "ebitdaY1": "EBITDA Y1",
+    "utileNetto": "Net Profit",
+    "cashRunway": "Cash Runway",
+    "mesi": "months"
+  },
+  "views": {
+    "panoramica": "Overview",
+    "wizard": "New Plan",
+    "dashboard": "Business Plan",
+    "scenari": "What-If Scenarios",
+    "report": "Report",
+    "impostazioni": "Settings",
+    "pianiSalvati": "My Plans",
+    "coWork": "Co-Work",
+    "profilo": "Profile",
+    "caricamenti": "Uploads"
+  },
+  "settings": {
+    "subtitle": "Config",
+    "title": "Settings",
+    "sections": {
+      "progetto": {
+        "label": "Project",
+        "notifiche": {
+          "label": "AI Notifications",
+          "desc": "Alerts when AI updates the plan"
+        },
+        "autosave": {
+          "label": "Auto Save",
+          "desc": "Save changes automatically"
+        }
+      },
+      "visualizzazione": {
+        "label": "Display",
+        "currency": {
+          "label": "Thousands format",
+          "desc": "Show values in K€"
+        },
+        "dark": {
+          "label": "Dark Theme",
+          "desc": "Dark mode interface"
+        }
+      },
+      "lingua": {
+        "label": "Language"
+      }
+    }
+  }
+}

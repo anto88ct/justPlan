@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { BusinessPlanService, IncomeRow } from '../../services/business-plan.service';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-dashboard-cruscotto',
@@ -92,15 +93,34 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
       font-weight: 600 !important;
     }
     :host ::ng-deep .apexcharts-svg { overflow: visible; }
+
+    /* ── Dark mode ────────────────────────────────────────────────────────── */
+    :host-context(.dark) .cell-editable:hover { background: rgba(99,102,241,0.08); }
+
+    :host-context(.dark) ::ng-deep .apexcharts-tooltip {
+      background: #18181b !important;
+      border-color: #3f3f46 !important;
+      box-shadow: 0 8px 24px -4px rgba(0,0,0,0.5) !important;
+    }
+    :host-context(.dark) ::ng-deep .apexcharts-tooltip-title {
+      background: #27272a !important;
+      border-bottom-color: #3f3f46 !important;
+      color: #a1a1aa !important;
+    }
+    :host-context(.dark) ::ng-deep .apexcharts-tooltip-y-group { color: #f4f4f5 !important; }
+
+    :host-context(.dark) .year-input { color: #f4f4f5; }
+    :host-context(.dark) .year-input:focus { color: #818cf8; }
+    :host-context(.dark) .year-input::placeholder { color: #52525b; }
   `],
   template: `
     <div class="flex flex-col h-full overflow-y-auto scrollbar-thin">
 
       <!-- ═══ PAGE HEADER ═══ -->
-      <div class="animate-fade-in px-4 md:px-8 pt-5 md:pt-7 pb-4 border-b border-zinc-100 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
+      <div class="animate-fade-in px-4 md:px-8 pt-5 md:pt-7 pb-4 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
         <div>
           <p class="text-[10px] font-semibold text-brand-500 uppercase tracking-[0.18em] mb-1 font-body">Panoramica</p>
-          <h1 class="text-xl md:text-2xl font-bold text-zinc-900 font-display tracking-tight">Business Plan 2025–2027</h1>
+          <h1 class="text-xl md:text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display tracking-tight">Business Plan 2025–2027</h1>
         </div>
         @if (planService.isAiUpdated()) {
           <div class="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 rounded-full border border-emerald-200 animate-fade-in">
@@ -120,10 +140,10 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
         <div class="grid grid-cols-2 xl:grid-cols-4 gap-3">
           @for (kpi of kpiCards(); track kpi.id; let i = $index) {
             <div
-              class="animate-kpi-in bg-white rounded-2xl border shadow-card
+              class="animate-kpi-in bg-white dark:bg-zinc-900 rounded-2xl border shadow-card
                      hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-300
                      p-4 md:p-5 flex flex-col gap-3 min-w-0 relative overflow-hidden"
-              [ngClass]="planService.isAiUpdated() ? 'border-emerald-200 ring-1 ring-emerald-100' : 'border-zinc-100'"
+              [ngClass]="planService.isAiUpdated() ? 'border-emerald-200 dark:border-emerald-800 ring-1 ring-emerald-100 dark:ring-emerald-900/40' : 'border-zinc-100 dark:border-zinc-800'"
               [style.animation-delay]="(i * 65) + 'ms'">
 
               <!-- Colored accent bar at top -->
@@ -147,9 +167,9 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
 
               <!-- Label + Value -->
               <div class="min-w-0">
-                <p class="text-[11px] text-zinc-400 font-medium font-body truncate mb-0.5">{{ kpi.label }}</p>
+                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium font-body truncate mb-0.5">{{ kpi.label }}</p>
                 <p class="text-xl md:text-[1.6rem] font-bold font-mono number-highlight truncate leading-tight transition-colors duration-500"
-                   [ngClass]="planService.isAiUpdated() ? 'text-emerald-600' : 'text-zinc-900'">
+                   [ngClass]="planService.isAiUpdated() ? 'text-emerald-600' : 'text-zinc-900 dark:text-zinc-100'">
                   {{ kpi.value }}
                 </p>
               </div>
@@ -158,15 +178,15 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
         </div>
 
         <!-- ═══ CASH FLOW CHART ═══ -->
-        <div class="animate-slide-up bg-white rounded-2xl border border-zinc-100 shadow-card p-4 md:p-6"
+        <div class="animate-slide-up bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-card p-4 md:p-6"
              style="animation-delay: 280ms">
           <!-- Chart header -->
           <div class="flex flex-wrap items-start justify-between gap-2 mb-2">
             <div>
-              <h3 class="text-sm font-semibold text-zinc-800 font-display">Flusso di Cassa</h3>
-              <p class="text-[11px] text-zinc-400 font-body mt-0.5">Proiezione mensile — Anno 1</p>
+              <h3 class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-display">Flusso di Cassa</h3>
+              <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Proiezione mensile — Anno 1</p>
             </div>
-            <div class="flex items-center gap-4 text-[11px] text-zinc-400 font-body">
+            <div class="flex items-center gap-4 text-[11px] text-zinc-400 dark:text-zinc-500 font-body">
               <div class="flex items-center gap-1.5">
                 <div class="w-3 h-0.5 rounded-full transition-colors duration-500"
                      [ngClass]="planService.isAiUpdated() ? 'bg-emerald-500' : 'bg-brand-500'"></div>
@@ -188,7 +208,7 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
             [stroke]="apexStroke"
             [fill]="apexFill"
             [colors]="apexColors()"
-            [grid]="apexGrid"
+            [grid]="apexGrid()"
             [markers]="apexMarkers"
             [tooltip]="apexTooltip"
             [responsive]="apexResponsive"
@@ -196,15 +216,15 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
         </div>
 
         <!-- ═══ INCOME STATEMENT TABLE ═══ -->
-        <div class="animate-slide-up bg-white rounded-2xl border border-zinc-100 shadow-card overflow-hidden"
+        <div class="animate-slide-up bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-card overflow-hidden"
              style="animation-delay: 380ms">
           <!-- Table header -->
-          <div class="px-4 md:px-6 py-3 md:py-4 border-b border-zinc-100 flex flex-wrap items-center justify-between gap-2">
+          <div class="px-4 md:px-6 py-3 md:py-4 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-2">
             <div>
-              <h3 class="text-sm font-semibold text-zinc-800 font-display">Conto Economico Sintetico</h3>
-              <p class="text-[11px] text-zinc-400 font-body mt-0.5">Proiezione triennale</p>
+              <h3 class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-display">Conto Economico Sintetico</h3>
+              <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Proiezione triennale</p>
             </div>
-            <div class="hidden sm:flex items-center gap-4 text-[10px] text-zinc-400 font-body">
+            <div class="hidden sm:flex items-center gap-4 text-[10px] text-zinc-400 dark:text-zinc-500 font-body">
               <div class="flex items-center gap-1">
                 <svg class="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                      stroke="currentColor" stroke-width="2">
@@ -226,17 +246,17 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
 
           <!-- Scrollable table with right-fade on mobile -->
           <div class="relative overflow-x-auto">
-            <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none z-10 md:hidden"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-zinc-900 to-transparent pointer-events-none z-10 md:hidden"></div>
             <table class="w-full border-collapse min-w-[440px]">
               <thead>
                 <tr>
-                  <th class="text-left px-4 md:px-6 py-3 text-[10px] font-semibold text-zinc-500 uppercase tracking-widest font-body bg-zinc-50/80 border-b border-zinc-100 whitespace-nowrap">
+                  <th class="text-left px-4 md:px-6 py-3 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest font-body bg-zinc-50/80 dark:bg-zinc-800/60 border-b border-zinc-100 dark:border-zinc-700 whitespace-nowrap">
                     Voce
                   </th>
-                  <th class="text-right px-4 py-3 text-[10px] font-semibold text-zinc-500 uppercase tracking-widest font-body bg-zinc-50/80 border-b border-zinc-100 whitespace-nowrap">
+                  <th class="text-right px-4 py-3 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest font-body bg-zinc-50/80 dark:bg-zinc-800/60 border-b border-zinc-100 dark:border-zinc-700 whitespace-nowrap">
                     Anno 1
                   </th>
-                  <th class="text-right px-4 py-3 text-[10px] font-semibold text-zinc-500 uppercase tracking-widest font-body bg-zinc-50/80 border-b border-zinc-100 whitespace-nowrap">
+                  <th class="text-right px-4 py-3 text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest font-body bg-zinc-50/80 dark:bg-zinc-800/60 border-b border-zinc-100 dark:border-zinc-700 whitespace-nowrap">
                     Anno 2
                   </th>
                   <th class="text-right px-4 md:px-6 py-3 text-[10px] font-semibold text-zinc-500 uppercase tracking-widest font-body bg-zinc-50/80 border-b border-zinc-100 whitespace-nowrap">
@@ -247,13 +267,13 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
               <tbody>
                 @for (row of planService.incomeStatement(); track row.label; let ri = $index) {
                   <tr [ngClass]="row.isHighlight
-                    ? 'bg-brand-50/50 border-b border-zinc-100'
-                    : 'bg-white border-b border-zinc-50 hover:bg-zinc-50/60 transition-colors duration-150'">
+                    ? 'bg-brand-50/50 dark:bg-brand-950/20 border-b border-zinc-100 dark:border-zinc-800'
+                    : 'bg-white dark:bg-zinc-900 border-b border-zinc-50 dark:border-zinc-800/50 hover:bg-zinc-50/60 dark:hover:bg-zinc-800/40 transition-colors duration-150'">
 
                     <!-- Label — clickable -->
                     <td [ngClass]="[
                         'px-4 md:px-6 py-0 text-sm font-body',
-                        row.isHighlight ? 'font-semibold text-zinc-800' : 'text-zinc-600'
+                        row.isHighlight ? 'font-semibold text-zinc-800 dark:text-zinc-200' : 'text-zinc-600 dark:text-zinc-400'
                       ]">
                       <button
                         class="label-clickable flex items-center gap-1.5 text-left w-full"
@@ -278,7 +298,7 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
                     <td [ngClass]="[
                         'px-4 py-0 text-right text-sm font-mono transition-all duration-300',
                         row.isHighlight ? 'font-semibold' : '',
-                        (row.isCost || row.anno1 < 0) ? 'text-rose-500' : 'text-zinc-800',
+                        (row.isCost || row.anno1 < 0) ? 'text-rose-500' : 'text-zinc-800 dark:text-zinc-200',
                         planService.isEditableRow(row.label) ? 'cell-editable' : 'opacity-60'
                       ]"
                       (click)="startEdit(row.label, 'anno1')">
@@ -297,7 +317,7 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
                     <td [ngClass]="[
                         'px-4 py-0 text-right text-sm font-mono transition-all duration-300',
                         row.isHighlight ? 'font-semibold' : '',
-                        (row.isCost || row.anno2 < 0) ? 'text-rose-500' : 'text-zinc-800',
+                        (row.isCost || row.anno2 < 0) ? 'text-rose-500' : 'text-zinc-800 dark:text-zinc-200',
                         planService.isEditableRow(row.label) ? 'cell-editable' : 'opacity-60'
                       ]"
                       (click)="startEdit(row.label, 'anno2')">
@@ -316,7 +336,7 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
                     <td [ngClass]="[
                         'px-4 md:px-6 py-0 text-right text-sm font-mono transition-all duration-300',
                         row.isHighlight ? 'font-semibold' : '',
-                        (row.isCost || row.anno3 < 0) ? 'text-rose-500' : 'text-zinc-800',
+                        (row.isCost || row.anno3 < 0) ? 'text-rose-500' : 'text-zinc-800 dark:text-zinc-200',
                         planService.isEditableRow(row.label) ? 'cell-editable' : 'opacity-60'
                       ]"
                       (click)="startEdit(row.label, 'anno3')">
@@ -350,10 +370,10 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
 
       <!-- Drawer panel -->
       <aside @drawerSlide
-             class="fixed inset-y-0 right-0 z-50 w-full max-w-sm sm:max-w-md flex flex-col bg-white shadow-2xl border-l border-zinc-200">
+             class="fixed inset-y-0 right-0 z-50 w-full max-w-sm sm:max-w-md flex flex-col bg-white dark:bg-zinc-900 shadow-2xl border-l border-zinc-200 dark:border-zinc-800">
 
         <!-- Drawer header -->
-        <div class="flex items-start justify-between px-5 pt-5 pb-4 border-b border-zinc-100">
+        <div class="flex items-start justify-between px-5 pt-5 pb-4 border-b border-zinc-100 dark:border-zinc-800">
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-1.5">
               @if (planService.isEditableRow(selectedRow()!.label)) {
@@ -366,7 +386,7 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
                   Modificabile
                 </span>
               } @else {
-                <span class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 bg-zinc-100 border border-zinc-200 px-2 py-0.5 rounded-full font-body">
+                <span class="inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded-full font-body">
                   <svg class="w-2.5 h-2.5 flex-shrink-0" fill="none" viewBox="0 0 24 24"
                        stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round"
@@ -376,11 +396,11 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
                 </span>
               }
             </div>
-            <h2 class="text-lg md:text-xl font-bold text-zinc-900 font-display truncate">{{ selectedRow()!.label }}</h2>
-            <p class="text-[11px] text-zinc-400 font-body mt-0.5">Proiezione triennale</p>
+            <h2 class="text-lg md:text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display truncate">{{ selectedRow()!.label }}</h2>
+            <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Proiezione triennale</p>
           </div>
           <button
-            class="ml-3 flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+            class="ml-3 flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             (click)="closeDetail()">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -398,8 +418,8 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
                  [ngClass]="[
                    'rounded-2xl border p-4 md:p-5 transition-all duration-200',
                    yc.isEditable
-                     ? 'border-zinc-200 hover:border-brand-200 hover:shadow-sm bg-white'
-                     : 'border-zinc-100 bg-zinc-50/60'
+                     ? 'border-zinc-200 dark:border-zinc-700 hover:border-brand-200 dark:hover:border-brand-700 hover:shadow-sm bg-white dark:bg-zinc-800'
+                     : 'border-zinc-100 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-800/40'
                  ]">
               <div class="flex items-center justify-between mb-3">
                 <span class="text-[10px] font-bold uppercase tracking-widest font-body"
@@ -417,12 +437,12 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
               </div>
 
               @if (yc.isEditable) {
-                <div class="flex items-end gap-1 border-b-2 border-zinc-200 focus-within:border-brand-400 pb-1 transition-colors">
-                  <span class="text-zinc-400 text-lg font-mono mb-0.5">€</span>
+                <div class="flex items-end gap-1 border-b-2 border-zinc-200 dark:border-zinc-600 focus-within:border-brand-400 pb-1 transition-colors">
+                  <span class="text-zinc-400 dark:text-zinc-500 text-lg font-mono mb-0.5">€</span>
                   <input
                     type="number"
                     class="year-input"
-                    [ngClass]="detailValues()![yc.key] < 0 ? 'text-rose-500' : 'text-zinc-900'"
+                    [ngClass]="detailValues()![yc.key] < 0 ? 'text-rose-500' : 'text-zinc-900 dark:text-zinc-100'"
                     [ngModel]="detailValues()![yc.key]"
                     (ngModelChange)="updateDetailValue(yc.key, $event)"
                     [placeholder]="'0'"/>
@@ -431,15 +451,15 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
               } @else {
                 <p [ngClass]="[
                     'text-2xl font-bold font-mono',
-                    getAnnoValue(selectedRow()!, yi + 1) < 0 ? 'text-rose-500' : 'text-zinc-800'
+                    getAnnoValue(selectedRow()!, yi + 1) < 0 ? 'text-rose-500' : 'text-zinc-800 dark:text-zinc-200'
                   ]">
                   {{ formatCurrency(getAnnoValue(selectedRow()!, yi + 1)) }}
                 </p>
-                <p class="text-[11px] text-zinc-400 font-body mt-1">Valore calcolato automaticamente</p>
+                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-body mt-1">Valore calcolato automaticamente</p>
               }
 
               <!-- Mini progress bar -->
-              <div class="mt-4 h-1 rounded-full bg-zinc-100 overflow-hidden">
+              <div class="mt-4 h-1 rounded-full bg-zinc-100 dark:bg-zinc-700 overflow-hidden">
                 <div class="bar-segment h-full rounded-full"
                      [style.width.%]="yc.barPct"
                      [ngClass]="yc.isEditable ? 'bg-brand-400' : 'bg-zinc-300'"></div>
@@ -448,9 +468,9 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
           }
 
           <!-- Triennial comparison bars -->
-          <div class="animate-slide-up rounded-2xl border border-zinc-100 bg-zinc-50 px-5 py-4"
+          <div class="animate-slide-up rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50 px-5 py-4"
                style="animation-delay: 240ms">
-            <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-widest font-body mb-3">Confronto triennale</p>
+            <p class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-3">Confronto triennale</p>
             <div class="flex items-end gap-2 h-14">
               @for (bar of comparisonBars(); track bar.year) {
                 <div class="flex-1 flex flex-col items-center gap-1">
@@ -461,7 +481,7 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
                          bar.isMax ? (bar.negative ? '!bg-rose-500' : '!bg-brand-500') : ''
                        ]">
                   </div>
-                  <span class="text-[10px] font-body text-zinc-400">{{ bar.year }}</span>
+                  <span class="text-[10px] font-body text-zinc-400 dark:text-zinc-500">{{ bar.year }}</span>
                 </div>
               }
             </div>
@@ -470,7 +490,7 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
         </div>
 
         <!-- Drawer footer -->
-        <div class="px-5 py-4 border-t border-zinc-100 flex items-center gap-3">
+        <div class="px-5 py-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-3">
           @if (planService.isEditableRow(selectedRow()!.label)) {
             <button
               class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-brand-600 hover:bg-brand-700 active:scale-[0.98] text-white text-sm font-semibold rounded-xl transition-all duration-150 font-body shadow-sm"
@@ -482,13 +502,13 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
               Salva modifiche
             </button>
             <button
-              class="px-4 py-2.5 text-sm font-medium text-zinc-600 hover:text-zinc-800 hover:bg-zinc-100 rounded-xl transition-colors font-body"
+              class="px-4 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors font-body"
               (click)="closeDetail()">
               Annulla
             </button>
           } @else {
             <button
-              class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-sm font-semibold rounded-xl transition-colors font-body"
+              class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-sm font-semibold rounded-xl transition-colors font-body"
               (click)="closeDetail()">
               Chiudi
             </button>
@@ -501,6 +521,7 @@ import { BusinessPlanService, IncomeRow } from '../../services/business-plan.ser
 })
 export class DashboardCruscottoComponent {
   readonly planService = inject(BusinessPlanService);
+  private themeService = inject(ThemeService);
 
   editingCell = signal<{ rowLabel: string; year: 'anno1' | 'anno2' | 'anno3' } | null>(null);
   selectedRow  = signal<IncomeRow | null>(null);
@@ -530,13 +551,13 @@ export class DashboardCruscottoComponent {
     gradient: { shadeIntensity: 1, opacityFrom: 0.20, opacityTo: 0.01, stops: [0, 95, 100] },
   };
 
-  readonly apexGrid = {
-    borderColor: '#f4f4f5',
+  readonly apexGrid = computed(() => ({
+    borderColor: this.themeService.dark() ? '#27272a' : '#f4f4f5',
     strokeDashArray: 4,
     yaxis: { lines: { show: true } },
     xaxis: { lines: { show: false } },
     padding: { top: 0, right: 8, bottom: 0, left: 8 },
-  };
+  }));
 
   readonly apexYaxis = { show: false };
 

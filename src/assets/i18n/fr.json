@@ -1,0 +1,198 @@
+{
+  "nav": {
+    "panoramica": "Aperçu",
+    "wizard": "Assistant",
+    "dashboard": "Tableau de bord",
+    "scenari": "Scénarios What-If",
+    "report": "Rapport",
+    "impostazioni": "Paramètres",
+    "pianiSalvati": "Mes Plans",
+    "coWork": "Co-Work",
+    "profilo": "Profil",
+    "businessPlan": "Plan d'affaires",
+    "caricamenti": "Chargements",
+    "scenariLabel": "Scénarios",
+    "menu": "Menu"
+  },
+  "sidebar": {
+    "expandTooltip": "Agrandir la barre latérale",
+    "collapseTitle": "Réduire la barre latérale",
+    "pianoCorrente": "Plan",
+    "profiloTooltip": "Profil",
+    "founder": "Fondateur",
+    "pianostarter": "Plan Starter",
+    "myProject": "Mon Projet"
+  },
+  "topbar": {
+    "modifica": "Modifier",
+    "pdf": "PDF",
+    "salva": "Enregistrer le Plan d'affaires",
+    "salvato": "Enregistré !",
+    "condividi": "Partager",
+    "aiCopilot": "AI Copilot",
+    "aiCopilotDockTitle": "Ancrer à droite",
+    "aiCopilotFullscreenTitle": "Plein écran",
+    "aiCopilotCloseTitle": "Fermer"
+  },
+  "panoramica": {
+    "hero": {
+      "subtitle": "Votre CFO Virtuel",
+      "title": "Plan d'affaires en 3 minutes. Vraiment.",
+      "desc": "Saisissez vos données une fois. L'AI Copilot analyse, simule et optimise votre plan financier.",
+      "cta": "Commencer maintenant",
+      "vediPiano": "Voir le Plan"
+    },
+    "pianoCorrente": "Plan actuel",
+    "comeFunziona": "Comment ça marche",
+    "guidaRapida": "Guide rapide",
+    "clicca": "Cliquez sur une étape pour commencer",
+    "tip": {
+      "title": "Conseil",
+      "desc": "Après l'assistant, utilisez l'AI Copilot pour simuler des scénarios what-if en quelques secondes.",
+      "btn": "Ouvrir AI"
+    }
+  },
+  "tutorial": {
+    "step1": {
+      "title": "Configurer le Projet",
+      "desc": "Saisissez les revenus, les coûts et l'équipe avec l'assistant guidé.",
+      "cta": "Aller à l'Assistant"
+    },
+    "step2": {
+      "title": "Analyser les KPI",
+      "desc": "Visualisez le chiffre d'affaires, l'EBITDA et les flux de trésorerie en temps réel.",
+      "cta": "Voir le Tableau de bord"
+    },
+    "step3": {
+      "title": "Simuler des Scénarios",
+      "desc": "Demandez à l'AI Copilot ce qui se passe si vous changez de stratégie.",
+      "cta": "Ouvrir les Scénarios"
+    },
+    "step4": {
+      "title": "Exporter le Rapport",
+      "desc": "Générez un PDF professionnel pour les investisseurs et les parties prenantes.",
+      "cta": "Voir le Rapport"
+    }
+  },
+  "scenari": {
+    "label": "Scénarios",
+    "title": "Simulateur What-If",
+    "desc": "Cliquez sur un scénario pour l'ouvrir dans l'AI Copilot.",
+    "noPlan": "générez un Plan d'affaires.",
+    "noPlanStrong": "D'abord",
+    "goToWizard": "Aller à l'assistant →",
+    "variazionePrezzo": "Changement de Prix",
+    "variazionePrezzo_q": "Que se passe-t-il si j'augmente le prix à 59€?",
+    "espansioneTeam": "Expansion de l'Équipe",
+    "espansioneTeam_q": "Simuler 2 employés supplémentaires à partir du Q3",
+    "riduzioneCosti": "Réduction des Coûts",
+    "riduzioneCosti_q": "Combien de runway je gagne en réduisant le marketing de 20%?",
+    "nuovoMercato": "Nouveau Marché",
+    "nuovoMercato_q": "Projection si je lance au Royaume-Uni avec un volume +30%"
+  },
+  "pianiSalvati": {
+    "archivio": "Archive",
+    "title": "Mes Plans",
+    "count": "plans enregistrés",
+    "nuovoPiano": "Nouveau Plan",
+    "nessunPiano": "Aucun plan enregistré",
+    "nessunPianoDesc": "Générez un plan et appuyez sur \"Enregistrer le Plan d'affaires\".",
+    "condiviso": "Partagé",
+    "fatturatoY1": "CA A1",
+    "ebitdaY1": "EBITDA A1",
+    "utileNetto": "Bénéfice Net",
+    "cashRunway": "Cash Runway",
+    "mesi": "mois",
+    "sostenibile": "Plan viable",
+    "rivedere": "Revoir les coûts",
+    "caricaPiano": "Charger le Plan"
+  },
+  "cowork": {
+    "title": "Co-Work",
+    "pianoBtn": "Plan",
+    "invitaEmail": "Inviter par email",
+    "linkInvito": "Lien d'invitation",
+    "copiato": "Copié",
+    "copia": "Copier",
+    "teamLabel": "Équipe ({{count}})",
+    "attesa": "en attente",
+    "attivi": "actifs",
+    "founderLabel": "Fondateur (vous)",
+    "nessunCollaboratore": "Aucun collaborateur",
+    "nessunCollaboratoreDesc": "Invitez par email ou lien.",
+    "attivo": "Actif",
+    "inAttesa": "En attente",
+    "tooltipReader": "Lecteur — consultation seulement",
+    "tooltipEditor": "Éditeur — peut modifier",
+    "tooltip2h": "Le lien expire 2 heures après sa génération"
+  },
+  "share": {
+    "title": "Partager le Plan d'affaires",
+    "generaLink": "Générer un Lien",
+    "inviaEmail": "Envoyer un Email",
+    "permessiAccesso": "Permissions d'accès",
+    "permessi": "Permissions",
+    "soloLettura": "Lecture seule",
+    "puoModificare": "Peut modifier",
+    "generaLinkBtn": "Générer un Lien",
+    "linkGenerato": "Lien généré",
+    "copiato": "Copié",
+    "copia": "Copier",
+    "accessoEditor": "Accès Éditeur",
+    "accessoReader": "Accès Lecteur",
+    "rigenera": "Régénérer",
+    "indirizzoEmail": "Adresse email",
+    "invitoInviato": "Invitation envoyée !",
+    "inviaInvito": "Envoyer l'Invitation"
+  },
+  "kpi": {
+    "fatturatoY1": "CA A1",
+    "ebitdaY1": "EBITDA A1",
+    "utileNetto": "Bénéfice Net",
+    "cashRunway": "Cash Runway",
+    "mesi": "mois"
+  },
+  "views": {
+    "panoramica": "Aperçu",
+    "wizard": "Nouveau Plan",
+    "dashboard": "Plan d'affaires",
+    "scenari": "Scénarios What-If",
+    "report": "Rapport",
+    "impostazioni": "Paramètres",
+    "pianiSalvati": "Mes Plans",
+    "coWork": "Co-Work",
+    "profilo": "Profil",
+    "caricamenti": "Chargements"
+  },
+  "settings": {
+    "subtitle": "Config",
+    "title": "Paramètres",
+    "sections": {
+      "progetto": {
+        "label": "Projet",
+        "notifiche": {
+          "label": "Notifications IA",
+          "desc": "Alertes quand l'IA met à jour le plan"
+        },
+        "autosave": {
+          "label": "Sauvegarde Auto",
+          "desc": "Enregistrer les modifications automatiquement"
+        }
+      },
+      "visualizzazione": {
+        "label": "Affichage",
+        "currency": {
+          "label": "Format en milliers",
+          "desc": "Afficher les valeurs en K€"
+        },
+        "dark": {
+          "label": "Thème Sombre",
+          "desc": "Interface en mode sombre"
+        }
+      },
+      "lingua": {
+        "label": "Langue"
+      }
+    }
+  }
+}

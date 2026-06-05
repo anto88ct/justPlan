@@ -1,0 +1,198 @@
+{
+  "nav": {
+    "panoramica": "Panoramica",
+    "wizard": "Wizard",
+    "dashboard": "Dashboard",
+    "scenari": "Scenari What-If",
+    "report": "Report",
+    "impostazioni": "Impostazioni",
+    "pianiSalvati": "I Miei Piani",
+    "coWork": "Co-Work",
+    "profilo": "Profilo",
+    "businessPlan": "Business Plan",
+    "caricamenti": "Caricamenti",
+    "scenariLabel": "Scenari",
+    "menu": "Menu"
+  },
+  "sidebar": {
+    "expandTooltip": "Espandi sidebar",
+    "collapseTitle": "Comprimi sidebar",
+    "pianoCorrente": "Piano",
+    "profiloTooltip": "Profilo",
+    "founder": "Founder",
+    "pianostarter": "Piano Starter",
+    "myProject": "Il mio Progetto"
+  },
+  "topbar": {
+    "modifica": "Modifica",
+    "pdf": "PDF",
+    "salva": "Salva Business Plan",
+    "salvato": "Salvato!",
+    "condividi": "Condividi",
+    "aiCopilot": "AI Copilot",
+    "aiCopilotDockTitle": "Aggancia a destra",
+    "aiCopilotFullscreenTitle": "Schermo intero",
+    "aiCopilotCloseTitle": "Chiudi"
+  },
+  "panoramica": {
+    "hero": {
+      "subtitle": "Il tuo CFO Virtuale",
+      "title": "Business Plan in 3 minuti. Davvero.",
+      "desc": "Inserisci i dati una volta. L'AI Copilot analizza, simula e ottimizza il tuo piano finanziario.",
+      "cta": "Inizia ora",
+      "vediPiano": "Vedi Piano"
+    },
+    "pianoCorrente": "Piano corrente",
+    "comeFunziona": "Come funziona",
+    "guidaRapida": "Guida rapida",
+    "clicca": "Clicca un passo per iniziare",
+    "tip": {
+      "title": "Suggerimento",
+      "desc": "Dopo il wizard, usa l'AI Copilot per simulare scenari what-if in pochi secondi.",
+      "btn": "Apri AI"
+    }
+  },
+  "tutorial": {
+    "step1": {
+      "title": "Configura il Progetto",
+      "desc": "Inserisci ricavi, costi e team con il wizard guidato.",
+      "cta": "Vai al Wizard"
+    },
+    "step2": {
+      "title": "Analizza i KPI",
+      "desc": "Visualizza fatturato, EBITDA e cash flow in tempo reale.",
+      "cta": "Vedi Dashboard"
+    },
+    "step3": {
+      "title": "Simula Scenari",
+      "desc": "Chiedi all'AI Copilot cosa succede se cambi strategia.",
+      "cta": "Apri Scenari"
+    },
+    "step4": {
+      "title": "Esporta il Report",
+      "desc": "Genera un PDF professionale per investitori e stakeholder.",
+      "cta": "Vedi Report"
+    }
+  },
+  "scenari": {
+    "label": "Scenari",
+    "title": "What-If Simulator",
+    "desc": "Clicca uno scenario per aprirlo nell'AI Copilot.",
+    "noPlan": "genera un Business Plan.",
+    "noPlanStrong": "Prima",
+    "goToWizard": "Vai al wizard →",
+    "variazionePrezzo": "Variazione Prezzo",
+    "variazionePrezzo_q": "Cosa succede se alzo il prezzo a 59€?",
+    "espansioneTeam": "Espansione Team",
+    "espansioneTeam_q": "Simula 2 dipendenti in più dal Q3",
+    "riduzioneCosti": "Riduzione Costi",
+    "riduzioneCosti_q": "Quanto runway guadagno tagliando il marketing 20%?",
+    "nuovoMercato": "Nuovo Mercato",
+    "nuovoMercato_q": "Proiezione se lancio in UK con volume +30%"
+  },
+  "pianiSalvati": {
+    "archivio": "Archivio",
+    "title": "I Miei Piani",
+    "count": "piani salvati",
+    "nuovoPiano": "Nuovo Piano",
+    "nessunPiano": "Nessun piano salvato",
+    "nessunPianoDesc": "Genera un piano e premi \"Salva Business Plan\".",
+    "condiviso": "Condiviso",
+    "fatturatoY1": "Fatturato Y1",
+    "ebitdaY1": "EBITDA Y1",
+    "utileNetto": "Utile Netto",
+    "cashRunway": "Cash Runway",
+    "mesi": "mesi",
+    "sostenibile": "Piano sostenibile",
+    "rivedere": "Rivedere i costi",
+    "caricaPiano": "Carica Piano"
+  },
+  "cowork": {
+    "title": "Co-Work",
+    "pianoBtn": "Piano",
+    "invitaEmail": "Invita via email",
+    "linkInvito": "Link invito",
+    "copiato": "Copiato",
+    "copia": "Copia",
+    "teamLabel": "Team ({{count}})",
+    "attesa": "attesa",
+    "attivi": "attivi",
+    "founderLabel": "Founder (tu)",
+    "nessunCollaboratore": "Nessun collaboratore",
+    "nessunCollaboratoreDesc": "Invita via email o link.",
+    "attivo": "Attivo",
+    "inAttesa": "In attesa",
+    "tooltipReader": "Lettore — solo visualizzazione",
+    "tooltipEditor": "Editor — può modificare",
+    "tooltip2h": "Il link scade dopo 2 ore dalla generazione"
+  },
+  "share": {
+    "title": "Condividi Business Plan",
+    "generaLink": "Genera Link",
+    "inviaEmail": "Invia Email",
+    "permessiAccesso": "Permessi accesso",
+    "permessi": "Permessi",
+    "soloLettura": "Solo lettura",
+    "puoModificare": "Può modificare",
+    "generaLinkBtn": "Genera Link",
+    "linkGenerato": "Link generato",
+    "copiato": "Copiato",
+    "copia": "Copia",
+    "accessoEditor": "Accesso Editor",
+    "accessoReader": "Accesso Reader",
+    "rigenera": "Rigenera",
+    "indirizzoEmail": "Indirizzo email",
+    "invitoInviato": "Invito inviato!",
+    "inviaInvito": "Invia Invito"
+  },
+  "kpi": {
+    "fatturatoY1": "Fatturato Y1",
+    "ebitdaY1": "EBITDA Y1",
+    "utileNetto": "Utile Netto",
+    "cashRunway": "Cash Runway",
+    "mesi": "mesi"
+  },
+  "views": {
+    "panoramica": "Panoramica",
+    "wizard": "Nuovo Piano",
+    "dashboard": "Business Plan",
+    "scenari": "Scenari What-If",
+    "report": "Report",
+    "impostazioni": "Impostazioni",
+    "pianiSalvati": "I Miei Piani",
+    "coWork": "Co-Work",
+    "profilo": "Profilo",
+    "caricamenti": "Caricamenti"
+  },
+  "settings": {
+    "subtitle": "Config",
+    "title": "Impostazioni",
+    "sections": {
+      "progetto": {
+        "label": "Progetto",
+        "notifiche": {
+          "label": "Notifiche AI",
+          "desc": "Avvisi quando l'AI aggiorna il piano"
+        },
+        "autosave": {
+          "label": "Salvataggio Auto",
+          "desc": "Salva modifiche automaticamente"
+        }
+      },
+      "visualizzazione": {
+        "label": "Visualizzazione",
+        "currency": {
+          "label": "Formato in migliaia",
+          "desc": "Mostra i valori in K€"
+        },
+        "dark": {
+          "label": "Tema Scuro",
+          "desc": "Interfaccia in dark mode"
+        }
+      },
+      "lingua": {
+        "label": "Lingua"
+      }
+    }
+  }
+}

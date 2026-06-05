@@ -1,7 +1,9 @@
 import { Component, signal, computed, inject, HostBinding, OnInit } from '@angular/core';
 import { ThemeService } from '../../services/theme.service';
+import { LanguageService } from '../../services/language.service';
 import { CommonModule, NgClass } from '@angular/common';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { WizardFormComponent } from '../wizard-form/wizard-form.component';
 import { DashboardCruscottoComponent } from '../dashboard-cruscotto/dashboard-cruscotto.component';
 import { AiChatbotComponent } from '../ai-chatbot/ai-chatbot.component';
@@ -45,7 +47,7 @@ interface SettingItem {
   selector: 'app-layout',
   standalone: true,
   host: { class: 'flex h-full w-full overflow-hidden' },
-  imports: [CommonModule, NgClass, MatTooltipModule, WizardFormComponent, DashboardCruscottoComponent, AiChatbotComponent, ReportComponent, ProfileComponent, UploadBusinessPlanComponent],
+  imports: [CommonModule, NgClass, MatTooltipModule, TranslatePipe, WizardFormComponent, DashboardCruscottoComponent, AiChatbotComponent, ReportComponent, ProfileComponent, UploadBusinessPlanComponent],
   styles: [`
     :host { display: flex; height: 100%; width: 100%; overflow: hidden; }
 
@@ -228,7 +230,7 @@ interface SettingItem {
       <!-- Logo row + collapse toggle -->
       @if (sidebarCollapsed()) {
         <div class="pt-5 pb-4 flex justify-center">
-          <button (click)="toggleSidebar()" matTooltip="Espandi sidebar" matTooltipPosition="right"
+          <button (click)="toggleSidebar()" [matTooltip]="'sidebar.expandTooltip' | translate" matTooltipPosition="right"
                   class="hidden lg:flex w-8 h-8 rounded-xl items-center justify-center
                          transition-all hover:scale-110 hover:ring-2 hover:ring-indigo-400/40"
                   style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
@@ -254,7 +256,7 @@ interface SettingItem {
             </div>
             <span class="text-base font-bold text-white tracking-tight font-display">AirPlan</span>
           </div>
-          <button (click)="toggleSidebar()" title="Comprimi sidebar"
+          <button (click)="toggleSidebar()" [title]="'sidebar.collapseTitle' | translate"
                   class="hidden lg:flex w-6 h-6 rounded-lg items-center justify-center
                          text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800 transition-all flex-shrink-0">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -275,7 +277,7 @@ interface SettingItem {
             </div>
             <div class="flex-1 text-left min-w-0">
               <p class="text-xs font-semibold text-zinc-200 truncate font-body">{{ projectDisplayName() }}</p>
-              <p class="text-xs text-zinc-600 font-body">Piano {{ planService.currentStartYear() }}</p>
+              <p class="text-xs text-zinc-600 font-body">{{ 'sidebar.pianoCorrente' | translate }} {{ planService.currentStartYear() }}</p>
             </div>
             <svg class="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors flex-shrink-0"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -290,13 +292,13 @@ interface SettingItem {
       <!-- Nav -->
       <nav class="flex-1 px-2 space-y-0.5 overflow-y-auto">
         @if (!sidebarCollapsed()) {
-          <p class="px-3 mb-2 text-xs font-semibold text-zinc-600 uppercase tracking-[0.12em] font-body">Menu</p>
+          <p class="px-3 mb-2 text-xs font-semibold text-zinc-600 uppercase tracking-[0.12em] font-body">{{ 'nav.menu' | translate }}</p>
         }
 
         @for (item of navItems; track item.id) {
           <button
             (click)="navigate(item)"
-            [matTooltip]="sidebarCollapsed() ? item.label : ''"
+            [matTooltip]="sidebarCollapsed() ? (item.label | translate) : ''"
             matTooltipPosition="right"
             [ngClass]="[
               'nav-btn w-full flex items-center px-3 py-2.5 rounded-xl text-sm transition-all duration-200 font-body group relative overflow-hidden',
@@ -312,7 +314,7 @@ interface SettingItem {
               <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svgPath"/>
             </svg>
             @if (!sidebarCollapsed()) {
-              <span class="flex-1 text-left z-10 text-[13px]">{{ item.label }}</span>
+              <span class="flex-1 text-left z-10 text-[13px]">{{ item.label | translate }}</span>
               @if (item.id === 'piano' && hasPlan()) {
                 <span [ngClass]="[
                   'text-xs px-1.5 py-0.5 rounded-lg font-semibold z-10',
@@ -330,7 +332,7 @@ interface SettingItem {
       <div class="px-2 pb-4">
         <button
           (click)="navigate({ id: 'profilo', view: 'profilo' })"
-          [matTooltip]="sidebarCollapsed() ? 'Profilo' : ''"
+          [matTooltip]="sidebarCollapsed() ? ('sidebar.profiloTooltip' | translate) : ''"
           matTooltipPosition="right"
           [ngClass]="[
             'w-full flex items-center rounded-xl hover:bg-zinc-800/50 transition-colors py-2 px-2',
@@ -343,8 +345,8 @@ interface SettingItem {
           </div>
           @if (!sidebarCollapsed()) {
             <div class="flex-1 min-w-0 text-left">
-              <p class="text-xs font-semibold text-zinc-300 font-body truncate">Founder</p>
-              <p class="text-xs text-zinc-600 font-body truncate">Piano Starter</p>
+              <p class="text-xs font-semibold text-zinc-300 font-body truncate">{{ 'sidebar.founder' | translate }}</p>
+              <p class="text-xs text-zinc-600 font-body truncate">{{ 'sidebar.pianostarter' | translate }}</p>
             </div>
             <svg class="w-3.5 h-3.5 text-zinc-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round"
@@ -372,7 +374,7 @@ interface SettingItem {
           <svg class="w-3 h-3 text-zinc-300 dark:text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
           </svg>
-          <span class="text-zinc-700 dark:text-zinc-300 font-semibold">{{ currentTitle() }}</span>
+          <span class="text-zinc-700 dark:text-zinc-300 font-semibold">{{ currentTitle() | translate }}</span>
         </div>
 
         <div class="flex-1"></div>
@@ -383,13 +385,13 @@ interface SettingItem {
             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
             </svg>
-            <span class="hidden sm:inline">Modifica</span>
+            <span class="hidden sm:inline">{{ 'topbar.modifica' | translate }}</span>
           </button>
           <button (click)="exportPdf()" class="flex items-center gap-1.5 text-xs text-zinc-600 dark:text-zinc-400 px-2 sm:px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 bg-white dark:bg-zinc-800 transition-all font-body flex-shrink-0">
             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
             </svg>
-            <span class="hidden sm:inline">PDF</span>
+            <span class="hidden sm:inline">{{ 'topbar.pdf' | translate }}</span>
           </button>
           <button (click)="onSavePlan()"
                   [ngClass]="[
@@ -402,12 +404,12 @@ interface SettingItem {
               <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
               </svg>
-              <span class="hidden sm:inline">Salvato!</span>
+              <span class="hidden sm:inline">{{ 'topbar.salvato' | translate }}</span>
             } @else {
               <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
               </svg>
-              <span class="hidden sm:inline">Salva Business Plan</span>
+              <span class="hidden sm:inline">{{ 'topbar.salva' | translate }}</span>
             }
           </button>
           <button (click)="openShareDialog()"
@@ -416,7 +418,7 @@ interface SettingItem {
             <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
             </svg>
-            <span class="hidden sm:inline">Condividi</span>
+            <span class="hidden sm:inline">{{ 'topbar.condividi' | translate }}</span>
           </button>
         }
 
@@ -429,7 +431,7 @@ interface SettingItem {
           <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
           </svg>
-          <span class="hidden sm:inline">AI Copilot</span>
+          <span class="hidden sm:inline">{{ 'topbar.aiCopilot' | translate }}</span>
         </button>
       </header>
 
@@ -474,13 +476,13 @@ interface SettingItem {
                     <!-- Left: headline + CTA -->
                     <div class="flex-1 p-7 md:p-8">
                       <p class="text-indigo-400 text-[10px] font-bold font-body uppercase tracking-[0.2em] mb-3">
-                        Il tuo CFO Virtuale
+                        {{ 'panoramica.hero.subtitle' | translate }}
                       </p>
                       <h1 class="text-2xl md:text-[1.85rem] font-bold text-white font-display mb-3 leading-tight tracking-tight">
-                        Business Plan in<br>3 minuti. Davvero.
+                        {{ 'panoramica.hero.title' | translate }}
                       </h1>
                       <p class="text-zinc-400 text-sm font-body mb-6 leading-relaxed max-w-[300px]">
-                        Inserisci i dati una volta. L'AI Copilot analizza, simula e ottimizza il tuo piano finanziario.
+                        {{ 'panoramica.hero.desc' | translate }}
                       </p>
                       <div class="flex items-center gap-3 flex-wrap">
                         <button (click)="goToWizard()"
@@ -490,7 +492,7 @@ interface SettingItem {
                           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                           </svg>
-                          Inizia ora
+                          {{ 'panoramica.hero.cta' | translate }}
                         </button>
                         @if (hasPlan()) {
                           <button (click)="currentView.set('dashboard')"
@@ -499,7 +501,7 @@ interface SettingItem {
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                             </svg>
-                            Vedi Piano
+                            {{ 'panoramica.hero.vediPiano' | translate }}
                           </button>
                         }
                       </div>
@@ -538,7 +540,7 @@ interface SettingItem {
                 @if (hasPlan()) {
                   <div>
                     <p class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.16em] font-body mb-3">
-                      Piano corrente
+                      {{ 'panoramica.pianoCorrente' | translate }}
                     </p>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                       @for (kpi of liveKpis(); track kpi.label; let i = $index) {
@@ -558,13 +560,13 @@ interface SettingItem {
                   <div class="flex items-baseline justify-between mb-4">
                     <div>
                       <p class="text-[10px] font-semibold text-brand-500 uppercase tracking-[0.18em] font-body mb-0.5">
-                        Come funziona
+                        {{ 'panoramica.comeFunziona' | translate }}
                       </p>
-                      <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-display">Guida rapida</h2>
+                      <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-display">{{ 'panoramica.guidaRapida' | translate }}</h2>
                     </div>
                     @if (!hasPlan()) {
                       <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body hidden sm:block">
-                        Clicca un passo per iniziare
+                        {{ 'panoramica.clicca' | translate }}
                       </span>
                     }
                   </div>
@@ -641,16 +643,16 @@ interface SettingItem {
                       </svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="text-xs font-semibold text-brand-700 dark:text-brand-300 font-body">Suggerimento</p>
+                      <p class="text-xs font-semibold text-brand-700 dark:text-brand-300 font-body">{{ 'panoramica.tip.title' | translate }}</p>
                       <p class="text-[11px] text-brand-600 dark:text-brand-400 font-body leading-relaxed">
-                        Dopo il wizard, usa l'AI Copilot per simulare scenari what-if in pochi secondi.
+                        {{ 'panoramica.tip.desc' | translate }}
                       </p>
                     </div>
                     <button (click)="toggleAi()"
                             class="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-semibold text-brand-600 dark:text-brand-400
                                    hover:text-brand-800 dark:hover:text-brand-200 px-3 py-1.5 bg-white dark:bg-zinc-900 rounded-xl border border-brand-200 dark:border-brand-800
                                    hover:border-brand-300 transition-all font-body whitespace-nowrap">
-                      Apri AI
+                      {{ 'panoramica.tip.btn' | translate }}
                       <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                       </svg>
@@ -680,18 +682,18 @@ interface SettingItem {
           @if (currentView() === 'scenari') {
             <div class="view-enter h-full overflow-y-auto scrollbar-thin p-8">
               <div class="max-w-xl mx-auto">
-                <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">Scenari</p>
-                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display mb-1">What-If Simulator</h1>
-                <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mb-7">Clicca uno scenario per aprirlo nell'AI Copilot.</p>
+                <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">{{ 'scenari.label' | translate }}</p>
+                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display mb-1">{{ 'scenari.title' | translate }}</h1>
+                <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mb-7">{{ 'scenari.desc' | translate }}</p>
                 <div class="space-y-3">
-                  @for (s of scenariExamples; track s.q; let i = $index) {
+                  @for (s of scenariExamples; track s.titleKey; let i = $index) {
                     <button
                       class="w-full bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-4 shadow-card text-left
                              hover:border-brand-200 dark:hover:border-brand-800 hover:shadow-card-hover hover:-translate-y-0.5
                              transition-all duration-200 group"
                       [style.animation-delay]="(i * 65 + 50) + 'ms'"
                       style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;"
-                      (click)="openAiWithScenario(s.q)">
+                      (click)="openAiWithScenario(translate.instant(s.qKey))">
                       <div class="flex items-center gap-4">
                         <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
                              [ngClass]="s.iconBg">
@@ -703,9 +705,9 @@ interface SettingItem {
                         </div>
                         <div class="flex-1 min-w-0">
                           <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body group-hover:text-brand-700 dark:group-hover:text-brand-400 transition-colors">
-                            {{ s.title }}
+                            {{ s.titleKey | translate }}
                           </p>
-                          <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5 italic truncate">"{{ s.q }}"</p>
+                          <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5 italic truncate">"{{ s.qKey | translate }}"</p>
                         </div>
                         <svg class="w-4 h-4 text-zinc-300 dark:text-zinc-600 group-hover:text-brand-500 dark:group-hover:text-brand-400 group-hover:translate-x-0.5
                                     transition-all flex-shrink-0"
@@ -720,9 +722,9 @@ interface SettingItem {
                   <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-100 dark:border-amber-900/40"
                        style="animation: viewEnter 0.5s 0.3s cubic-bezier(0.16,1,0.3,1) both;">
                     <p class="text-sm text-amber-700 dark:text-amber-400 font-body">
-                      <strong>Prima</strong> genera un Business Plan.
+                      <strong>{{ 'scenari.noPlanStrong' | translate }}</strong> {{ 'scenari.noPlan' | translate }}
                       <button (click)="goToWizard()" class="ml-1 underline font-bold hover:text-amber-900 dark:hover:text-amber-200 transition-colors">
-                        Vai al wizard →
+                        {{ 'scenari.goToWizard' | translate }}
                       </button>
                     </p>
                   </div>
@@ -737,9 +739,9 @@ interface SettingItem {
               <div class="max-w-4xl mx-auto">
                 <div class="flex items-start justify-between mb-7">
                   <div>
-                    <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">Archivio</p>
-                    <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display">I Miei Piani</h1>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mt-1">{{ planService.savedPlans().length }} piani salvati</p>
+                    <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">{{ 'pianiSalvati.archivio' | translate }}</p>
+                    <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display">{{ 'pianiSalvati.title' | translate }}</h1>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mt-1">{{ planService.savedPlans().length }} {{ 'pianiSalvati.count' | translate }}</p>
                   </div>
                   <button (click)="goToWizard()"
                           class="flex items-center gap-2 px-4 py-2.5 bg-brand-600 hover:bg-brand-500
@@ -748,7 +750,7 @@ interface SettingItem {
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
                     </svg>
-                    Nuovo Piano
+                    {{ 'pianiSalvati.nuovoPiano' | translate }}
                   </button>
                 </div>
                 @if (planService.savedPlans().length === 0) {
@@ -758,8 +760,8 @@ interface SettingItem {
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12l1-12"/>
                       </svg>
                     </div>
-                    <p class="text-sm font-semibold text-zinc-600 dark:text-zinc-400 font-display mb-1">Nessun piano salvato</p>
-                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Genera un piano e premi "Salva Business Plan".</p>
+                    <p class="text-sm font-semibold text-zinc-600 dark:text-zinc-400 font-display mb-1">{{ 'pianiSalvati.nessunPiano' | translate }}</p>
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.nessunPianoDesc' | translate }}</p>
                   </div>
                 } @else {
                   <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -778,7 +780,7 @@ interface SettingItem {
                                 <svg class="w-3 h-3 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                                 </svg>
-                                <span class="text-[10px] font-semibold text-violet-700 dark:text-violet-400 font-body">Condiviso</span>
+                                <span class="text-[10px] font-semibold text-violet-700 dark:text-violet-400 font-body">{{ 'pianiSalvati.condiviso' | translate }}</span>
                               </div>
                               <!-- Overlapping avatar stack -->
                               <div class="flex items-center -space-x-2">
@@ -808,24 +810,24 @@ interface SettingItem {
                         </div>
                         <div class="px-5 py-4 grid grid-cols-2 gap-3">
                           <div>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Fatturato Y1</p>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.fatturatoY1' | translate }}</p>
                             <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">{{ formatK(plan.kpi.fatturatoTotale) }}</p>
                           </div>
                           <div>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">EBITDA Y1</p>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.ebitdaY1' | translate }}</p>
                             <p [ngClass]="['text-sm font-bold font-mono mt-0.5', plan.kpi.ebitda >= 0 ? 'text-emerald-600' : 'text-rose-500']">
                               {{ formatK(plan.kpi.ebitda) }}
                             </p>
                           </div>
                           <div>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Utile Netto</p>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.utileNetto' | translate }}</p>
                             <p [ngClass]="['text-sm font-bold font-mono mt-0.5', plan.kpi.utileNetto >= 0 ? 'text-zinc-800 dark:text-zinc-200' : 'text-rose-500']">
                               {{ formatK(plan.kpi.utileNetto) }}
                             </p>
                           </div>
                           <div>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Cash Runway</p>
-                            <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">{{ plan.kpi.cashRunway }} mesi</p>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.cashRunway' | translate }}</p>
+                            <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">{{ plan.kpi.cashRunway }} {{ 'pianiSalvati.mesi' | translate }}</p>
                           </div>
                         </div>
                         <div class="px-5 pb-4">
@@ -834,7 +836,7 @@ interface SettingItem {
                             plan.kpi.ebitda >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
                           ]">
                             <div [ngClass]="['w-1.5 h-1.5 rounded-full', plan.kpi.ebitda >= 0 ? 'bg-emerald-500' : 'bg-amber-500']"></div>
-                            {{ plan.kpi.ebitda >= 0 ? 'Piano sostenibile' : 'Rivedere i costi' }}
+                            {{ plan.kpi.ebitda >= 0 ? ('pianiSalvati.sostenibile' | translate) : ('pianiSalvati.rivedere' | translate) }}
                           </div>
                         </div>
                         <div class="px-5 pb-5">
@@ -845,7 +847,7 @@ interface SettingItem {
                             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
                             </svg>
-                            Carica Piano
+                            {{ 'pianiSalvati.caricaPiano' | translate }}
                           </button>
                         </div>
                       </div>
@@ -1031,22 +1033,22 @@ interface SettingItem {
                     <div class="w-1.5 h-1.5 rounded-full"
                          [ngClass]="hoveredCoworkNode()!.status === 'joined' ? 'bg-emerald-400' : 'bg-amber-400'"></div>
                     <span class="text-[9px] text-zinc-400 dark:text-zinc-500 font-body">
-                      {{ hoveredCoworkNode()!.status === 'joined' ? 'Attivo' : 'In attesa' }}
+                      {{ hoveredCoworkNode()!.status === 'joined' ? ('cowork.attivo' | translate) : ('cowork.inAttesa' | translate) }}
                     </span>
                   </div>
                 </div>
               }
 
               <!-- ── FORM PANEL: compact left sidebar ── -->
-              <div class="w-full lg:w-80 xl:w-96 flex-shrink-0 flex flex-col overflow-hidden relative z-10
+              <div class="w-full lg:w-[26rem] xl:w-[30rem] flex-shrink-0 flex flex-col overflow-hidden relative z-10
                           bg-white/85 dark:bg-zinc-950/85 backdrop-blur-md
                           border-b lg:border-b-0 lg:border-r border-zinc-200/50 dark:border-zinc-800/50">
-                <div class="flex-1 flex flex-col min-h-0 p-4 gap-3 overflow-hidden">
+                <div class="flex-1 flex flex-col min-h-0 p-5 gap-4 overflow-hidden">
 
                   <!-- Header row -->
                   <div class="flex items-center justify-between flex-shrink-0 pt-1">
                     <div class="flex items-center gap-2.5">
-                      <h1 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 font-display">Co-Work</h1>
+                      <h1 class="text-lg font-bold text-zinc-900 dark:text-zinc-100 font-display">{{ 'cowork.title' | translate }}</h1>
                       @if (coworkMembers().length > 0) {
                         <div class="flex items-center gap-1.5">
                           <div class="flex items-center -space-x-1.5">
@@ -1066,26 +1068,37 @@ interface SettingItem {
                       <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                       </svg>
-                      Piano
+                      {{ 'cowork.pianoBtn' | translate }}
                     </button>
                   </div>
 
                   <!-- Invite by email -->
-                  <div class="bg-white/90 dark:bg-zinc-900/80 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 p-3 flex-shrink-0">
-                    <p class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-body mb-2">Invita via email</p>
-                    <div class="flex gap-1.5">
+                  <div class="bg-white/90 dark:bg-zinc-900/80 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 p-4 flex-shrink-0">
+                    <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-body mb-3">{{ 'cowork.invitaEmail' | translate }}</p>
+                    <div class="flex gap-2">
                       <input type="email" placeholder="nome@azienda.com"
                              [value]="coworkEmailInput()"
                              (input)="coworkEmailInput.set($any($event.target).value)"
                              (keydown.enter)="addCoworkMember()"
-                             class="flex-1 min-w-0 px-2.5 py-1.5 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 transition-all"/>
+                             class="flex-1 min-w-0 px-3 py-2 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 transition-all"/>
                       <div class="flex gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg flex-shrink-0">
                         <button (click)="coworkRoleInput.set('reader')"
+                                [matTooltip]="'cowork.tooltipReader' | translate" matTooltipPosition="below"
                                 [ngClass]="coworkRoleInput() === 'reader' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'text-zinc-400 dark:text-zinc-500'"
-                                class="px-2 py-1 rounded-md text-[9px] font-bold font-body transition-all">R</button>
+                                class="px-2.5 py-1.5 rounded-md transition-all flex items-center justify-center">
+                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                          </svg>
+                        </button>
                         <button (click)="coworkRoleInput.set('editor')"
+                                [matTooltip]="'cowork.tooltipEditor' | translate" matTooltipPosition="below"
                                 [ngClass]="coworkRoleInput() === 'editor' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'text-zinc-400 dark:text-zinc-500'"
-                                class="px-2 py-1 rounded-md text-[9px] font-bold font-body transition-all">E</button>
+                                class="px-2.5 py-1.5 rounded-md transition-all flex items-center justify-center">
+                          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                          </svg>
+                        </button>
                       </div>
                       <button (click)="addCoworkMember()"
                               [disabled]="!coworkEmailInput()"
@@ -1099,25 +1112,38 @@ interface SettingItem {
                   </div>
 
                   <!-- Invite link: compact single row -->
-                  <div class="bg-white/90 dark:bg-zinc-900/80 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 p-3 flex-shrink-0">
+                  <div class="bg-white/90 dark:bg-zinc-900/80 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 p-4 flex-shrink-0">
                     <div class="flex items-center gap-2">
                       <div class="flex-1 min-w-0 flex items-center gap-1.5">
-                        <p class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-body">Link invito</p>
-                        <span class="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-800/50">
-                          <svg class="w-2 h-2 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-body">{{ 'cowork.linkInvito' | translate }}</p>
+                        <span class="flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 border border-amber-100 dark:border-amber-800/50 cursor-default"
+                              tabindex="0"
+                              [matTooltip]="'cowork.tooltip2h' | translate" matTooltipPosition="below">
+                          <svg class="w-2.5 h-2.5 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                           </svg>
-                          <span class="text-[8px] font-semibold text-amber-700 dark:text-amber-400 font-body">2h</span>
+                          <span class="text-[9px] font-semibold text-amber-700 dark:text-amber-400 font-body">2h</span>
                         </span>
                       </div>
                       <div class="flex items-center gap-1 flex-shrink-0">
                         <div class="flex gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
                           <button (click)="inviteLinkRole.set('reader')"
+                                  [matTooltip]="'cowork.tooltipReader' | translate" matTooltipPosition="below"
                                   [ngClass]="inviteLinkRole() === 'reader' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'text-zinc-400 dark:text-zinc-500'"
-                                  class="px-2 py-1 rounded-md text-[9px] font-bold font-body transition-all">R</button>
+                                  class="px-2.5 py-1.5 rounded-md transition-all flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                          </button>
                           <button (click)="inviteLinkRole.set('editor')"
+                                  [matTooltip]="'cowork.tooltipEditor' | translate" matTooltipPosition="below"
                                   [ngClass]="inviteLinkRole() === 'editor' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'text-zinc-400 dark:text-zinc-500'"
-                                  class="px-2 py-1 rounded-md text-[9px] font-bold font-body transition-all">E</button>
+                                  class="px-2.5 py-1.5 rounded-md transition-all flex items-center justify-center">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                            </svg>
+                          </button>
                         </div>
                         <button (click)="generateInviteLink()"
                                 class="flex items-center gap-1 px-2.5 py-1.5 bg-zinc-900 dark:bg-zinc-700 hover:bg-zinc-800 dark:hover:bg-zinc-600 text-white text-[10px] font-semibold rounded-lg font-body transition-all duration-200">
@@ -1125,12 +1151,12 @@ interface SettingItem {
                             <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                             </svg>
-                            Copiato
+                            {{ 'cowork.copiato' | translate }}
                           } @else {
                             <svg class="w-2.5 h-2.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                               <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                             </svg>
-                            Copia
+                            {{ 'cowork.copia' | translate }}
                           }
                         </button>
                       </div>
@@ -1140,13 +1166,13 @@ interface SettingItem {
                   <!-- Team list: compact, fills remaining height -->
                   <div class="bg-white/90 dark:bg-zinc-900/80 rounded-xl border border-zinc-200/70 dark:border-zinc-700/60 overflow-hidden flex-1 flex flex-col min-h-0">
                     <div class="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between flex-shrink-0">
-                      <p class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-body">Team ({{ coworkMembers().length + 1 }})</p>
+                      <p class="text-[9px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wide font-body">{{ 'cowork.title' | translate }} ({{ coworkMembers().length + 1 }})</p>
                       <div class="flex items-center gap-1">
                         @if (coworkPendingCount() > 0) {
-                          <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 font-body">{{ coworkPendingCount() }} attesa</span>
+                          <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-700 dark:text-amber-400 font-body">{{ coworkPendingCount() }} {{ 'cowork.attesa' | translate }}</span>
                         }
                         @if (coworkJoinedCount() > 0) {
-                          <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-body">{{ coworkJoinedCount() }} attivi</span>
+                          <span class="text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 font-body">{{ coworkJoinedCount() }} {{ 'cowork.attivi' | translate }}</span>
                         }
                       </div>
                     </div>
@@ -1156,7 +1182,7 @@ interface SettingItem {
                         <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
                              style="background: linear-gradient(135deg, #f59e0b, #ef4444);">F</div>
                         <div class="flex-1 min-w-0">
-                          <p class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 font-body">Founder (tu)</p>
+                          <p class="text-xs font-semibold text-zinc-800 dark:text-zinc-200 font-body">{{ 'cowork.founderLabel' | translate }}</p>
                           <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body truncate">antonio.darrigoct&#64;gmail.com</p>
                         </div>
                         <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-400 font-body flex-shrink-0">Owner</span>
@@ -1197,8 +1223,8 @@ interface SettingItem {
                       }
                       @if (coworkMembers().length === 0) {
                         <div class="px-3 py-8 text-center">
-                          <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-0.5">Nessun collaboratore</p>
-                          <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body">Invita via email o link.</p>
+                          <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-0.5">{{ 'cowork.nessunCollaboratore' | translate }}</p>
+                          <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body">{{ 'cowork.nessunCollaboratoreDesc' | translate }}</p>
                         </div>
                       }
                     </div>
@@ -1238,20 +1264,20 @@ interface SettingItem {
           @if (currentView() === 'impostazioni') {
             <div class="view-enter h-full overflow-y-auto scrollbar-thin p-8">
               <div class="max-w-lg mx-auto">
-                <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">Config</p>
-                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display mb-7">Impostazioni</h1>
+                <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">{{ 'settings.subtitle' | translate }}</p>
+                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display mb-7">{{ 'settings.title' | translate }}</h1>
                 <div class="space-y-4">
                   @for (section of settingSections; track section.label; let i = $index) {
                     <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-card"
                          [style.animation-delay]="(i * 70 + 50) + 'ms'"
                          style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;">
-                      <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-4">{{ section.label }}</p>
+                      <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-4">{{ section.label | translate }}</p>
                       <div class="space-y-4">
                         @for (item of section.items; track item.key) {
                           <div class="flex items-center justify-between">
                             <div class="flex-1 pr-4">
-                              <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300 font-body">{{ item.label }}</p>
-                              <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ item.desc }}</p>
+                              <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300 font-body">{{ item.label | translate }}</p>
+                              <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ item.desc | translate }}</p>
                             </div>
                             <button
                               (click)="toggleSettingItem(item)"
@@ -1269,6 +1295,42 @@ interface SettingItem {
                       </div>
                     </div>
                   }
+
+                  <!-- SEZIONE LINGUA -->
+                  <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-card"
+                       [style.animation-delay]="(settingSections.length * 70 + 50) + 'ms'"
+                       style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;">
+                    <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-4">{{ 'settings.sections.lingua.label' | translate }}</p>
+                    <div class="grid grid-cols-2 gap-2">
+                      @for (lang of languageService.languages; track lang.code) {
+                        <button
+                          (click)="languageService.setLanguage(lang.code)"
+                          [ngClass]="[
+                            'flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all duration-200 text-left',
+                            languageService.currentLang() === lang.code
+                              ? 'border-brand-600 bg-brand-50 dark:bg-brand-600/10'
+                              : 'border-zinc-100 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                          ]">
+                          <span class="text-xl leading-none">{{ lang.flag }}</span>
+                          <div class="flex-1 min-w-0">
+                            <p [ngClass]="[
+                              'text-sm font-medium font-body leading-tight',
+                              languageService.currentLang() === lang.code
+                                ? 'text-brand-600 dark:text-brand-400'
+                                : 'text-zinc-700 dark:text-zinc-300'
+                            ]">{{ lang.label }}</p>
+                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ lang.nativeLabel }}</p>
+                          </div>
+                          @if (languageService.currentLang() === lang.code) {
+                            <svg class="w-4 h-4 text-brand-600 dark:text-brand-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                            </svg>
+                          }
+                        </button>
+                      }
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -1293,7 +1355,7 @@ interface SettingItem {
                   <svg class="w-4 h-4 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                   </svg>
-                  <span class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body">AI Copilot</span>
+                  <span class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body">{{ 'topbar.aiCopilot' | translate }}</span>
                 </div>
                 <button (click)="toggleAi()"
                         class="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
@@ -1322,13 +1384,13 @@ interface SettingItem {
                   <svg class="w-3.5 h-3.5 text-brand-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                   </svg>
-                  <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body">AI Copilot</span>
+                  <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body">{{ 'topbar.aiCopilot' | translate }}</span>
                 </div>
                 <div class="flex items-center gap-0.5">
                   @if (chatDesktopFullscreen()) {
                     <!-- Dock back to side panel -->
                     <button (click)="chatDesktopFullscreen.set(false)"
-                            title="Aggancia a destra"
+                            [title]="'topbar.aiCopilotDockTitle' | translate"
                             class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 dark:text-zinc-500
                                    hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1339,7 +1401,7 @@ interface SettingItem {
                   } @else {
                     <!-- Expand to fullscreen -->
                     <button (click)="chatDesktopFullscreen.set(true)"
-                            title="Schermo intero"
+                            [title]="'topbar.aiCopilotFullscreenTitle' | translate"
                             class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 dark:text-zinc-500
                                    hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                       <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1350,7 +1412,7 @@ interface SettingItem {
                   }
                   <!-- Close -->
                   <button (click)="toggleAi()"
-                          title="Chiudi"
+                          [title]="'topbar.aiCopilotCloseTitle' | translate"
                           class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 dark:text-zinc-500
                                  hover:text-zinc-700 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
                     <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -1382,7 +1444,7 @@ interface SettingItem {
           <!-- Header -->
           <div class="flex items-center justify-between px-6 pt-6 pb-4">
             <div>
-              <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-display">Condividi Business Plan</h2>
+              <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-display">{{ 'share.title' | translate }}</h2>
               <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ projectDisplayName() }}</p>
             </div>
             <button (click)="closeShareDialog()"
@@ -1405,7 +1467,7 @@ interface SettingItem {
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                 </svg>
-                Genera Link
+                {{ 'share.generaLink' | translate }}
               </button>
               <button (click)="shareTab.set('email')"
                       [ngClass]="shareTab() === 'email'
@@ -1415,7 +1477,7 @@ interface SettingItem {
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                 </svg>
-                Invia Email
+                {{ 'share.inviaEmail' | translate }}
               </button>
             </div>
           </div>
@@ -1425,7 +1487,7 @@ interface SettingItem {
             <div class="px-6 pb-6 space-y-4">
               <!-- Permission selector -->
               <div>
-                <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">Permessi accesso</p>
+                <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">{{ 'share.permessiAccesso' | translate }}</p>
                 <div class="flex gap-2">
                   <button (click)="sharePermission.set('reader')"
                           [ngClass]="sharePermission() === 'reader'
@@ -1437,7 +1499,7 @@ interface SettingItem {
                       <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
                     </svg>
                     <span class="text-[11px] font-semibold">Reader</span>
-                    <span class="text-[10px] text-center leading-tight opacity-70">Solo lettura</span>
+                    <span class="text-[10px] text-center leading-tight opacity-70">{{ 'share.soloLettura' | translate }}</span>
                   </button>
                   <button (click)="sharePermission.set('editor')"
                           [ngClass]="sharePermission() === 'editor'
@@ -1448,7 +1510,7 @@ interface SettingItem {
                       <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                     </svg>
                     <span class="text-[11px] font-semibold">Editor</span>
-                    <span class="text-[10px] text-center leading-tight opacity-70">Può modificare</span>
+                    <span class="text-[10px] text-center leading-tight opacity-70">{{ 'share.puoModificare' | translate }}</span>
                   </button>
                 </div>
               </div>
@@ -1460,11 +1522,11 @@ interface SettingItem {
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
                   </svg>
-                  Genera Link
+                  {{ 'share.generaLinkBtn' | translate }}
                 </button>
               } @else {
                 <div>
-                  <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">Link generato</p>
+                  <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">{{ 'share.linkGenerato' | translate }}</p>
                   <div class="flex gap-2">
                     <input type="text" [value]="shareLink()" readonly
                            class="flex-1 px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-mono text-zinc-600 dark:text-zinc-400 focus:outline-none truncate"/>
@@ -1475,12 +1537,12 @@ interface SettingItem {
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                         </svg>
-                        Copiato
+                        {{ 'share.copiato' | translate }}
                       } @else {
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                         </svg>
-                        Copia
+                        {{ 'share.copia' | translate }}
                       }
                     </button>
                   </div>
@@ -1488,9 +1550,9 @@ interface SettingItem {
                     <div [ngClass]="sharePermission() === 'editor' ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-400' : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'"
                          class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold font-body">
                       <div [ngClass]="sharePermission() === 'editor' ? 'bg-violet-500' : 'bg-zinc-400'" class="w-1.5 h-1.5 rounded-full"></div>
-                      {{ sharePermission() === 'editor' ? 'Accesso Editor' : 'Accesso Reader' }}
+                      {{ sharePermission() === 'editor' ? ('share.accessoEditor' | translate) : ('share.accessoReader' | translate) }}
                     </div>
-                    <button (click)="linkGenerated.set(false)" class="text-[10px] text-zinc-400 hover:text-zinc-600 font-body transition-colors">Rigenera</button>
+                    <button (click)="linkGenerated.set(false)" class="text-[10px] text-zinc-400 hover:text-zinc-600 font-body transition-colors">{{ 'share.rigenera' | translate }}</button>
                   </div>
                 </div>
               }
@@ -1501,7 +1563,7 @@ interface SettingItem {
           @if (shareTab() === 'email') {
             <div class="px-6 pb-6 space-y-4">
               <div>
-                <label class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2 block">Indirizzo email</label>
+                <label class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2 block">{{ 'share.indirizzoEmail' | translate }}</label>
                 <input type="email" placeholder="nome@azienda.com"
                        [value]="shareEmailInput()"
                        (input)="shareEmailInput.set($any($event.target).value)"
@@ -1509,7 +1571,7 @@ interface SettingItem {
               </div>
               <!-- Permission selector -->
               <div>
-                <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">Permessi</p>
+                <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">{{ 'share.permessi' | translate }}</p>
                 <div class="flex gap-2">
                   <button (click)="shareEmailPermission.set('reader')"
                           [ngClass]="shareEmailPermission() === 'reader'
@@ -1546,12 +1608,12 @@ interface SettingItem {
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Invito inviato!
+                  {{ 'share.invitoInviato' | translate }}
                 } @else {
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                   </svg>
-                  Invia Invito
+                  {{ 'share.inviaInvito' | translate }}
                 }
               </button>
             </div>
@@ -1562,8 +1624,10 @@ interface SettingItem {
   `,
 })
 export class AppLayoutComponent implements OnInit {
-  readonly planService = inject(BusinessPlanService);
-  readonly themeService = inject(ThemeService);
+  readonly planService     = inject(BusinessPlanService);
+  readonly themeService    = inject(ThemeService);
+  readonly languageService = inject(LanguageService);
+  readonly translate       = inject(TranslateService);
 
   sidebarOpen      = signal(false);
   sidebarCollapsed = signal(false);
@@ -1654,35 +1718,35 @@ export class AppLayoutComponent implements OnInit {
 
   navItems: NavItem[] = [
     {
-      id: 'panoramica', view: 'panoramica', label: 'Panoramica',
+      id: 'panoramica', view: 'panoramica', label: 'nav.panoramica',
       svgPath: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
     },
     {
-      id: 'piano', view: 'wizard', label: 'Business Plan',
+      id: 'piano', view: 'wizard', label: 'nav.businessPlan',
       svgPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
     },
     {
-      id: 'piani-salvati', view: 'piani-salvati', label: 'I Miei Piani',
+      id: 'piani-salvati', view: 'piani-salvati', label: 'nav.pianiSalvati',
       svgPath: 'M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12l1-12',
     },
     {
-      id: 'co-work', view: 'co-work', label: 'Co-Work',
+      id: 'co-work', view: 'co-work', label: 'nav.coWork',
       svgPath: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z',
     },
     {
-      id: 'caricamenti', view: 'caricamenti', label: 'Caricamenti',
+      id: 'caricamenti', view: 'caricamenti', label: 'nav.caricamenti',
       svgPath: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5',
     },
     {
-      id: 'scenari', view: 'scenari', label: 'Scenari',
+      id: 'scenari', view: 'scenari', label: 'nav.scenariLabel',
       svgPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
     },
     {
-      id: 'report', view: 'report', label: 'Report',
+      id: 'report', view: 'report', label: 'nav.report',
       svgPath: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
     },
     {
-      id: 'impostazioni', view: 'impostazioni', label: 'Impostazioni',
+      id: 'impostazioni', view: 'impostazioni', label: 'nav.impostazioni',
       svgPath: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z',
     },
   ];
@@ -1691,42 +1755,42 @@ export class AppLayoutComponent implements OnInit {
     {
       iconPath: 'M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
       iconBg: 'bg-blue-50 dark:bg-blue-900/30', iconColor: 'text-blue-500 dark:text-blue-400',
-      title: 'Variazione Prezzo',
-      q: 'Cosa succede se alzo il prezzo a 59€?',
+      titleKey: 'scenari.variazionePrezzo',
+      qKey: 'scenari.variazionePrezzo_q',
     },
     {
       iconPath: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
       iconBg: 'bg-violet-50 dark:bg-violet-900/30', iconColor: 'text-violet-500 dark:text-violet-400',
-      title: 'Espansione Team',
-      q: 'Simula 2 dipendenti in più dal Q3',
+      titleKey: 'scenari.espansioneTeam',
+      qKey: 'scenari.espansioneTeam_q',
     },
     {
       iconPath: 'M13 17h8m0 0V9m0 8l-8-8-4 4-6-6',
       iconBg: 'bg-emerald-50 dark:bg-emerald-900/30', iconColor: 'text-emerald-500 dark:text-emerald-400',
-      title: 'Riduzione Costi',
-      q: 'Quanto runway guadagno tagliando il marketing 20%?',
+      titleKey: 'scenari.riduzioneCosti',
+      qKey: 'scenari.riduzioneCosti_q',
     },
     {
       iconPath: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
       iconBg: 'bg-amber-50 dark:bg-amber-900/30', iconColor: 'text-amber-500 dark:text-amber-400',
-      title: 'Nuovo Mercato',
-      q: 'Proiezione se lancio in UK con volume +30%',
+      titleKey: 'scenari.nuovoMercato',
+      qKey: 'scenari.nuovoMercato_q',
     },
   ];
 
   settingSections: { label: string; items: SettingItem[] }[] = [
     {
-      label: 'Progetto',
+      label: 'settings.sections.progetto.label',
       items: [
-        { key: 'notify',   label: 'Notifiche AI',     desc: "Avvisi quando l'AI aggiorna il piano", enabled: true },
-        { key: 'autosave', label: 'Salvataggio Auto', desc: 'Salva modifiche automaticamente',       enabled: true },
+        { key: 'notify',   label: 'settings.sections.progetto.notifiche.label', desc: 'settings.sections.progetto.notifiche.desc', enabled: true },
+        { key: 'autosave', label: 'settings.sections.progetto.autosave.label',  desc: 'settings.sections.progetto.autosave.desc',  enabled: true },
       ]
     },
     {
-      label: 'Visualizzazione',
+      label: 'settings.sections.visualizzazione.label',
       items: [
-        { key: 'currency', label: 'Formato in migliaia', desc: 'Mostra i valori in K€',    enabled: false },
-        { key: 'dark',     label: 'Tema Scuro',           desc: 'Interfaccia in dark mode', enabled: false },
+        { key: 'currency', label: 'settings.sections.visualizzazione.currency.label', desc: 'settings.sections.visualizzazione.currency.desc', enabled: false },
+        { key: 'dark',     label: 'settings.sections.visualizzazione.dark.label',     desc: 'settings.sections.visualizzazione.dark.desc',     enabled: false },
       ]
     }
   ];
@@ -1740,12 +1804,15 @@ export class AppLayoutComponent implements OnInit {
 
   // ── Tutorial steps (reactive to hasPlan) ────────────────────────────────────
 
-  readonly tutorialSteps = computed(() => [
+  readonly tutorialSteps = computed(() => {
+    // depend on language signal so steps re-compute on language change
+    this.languageService.currentLang();
+    return [
     {
       num: '01',
-      title: 'Configura il Progetto',
-      desc: 'Inserisci ricavi, costi e team con il wizard guidato.',
-      cta: 'Vai al Wizard',
+      title: this.translate.instant('tutorial.step1.title'),
+      desc:  this.translate.instant('tutorial.step1.desc'),
+      cta:   this.translate.instant('tutorial.step1.cta'),
       iconPath: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
       iconBg:    'bg-brand-50 dark:bg-brand-900/30',
       iconColor: 'text-brand-500 dark:text-brand-400',
@@ -1754,9 +1821,9 @@ export class AppLayoutComponent implements OnInit {
     },
     {
       num: '02',
-      title: 'Analizza i KPI',
-      desc: 'Visualizza fatturato, EBITDA e cash flow in tempo reale.',
-      cta: 'Vedi Dashboard',
+      title: this.translate.instant('tutorial.step2.title'),
+      desc:  this.translate.instant('tutorial.step2.desc'),
+      cta:   this.translate.instant('tutorial.step2.cta'),
       iconPath: 'M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z',
       iconBg:    'bg-violet-50 dark:bg-violet-900/30',
       iconColor: 'text-violet-500 dark:text-violet-400',
@@ -1765,9 +1832,9 @@ export class AppLayoutComponent implements OnInit {
     },
     {
       num: '03',
-      title: 'Simula Scenari',
-      desc: "Chiedi all'AI Copilot cosa succede se cambi strategia.",
-      cta: 'Apri Scenari',
+      title: this.translate.instant('tutorial.step3.title'),
+      desc:  this.translate.instant('tutorial.step3.desc'),
+      cta:   this.translate.instant('tutorial.step3.cta'),
       iconPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
       iconBg:    'bg-emerald-50 dark:bg-emerald-900/30',
       iconColor: 'text-emerald-500 dark:text-emerald-400',
@@ -1776,28 +1843,31 @@ export class AppLayoutComponent implements OnInit {
     },
     {
       num: '04',
-      title: 'Esporta il Report',
-      desc: 'Genera un PDF professionale per investitori e stakeholder.',
-      cta: 'Vedi Report',
+      title: this.translate.instant('tutorial.step4.title'),
+      desc:  this.translate.instant('tutorial.step4.desc'),
+      cta:   this.translate.instant('tutorial.step4.cta'),
       iconPath: 'M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
       iconBg:    'bg-amber-50 dark:bg-amber-900/30',
       iconColor: 'text-amber-500 dark:text-amber-400',
       targetView: 'report' as View,
       done: false,
     },
-  ]);
+    ];
+  });
 
   // ── Computed ────────────────────────────────────────────────────────────────
 
-  readonly projectDisplayName = computed(() =>
-    this.planService.currentProjectName() || 'Il mio Progetto'
-  );
+  readonly projectDisplayName = computed(() => {
+    this.languageService.currentLang(); // reactive on language change
+    return this.planService.currentProjectName() || this.translate.instant('sidebar.myProject');
+  });
 
   readonly projectInitial = computed(() =>
     (this.planService.currentProjectName() || 'P').charAt(0).toUpperCase()
   );
 
   readonly liveKpis = computed(() => {
+    this.languageService.currentLang(); // reactive on language change
     const k = this.planService.kpi();
     const fmt = (v: number) => {
       const abs = Math.abs(v);
@@ -1807,25 +1877,26 @@ export class AppLayoutComponent implements OnInit {
       return `${s}€${abs}`;
     };
     return [
-      { label: 'Fatturato Y1', value: fmt(k.fatturatoTotale) },
-      { label: 'EBITDA Y1',    value: fmt(k.ebitda) },
-      { label: 'Utile Netto',  value: fmt(k.utileNetto) },
-      { label: 'Cash Runway',  value: `${k.cashRunway} mesi` },
+      { label: this.translate.instant('kpi.fatturatoY1'), value: fmt(k.fatturatoTotale) },
+      { label: this.translate.instant('kpi.ebitdaY1'),    value: fmt(k.ebitda) },
+      { label: this.translate.instant('kpi.utileNetto'),  value: fmt(k.utileNetto) },
+      { label: this.translate.instant('kpi.cashRunway'),  value: `${k.cashRunway} ${this.translate.instant('kpi.mesi')}` },
     ];
   });
 
   readonly currentTitle = computed(() => {
+    this.languageService.currentLang(); // reactive on language change
     const map: Record<View, string> = {
-      panoramica:      'Panoramica',
-      wizard:          'Nuovo Piano',
-      dashboard:       'Business Plan',
-      scenari:         'Scenari What-If',
-      report:          'Report',
-      impostazioni:    'Impostazioni',
-      'piani-salvati': 'I Miei Piani',
-      'co-work':       'Co-Work',
-      profilo:         'Profilo',
-      caricamenti:     'Caricamenti',
+      panoramica:      'views.panoramica',
+      wizard:          'views.wizard',
+      dashboard:       'views.dashboard',
+      scenari:         'views.scenari',
+      report:          'views.report',
+      impostazioni:    'views.impostazioni',
+      'piani-salvati': 'views.pianiSalvati',
+      'co-work':       'views.coWork',
+      profilo:         'views.profilo',
+      caricamenti:     'views.caricamenti',
     };
     return map[this.currentView()];
   });

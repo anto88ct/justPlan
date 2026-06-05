@@ -15,10 +15,10 @@ interface ChatMessage {
   host: { class: 'flex flex-col h-full overflow-hidden' },
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="flex flex-col h-full bg-white">
+    <div class="flex flex-col h-full bg-white dark:bg-zinc-900">
 
       <!-- Panel header -->
-      <div class="px-4 py-4 border-b border-zinc-100 flex-shrink-0">
+      <div class="px-4 py-4 border-b border-zinc-100 dark:border-zinc-800 flex-shrink-0">
         <div class="flex items-center gap-3">
           <div class="relative">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-violet-600 flex items-center justify-center">
@@ -27,10 +27,10 @@ interface ChatMessage {
                       d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
               </svg>
             </div>
-            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white"></div>
+            <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-emerald-400 border-2 border-white dark:border-zinc-900"></div>
           </div>
           <div>
-            <p class="text-sm font-semibold text-zinc-800 font-display">AI Copilot</p>
+            <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-display">AI Copilot</p>
             <p class="text-xs text-emerald-600 font-body">CFO Virtuale — Online</p>
           </div>
         </div>
@@ -38,12 +38,12 @@ interface ChatMessage {
 
       <!-- Suggested prompts (shown before first user message) -->
       @if (showSuggestions()) {
-        <div class="px-4 py-3 border-b border-zinc-50 flex-shrink-0">
-          <p class="text-xs text-zinc-400 font-body mb-2">Prova a chiedermi:</p>
+        <div class="px-4 py-3 border-b border-zinc-50 dark:border-zinc-800 flex-shrink-0">
+          <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mb-2">Prova a chiedermi:</p>
           <div class="space-y-1.5">
             @for (s of suggestions; track s) {
               <button (click)="useSuggestion(s)"
-                      class="w-full text-left text-xs px-3 py-2 rounded-lg bg-zinc-50 hover:bg-brand-50 hover:text-brand-700 text-zinc-600 transition-colors font-body border border-zinc-100 hover:border-brand-200">
+                      class="w-full text-left text-xs px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-800 hover:bg-brand-50 dark:hover:bg-brand-950/40 hover:text-brand-700 dark:hover:text-brand-400 text-zinc-600 dark:text-zinc-400 transition-colors font-body border border-zinc-100 dark:border-zinc-700 hover:border-brand-200 dark:hover:border-brand-800">
                 {{ s }}
               </button>
             }
@@ -64,17 +64,17 @@ interface ChatMessage {
                 </div>
                 <div class="flex-1 min-w-0">
                   @if (msg.isLoading) {
-                    <div class="inline-flex items-center gap-2 px-4 py-3 bg-zinc-100 rounded-2xl rounded-tl-sm">
+                    <div class="inline-flex items-center gap-2 px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl rounded-tl-sm">
                       <div class="flex gap-1">
-                        <div class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay: 0ms"></div>
-                        <div class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay: 150ms"></div>
-                        <div class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay: 300ms"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce" style="animation-delay: 0ms"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce" style="animation-delay: 150ms"></div>
+                        <div class="w-1.5 h-1.5 rounded-full bg-zinc-400 dark:bg-zinc-500 animate-bounce" style="animation-delay: 300ms"></div>
                       </div>
-                      <span class="text-xs text-zinc-500 font-body">L'AI sta ricalcolando...</span>
+                      <span class="text-xs text-zinc-500 dark:text-zinc-400 font-body">L'AI sta ricalcolando...</span>
                     </div>
                   } @else {
-                    <div class="px-4 py-3 bg-zinc-100 rounded-2xl rounded-tl-sm">
-                      <p class="text-sm text-zinc-800 leading-relaxed font-body whitespace-pre-wrap">{{ msg.text }}</p>
+                    <div class="px-4 py-3 bg-zinc-100 dark:bg-zinc-800 rounded-2xl rounded-tl-sm">
+                      <p class="text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed font-body whitespace-pre-wrap">{{ msg.text }}</p>
                     </div>
                   }
                 </div>
@@ -91,7 +91,7 @@ interface ChatMessage {
       </div>
 
       <!-- Input area -->
-      <div class="px-4 py-4 border-t border-zinc-100 flex-shrink-0">
+      <div class="px-4 py-4 border-t border-zinc-100 dark:border-zinc-800 flex-shrink-0">
         @if (planService.isAiUpdated()) {
           <div class="mb-3 flex items-center justify-between px-3 py-2 bg-emerald-50 rounded-xl border border-emerald-100">
             <div class="flex items-center gap-2">
@@ -109,23 +109,23 @@ interface ChatMessage {
                     (keydown.enter)="onEnterKey($event)"
                     placeholder="Chiedi uno scenario 'What-If'..."
                     rows="2"
-                    class="flex-1 resize-none text-sm px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-xl
+                    class="flex-1 resize-none text-sm px-3 py-2.5 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl
                            focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
-                           placeholder:text-zinc-400 font-body text-zinc-800 transition-all"
+                           placeholder:text-zinc-400 dark:placeholder:text-zinc-600 font-body text-zinc-800 dark:text-zinc-200 transition-all"
                     [disabled]="isLoading()">
           </textarea>
           <button (click)="sendMessage()"
                   [disabled]="!inputText.trim() || isLoading()"
                   class="flex-shrink-0 w-10 h-10 rounded-xl bg-brand-600 hover:bg-brand-700
-                         disabled:bg-zinc-200 disabled:cursor-not-allowed
+                         disabled:bg-zinc-200 dark:disabled:bg-zinc-700 disabled:cursor-not-allowed
                          flex items-center justify-center transition-all duration-200 shadow-brand hover:shadow-none">
             <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
             </svg>
           </button>
         </div>
-        <p class="mt-2 text-xs text-zinc-400 text-center font-body">
-          Premi <kbd class="px-1 py-0.5 bg-zinc-100 rounded text-zinc-500 font-mono text-xs">Enter</kbd> per inviare
+        <p class="mt-2 text-xs text-zinc-400 dark:text-zinc-500 text-center font-body">
+          Premi <kbd class="px-1 py-0.5 bg-zinc-100 dark:bg-zinc-800 rounded text-zinc-500 dark:text-zinc-400 font-mono text-xs">Enter</kbd> per inviare
         </p>
       </div>
 

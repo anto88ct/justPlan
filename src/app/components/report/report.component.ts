@@ -2,6 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { CommonModule, NgClass } from '@angular/common';
 import { NgApexchartsModule } from 'ng-apexcharts';
 import { BusinessPlanService } from '../../services/business-plan.service';
+import { ThemeService } from '../../services/theme.service';
 
 type YearFilter = 1 | 2 | 3;
 
@@ -18,23 +19,23 @@ const COLORS = {
 
 const FONT = "'Outfit', sans-serif";
 
-const baseChart = (type: string, height: number, extra: any = {}) => ({
+const makeBaseChart = (type: string, height: number, foreColor: string, extra: any = {}) => ({
   type,
   height,
   fontFamily: FONT,
-  foreColor: '#71717a',
+  foreColor,
   toolbar: { show: true, tools: { download: true, selection: false, zoom: false, zoomin: false, zoomout: false, pan: false, reset: false }, ...extra.toolbar },
   animations: { enabled: true, easing: 'easeinout', speed: 600, animateGradually: { enabled: true, delay: 80 }, dynamicAnimation: { enabled: true, speed: 350 } },
   ...extra,
 });
 
-const gridConfig = {
-  borderColor: '#f4f4f5',
+const makeGrid = (isDark: boolean) => ({
+  borderColor: isDark ? '#27272a' : '#f4f4f5',
   strokeDashArray: 4,
   xaxis: { lines: { show: false } },
   yaxis: { lines: { show: true } },
   padding: { top: 4, right: 8, bottom: 4, left: 8 },
-};
+});
 
 const legendConfig: any = { fontFamily: FONT, fontSize: '12px', markers: { radius: 4 } };
 
@@ -99,16 +100,32 @@ function fmtK(val: number): string {
       font-weight: 700;
       font-family: 'JetBrains Mono', monospace;
     }
+
+    /* ── Dark mode ────────────────────────────────────────────────────────── */
+    :host-context(.dark) .chart-card {
+      background: #18181b;
+      border-color: #27272a;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    :host-context(.dark) .filter-pill:not(.active) {
+      background: #27272a;
+      color: #a1a1aa;
+      border-color: #3f3f46;
+    }
+    :host-context(.dark) .filter-pill:not(.active):hover {
+      border-color: #818cf8;
+      color: #818cf8;
+    }
   `],
   template: `
-    <div class="h-full overflow-y-auto scrollbar-thin bg-zinc-50">
+    <div class="h-full overflow-y-auto scrollbar-thin bg-zinc-50 dark:bg-zinc-950">
 
       <!-- ── Header ─────────────────────────────────────────────────────── -->
-      <div class="px-4 md:px-8 pt-5 md:pt-8 pb-5 border-b border-zinc-100 bg-white flex flex-wrap items-start justify-between gap-4 sticky top-0 z-10">
+      <div class="px-4 md:px-8 pt-5 md:pt-8 pb-5 border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-wrap items-start justify-between gap-4 sticky top-0 z-10">
         <div>
           <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">Analytics</p>
-          <h1 class="text-2xl font-bold text-zinc-900 font-display">Report & Dashboard</h1>
-          <p class="text-sm text-zinc-400 font-body mt-0.5">{{ planName() }}</p>
+          <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display">Report & Dashboard</h1>
+          <p class="text-sm text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ planName() }}</p>
         </div>
 
         <!-- Year filter -->
@@ -128,10 +145,10 @@ function fmtK(val: number): string {
       <div class="px-4 md:px-8 pt-5 pb-0">
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           @for (kpi of kpiStrip(); track kpi.label) {
-            <div class="bg-white rounded-2xl border border-zinc-100 px-4 py-3 shadow-sm fade-slide flex items-center gap-3">
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 px-4 py-3 shadow-sm fade-slide flex items-center gap-3">
               <div class="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-base" [class]="kpi.iconBg">{{ kpi.icon }}</div>
               <div class="min-w-0">
-                <p class="text-xs text-zinc-400 font-body truncate">{{ kpi.label }}</p>
+                <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body truncate">{{ kpi.label }}</p>
                 <p class="text-lg font-bold font-mono leading-tight" [class]="kpi.valClass">{{ kpi.value }}</p>
               </div>
             </div>
@@ -146,8 +163,8 @@ function fmtK(val: number): string {
         <div class="chart-card fade-slide xl:col-span-2">
           <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
             <div>
-              <h3 class="text-sm font-bold text-zinc-800 font-display">Ricavi e Redditività</h3>
-              <p class="text-xs text-zinc-400 font-body">Proiezione triennale</p>
+              <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-display">Ricavi e Redditività</h3>
+              <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Proiezione triennale</p>
             </div>
             <div class="flex gap-1.5">
               @for (m of revenueMetrics; track m.key) {
@@ -161,7 +178,7 @@ function fmtK(val: number): string {
           </div>
           <apx-chart
             [series]="revenueBarSeries()"
-            [chart]="revenueChart"
+            [chart]="revenueChart()"
             [xaxis]="threeYearXAxis"
             [yaxis]="euroYAxis"
             [plotOptions]="barPlotOptions"
@@ -169,7 +186,7 @@ function fmtK(val: number): string {
             [stroke]="barStroke"
             [fill]="solidFill"
             [colors]="revenueColors()"
-            [grid]="gridConfig"
+            [grid]="gridConf()"
             [legend]="legendTop"
             [tooltip]="euroTooltip"
           ></apx-chart>
@@ -178,20 +195,20 @@ function fmtK(val: number): string {
         <!-- 2 · Monthly Cash Flow ───────────────────────────────────────── -->
         <div class="chart-card fade-slide">
           <div class="mb-4">
-            <h3 class="text-sm font-bold text-zinc-800 font-display">Flusso di Cassa Mensile</h3>
-            <p class="text-xs text-zinc-400 font-body">Anno {{ selectedYear() }} — posizione cumulata</p>
+            <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-display">Flusso di Cassa Mensile</h3>
+            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Anno {{ selectedYear() }} — posizione cumulata</p>
           </div>
           <apx-chart
             [series]="cashFlowAreaSeries()"
-            [chart]="cashFlowChart"
+            [chart]="cashFlowChart()"
             [xaxis]="cashFlowXAxis()"
             [yaxis]="euroYAxis"
             [dataLabels]="noDataLabels"
             [stroke]="smoothStroke"
             [fill]="gradientFill"
             [colors]="['#6366f1']"
-            [grid]="gridConfig"
-            [annotations]="zeroLineAnnotation"
+            [grid]="gridConf()"
+            [annotations]="zeroLineAnnotation()"
             [tooltip]="euroTooltip"
             [markers]="dotMarkers"
           ></apx-chart>
@@ -200,12 +217,12 @@ function fmtK(val: number): string {
         <!-- 3 · Cost Structure ──────────────────────────────────────────── -->
         <div class="chart-card fade-slide">
           <div class="mb-4">
-            <h3 class="text-sm font-bold text-zinc-800 font-display">Struttura dei Costi</h3>
-            <p class="text-xs text-zinc-400 font-body">Anno {{ selectedYear() }}</p>
+            <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-display">Struttura dei Costi</h3>
+            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Anno {{ selectedYear() }}</p>
           </div>
           <apx-chart
             [series]="costDonutSeries()"
-            [chart]="donutChart"
+            [chart]="donutChart()"
             [labels]="costLabels"
             [colors]="donutColors"
             [plotOptions]="donutPlotOptions()"
@@ -218,18 +235,18 @@ function fmtK(val: number): string {
         <!-- 4 · Margin Trends ───────────────────────────────────────────── -->
         <div class="chart-card fade-slide">
           <div class="mb-4">
-            <h3 class="text-sm font-bold text-zinc-800 font-display">Evoluzione dei Margini</h3>
-            <p class="text-xs text-zinc-400 font-body">% su Ricavi Totali — 3 anni</p>
+            <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-display">Evoluzione dei Margini</h3>
+            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">% su Ricavi Totali — 3 anni</p>
           </div>
           <apx-chart
             [series]="marginLineSeries()"
-            [chart]="lineChart"
+            [chart]="lineChart()"
             [xaxis]="threeYearXAxis"
             [yaxis]="pctYAxis"
             [stroke]="smoothStrokeThick"
             [dataLabels]="pctDataLabels"
             [colors]="['#6366f1','#22c55e','#f59e0b']"
-            [grid]="gridConfig"
+            [grid]="gridConf()"
             [markers]="roundMarkers"
             [legend]="legendTop"
             [tooltip]="pctTooltip"
@@ -239,12 +256,12 @@ function fmtK(val: number): string {
         <!-- 5 · Cost Composition stacked ───────────────────────────────── -->
         <div class="chart-card fade-slide">
           <div class="mb-4">
-            <h3 class="text-sm font-bold text-zinc-800 font-display">Composizione dei Costi</h3>
-            <p class="text-xs text-zinc-400 font-body">Stacked — proiezione 3 anni</p>
+            <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-display">Composizione dei Costi</h3>
+            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Stacked — proiezione 3 anni</p>
           </div>
           <apx-chart
             [series]="stackedCostSeries()"
-            [chart]="stackedBarChart"
+            [chart]="stackedBarChart()"
             [xaxis]="threeYearXAxis"
             [yaxis]="euroYAxis"
             [plotOptions]="stackedBarPlotOptions"
@@ -252,7 +269,7 @@ function fmtK(val: number): string {
             [stroke]="barStroke"
             [fill]="solidFill"
             [colors]="['#ef4444','#f97316','#8b5cf6','#06b6d4']"
-            [grid]="gridConfig"
+            [grid]="gridConf()"
             [legend]="legendTop"
             [tooltip]="euroTooltip"
           ></apx-chart>
@@ -261,13 +278,13 @@ function fmtK(val: number): string {
         <!-- 6 · Margin Radial ───────────────────────────────────────────── -->
         <div class="chart-card fade-slide">
           <div class="mb-2">
-            <h3 class="text-sm font-bold text-zinc-800 font-display">Indicatori di Marginalità</h3>
-            <p class="text-xs text-zinc-400 font-body">Anno {{ selectedYear() }} — % su Ricavi</p>
+            <h3 class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-display">Indicatori di Marginalità</h3>
+            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Anno {{ selectedYear() }} — % su Ricavi</p>
           </div>
           <div class="flex flex-col lg:flex-row items-center gap-4">
             <apx-chart
               [series]="radialSeries()"
-              [chart]="radialChart"
+              [chart]="radialChart()"
               [plotOptions]="radialPlotOptions"
               [labels]="radialLabels"
               [colors]="['#6366f1','#22c55e','#f59e0b']"
@@ -277,10 +294,10 @@ function fmtK(val: number): string {
             <!-- Legend chips -->
             <div class="flex flex-col gap-3 min-w-0">
               @for (item of radialLegend(); track item.label) {
-                <div class="flex items-center justify-between gap-4 p-3 rounded-xl border border-zinc-100 bg-zinc-50">
+                <div class="flex items-center justify-between gap-4 p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
                   <div class="flex items-center gap-2.5">
                     <div class="w-2.5 h-2.5 rounded-full flex-shrink-0" [style.background]="item.color"></div>
-                    <span class="text-xs text-zinc-600 font-body">{{ item.label }}</span>
+                    <span class="text-xs text-zinc-600 dark:text-zinc-400 font-body">{{ item.label }}</span>
                   </div>
                   <span class="kpi-chip" [style.background]="item.color + '18'" [style.color]="item.color">
                     {{ item.value }}%
@@ -295,12 +312,12 @@ function fmtK(val: number): string {
 
       <!-- ── No-plan placeholder ─────────────────────────────────────────── -->
       @if (!hasPlan()) {
-        <div class="fixed inset-0 bg-zinc-50/95 flex flex-col items-center justify-center z-20 p-8">
-          <div class="w-20 h-20 rounded-3xl bg-white border border-zinc-100 flex items-center justify-center mb-5 shadow-sm">
+        <div class="fixed inset-0 bg-zinc-50/95 dark:bg-zinc-950/95 flex flex-col items-center justify-center z-20 p-8">
+          <div class="w-20 h-20 rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center mb-5 shadow-sm">
             <span class="text-4xl">📊</span>
           </div>
-          <h2 class="text-xl font-bold text-zinc-800 font-display mb-2">Nessun piano generato</h2>
-          <p class="text-sm text-zinc-500 font-body text-center max-w-xs leading-relaxed">
+          <h2 class="text-xl font-bold text-zinc-800 dark:text-zinc-200 font-display mb-2">Nessun piano generato</h2>
+          <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body text-center max-w-xs leading-relaxed">
             Genera un Business Plan dal wizard per visualizzare le dashboard interattive.
           </p>
         </div>
@@ -311,6 +328,8 @@ function fmtK(val: number): string {
 })
 export class ReportComponent {
   private svc = inject(BusinessPlanService);
+  private themeService = inject(ThemeService);
+  private isDark = computed(() => this.themeService.dark());
 
   selectedYear = signal<YearFilter>(1);
   activeRevenueMetric = signal<'all' | 'ricavi' | 'gp' | 'ebitda' | 'utile'>('all');
@@ -424,9 +443,9 @@ export class ReportComponent {
           labels: {
             show: true,
             name: { show: true, fontFamily: FONT, fontSize: '12px', color: '#71717a' },
-            value: { show: true, fontFamily: FONT, fontSize: '18px', fontWeight: '700', color: '#18181b',
+            value: { show: true, fontFamily: FONT, fontSize: '18px', fontWeight: '700', color: this.isDark() ? '#f4f4f5' : '#18181b',
                      formatter: (val: string) => fmtK(parseFloat(val)) },
-            total: { show: true, label: 'Tot. Costi', fontFamily: FONT, fontSize: '11px', color: '#71717a',
+            total: { show: true, label: 'Tot. Costi', fontFamily: FONT, fontSize: '11px', color: this.isDark() ? '#a1a1aa' : '#71717a',
                      formatter: () => fmtK(total) },
           },
         },
@@ -493,21 +512,13 @@ export class ReportComponent {
 
   // ── Static chart configs ──────────────────────────────────────────────────
 
-  readonly revenueChart = baseChart('bar', 300, { toolbar: { show: true, tools: { download: true } } });
-
-  readonly cashFlowChart = {
-    ...baseChart('area', 250),
-    toolbar: { show: false },
-    zoom: { enabled: false },
-  };
-
-  readonly donutChart = { ...baseChart('donut', 300), toolbar: { show: false } };
-
-  readonly lineChart = { ...baseChart('line', 250), toolbar: { show: false } };
-
-  readonly stackedBarChart = { ...baseChart('bar', 250), stacked: true, toolbar: { show: false } };
-
-  readonly radialChart = { ...baseChart('radialBar', 260), toolbar: { show: false } };
+  revenueChart    = computed(() => makeBaseChart('bar', 300, this.isDark() ? '#a1a1aa' : '#71717a', { toolbar: { show: true, tools: { download: true } } }));
+  cashFlowChart   = computed(() => ({ ...makeBaseChart('area', 250, this.isDark() ? '#a1a1aa' : '#71717a'), toolbar: { show: false }, zoom: { enabled: false } }));
+  donutChart      = computed(() => ({ ...makeBaseChart('donut', 300, this.isDark() ? '#a1a1aa' : '#71717a'), toolbar: { show: false } }));
+  lineChart       = computed(() => ({ ...makeBaseChart('line', 250, this.isDark() ? '#a1a1aa' : '#71717a'), toolbar: { show: false } }));
+  stackedBarChart = computed(() => ({ ...makeBaseChart('bar', 250, this.isDark() ? '#a1a1aa' : '#71717a'), stacked: true, toolbar: { show: false } }));
+  radialChart     = computed(() => ({ ...makeBaseChart('radialBar', 260, this.isDark() ? '#a1a1aa' : '#71717a'), toolbar: { show: false } }));
+  gridConf        = computed(() => makeGrid(this.isDark()));
 
   readonly threeYearXAxis = {
     categories: ['Anno 1', 'Anno 2', 'Anno 3'],
@@ -544,7 +555,6 @@ export class ReportComponent {
   readonly smoothStrokeThick = { curve: 'smooth' as const, width: [3, 3, 3] };
   readonly solidFill      = { opacity: 1 };
   readonly gradientFill   = { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.35, opacityTo: 0.03, stops: [0, 100] } };
-  readonly gridConfig     = gridConfig;
   readonly legendTop      = { ...legendConfig, position: 'top' as const, horizontalAlign: 'left' as const };
   readonly legendBottom   = { ...legendConfig, position: 'bottom' as const };
   readonly dotMarkers     = { size: 0, hover: { size: 5, sizeOffset: 2 } };
@@ -583,19 +593,19 @@ export class ReportComponent {
     style: { fontFamily: FONT },
   };
 
-  readonly zeroLineAnnotation = {
+  zeroLineAnnotation = computed(() => ({
     yaxis: [{
       y: 0,
-      borderColor: '#e4e4e7',
+      borderColor: this.isDark() ? '#3f3f46' : '#e4e4e7',
       borderWidth: 1.5,
       strokeDashArray: 5,
       label: {
         text: 'Break-even',
-        style: { background: '#f4f4f5', color: '#a1a1aa', fontSize: '10px', fontFamily: FONT, padding: { left: 6, right: 6, top: 2, bottom: 2 } },
+        style: { background: this.isDark() ? '#27272a' : '#f4f4f5', color: '#a1a1aa', fontSize: '10px', fontFamily: FONT, padding: { left: 6, right: 6, top: 2, bottom: 2 } },
         position: 'right',
       },
     }],
-  };
+  }));
 
   readonly radialPlotOptions = {
     radialBar: {
@@ -603,7 +613,7 @@ export class ReportComponent {
       track: { background: '#f4f4f5', margin: 6 },
       dataLabels: {
         name: { show: true, fontSize: '11px', fontFamily: FONT, color: '#a1a1aa', offsetY: -4 },
-        value: { show: true, fontSize: '15px', fontFamily: "'JetBrains Mono', monospace", fontWeight: '700', color: '#18181b', offsetY: 4,
+        value: { show: true, fontSize: '15px', fontFamily: "'JetBrains Mono', monospace", fontWeight: '700', color: this.isDark() ? '#f4f4f5' : '#18181b', offsetY: 4,
                  formatter: (val: number) => `${val}%` },
         total: {
           show: true,

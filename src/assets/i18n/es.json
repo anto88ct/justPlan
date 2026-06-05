@@ -1,0 +1,198 @@
+{
+  "nav": {
+    "panoramica": "Resumen",
+    "wizard": "Asistente",
+    "dashboard": "Panel",
+    "scenari": "Escenarios What-If",
+    "report": "Informe",
+    "impostazioni": "Configuración",
+    "pianiSalvati": "Mis Planes",
+    "coWork": "Co-Work",
+    "profilo": "Perfil",
+    "businessPlan": "Plan de Negocio",
+    "caricamenti": "Cargas",
+    "scenariLabel": "Escenarios",
+    "menu": "Menú"
+  },
+  "sidebar": {
+    "expandTooltip": "Expandir barra lateral",
+    "collapseTitle": "Contraer barra lateral",
+    "pianoCorrente": "Plan",
+    "profiloTooltip": "Perfil",
+    "founder": "Fundador",
+    "pianostarter": "Plan Starter",
+    "myProject": "Mi Proyecto"
+  },
+  "topbar": {
+    "modifica": "Editar",
+    "pdf": "PDF",
+    "salva": "Guardar Plan de Negocio",
+    "salvato": "¡Guardado!",
+    "condividi": "Compartir",
+    "aiCopilot": "AI Copilot",
+    "aiCopilotDockTitle": "Anclar a la derecha",
+    "aiCopilotFullscreenTitle": "Pantalla completa",
+    "aiCopilotCloseTitle": "Cerrar"
+  },
+  "panoramica": {
+    "hero": {
+      "subtitle": "Tu CFO Virtual",
+      "title": "Plan de Negocio en 3 minutos. De verdad.",
+      "desc": "Introduce los datos una vez. El AI Copilot analiza, simula y optimiza tu plan financiero.",
+      "cta": "Empezar ahora",
+      "vediPiano": "Ver Plan"
+    },
+    "pianoCorrente": "Plan actual",
+    "comeFunziona": "Cómo funciona",
+    "guidaRapida": "Guía rápida",
+    "clicca": "Haz clic en un paso para comenzar",
+    "tip": {
+      "title": "Sugerencia",
+      "desc": "Después del asistente, usa el AI Copilot para simular escenarios what-if en segundos.",
+      "btn": "Abrir AI"
+    }
+  },
+  "tutorial": {
+    "step1": {
+      "title": "Configura el Proyecto",
+      "desc": "Introduce ingresos, costes y equipo con el asistente guiado.",
+      "cta": "Ir al Asistente"
+    },
+    "step2": {
+      "title": "Analiza los KPI",
+      "desc": "Visualiza facturación, EBITDA y flujo de caja en tiempo real.",
+      "cta": "Ver Panel"
+    },
+    "step3": {
+      "title": "Simula Escenarios",
+      "desc": "Pregunta al AI Copilot qué pasa si cambias de estrategia.",
+      "cta": "Abrir Escenarios"
+    },
+    "step4": {
+      "title": "Exporta el Informe",
+      "desc": "Genera un PDF profesional para inversores y stakeholders.",
+      "cta": "Ver Informe"
+    }
+  },
+  "scenari": {
+    "label": "Escenarios",
+    "title": "Simulador What-If",
+    "desc": "Haz clic en un escenario para abrirlo en el AI Copilot.",
+    "noPlan": "genera un Plan de Negocio.",
+    "noPlanStrong": "Primero",
+    "goToWizard": "Ir al asistente →",
+    "variazionePrezzo": "Cambio de Precio",
+    "variazionePrezzo_q": "¿Qué pasa si subo el precio a 59€?",
+    "espansioneTeam": "Expansión del Equipo",
+    "espansioneTeam_q": "Simula 2 empleados más desde el Q3",
+    "riduzioneCosti": "Reducción de Costes",
+    "riduzioneCosti_q": "¿Cuánto runway gano recortando el marketing un 20%?",
+    "nuovoMercato": "Nuevo Mercado",
+    "nuovoMercato_q": "Proyección si lanzo en UK con volumen +30%"
+  },
+  "pianiSalvati": {
+    "archivio": "Archivo",
+    "title": "Mis Planes",
+    "count": "planes guardados",
+    "nuovoPiano": "Nuevo Plan",
+    "nessunPiano": "Ningún plan guardado",
+    "nessunPianoDesc": "Genera un plan y pulsa \"Guardar Plan de Negocio\".",
+    "condiviso": "Compartido",
+    "fatturatoY1": "Facturación A1",
+    "ebitdaY1": "EBITDA A1",
+    "utileNetto": "Beneficio Neto",
+    "cashRunway": "Cash Runway",
+    "mesi": "meses",
+    "sostenibile": "Plan sostenible",
+    "rivedere": "Revisar costes",
+    "caricaPiano": "Cargar Plan"
+  },
+  "cowork": {
+    "title": "Co-Work",
+    "pianoBtn": "Plan",
+    "invitaEmail": "Invitar por email",
+    "linkInvito": "Enlace de invitación",
+    "copiato": "Copiado",
+    "copia": "Copiar",
+    "teamLabel": "Equipo ({{count}})",
+    "attesa": "pendiente",
+    "attivi": "activos",
+    "founderLabel": "Fundador (tú)",
+    "nessunCollaboratore": "Sin colaboradores",
+    "nessunCollaboratoreDesc": "Invita por email o enlace.",
+    "attivo": "Activo",
+    "inAttesa": "Pendiente",
+    "tooltipReader": "Lector — solo visualización",
+    "tooltipEditor": "Editor — puede modificar",
+    "tooltip2h": "El enlace caduca 2 horas después de generarse"
+  },
+  "share": {
+    "title": "Compartir Plan de Negocio",
+    "generaLink": "Generar Enlace",
+    "inviaEmail": "Enviar Email",
+    "permessiAccesso": "Permisos de acceso",
+    "permessi": "Permisos",
+    "soloLettura": "Solo lectura",
+    "puoModificare": "Puede editar",
+    "generaLinkBtn": "Generar Enlace",
+    "linkGenerato": "Enlace generado",
+    "copiato": "Copiado",
+    "copia": "Copiar",
+    "accessoEditor": "Acceso Editor",
+    "accessoReader": "Acceso Reader",
+    "rigenera": "Regenerar",
+    "indirizzoEmail": "Dirección email",
+    "invitoInviato": "¡Invitación enviada!",
+    "inviaInvito": "Enviar Invitación"
+  },
+  "kpi": {
+    "fatturatoY1": "Facturación A1",
+    "ebitdaY1": "EBITDA A1",
+    "utileNetto": "Beneficio Neto",
+    "cashRunway": "Cash Runway",
+    "mesi": "meses"
+  },
+  "views": {
+    "panoramica": "Resumen",
+    "wizard": "Nuevo Plan",
+    "dashboard": "Plan de Negocio",
+    "scenari": "Escenarios What-If",
+    "report": "Informe",
+    "impostazioni": "Configuración",
+    "pianiSalvati": "Mis Planes",
+    "coWork": "Co-Work",
+    "profilo": "Perfil",
+    "caricamenti": "Cargas"
+  },
+  "settings": {
+    "subtitle": "Config",
+    "title": "Configuración",
+    "sections": {
+      "progetto": {
+        "label": "Proyecto",
+        "notifiche": {
+          "label": "Notificaciones IA",
+          "desc": "Alertas cuando la IA actualiza el plan"
+        },
+        "autosave": {
+          "label": "Guardado Automático",
+          "desc": "Guardar cambios automáticamente"
+        }
+      },
+      "visualizzazione": {
+        "label": "Visualización",
+        "currency": {
+          "label": "Formato en miles",
+          "desc": "Mostrar valores en K€"
+        },
+        "dark": {
+          "label": "Tema Oscuro",
+          "desc": "Interfaz en modo oscuro"
+        }
+      },
+      "lingua": {
+        "label": "Idioma"
+      }
+    }
+  }
+}

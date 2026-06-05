@@ -220,9 +220,41 @@ interface LoanItem {
       transform: translateX(-50%) translateY(0);
     }
 
+    /* Desktop: use JS-positioned fixed tooltip instead */
+    @media (min-width: 641px) {
+      .tt-box { display: none !important; }
+    }
     /* Mobile: disable inline tooltip, use centered modal instead */
     @media (max-width: 640px) {
       .tt-box { display: none !important; }
+    }
+
+    .desk-tip {
+      position: fixed;
+      width: 270px;
+      padding: 13px 15px;
+      background: #1a1a2e;
+      color: #dcdcef;
+      font-size: 12.5px;
+      font-weight: 400;
+      line-height: 1.62;
+      border-radius: 13px;
+      pointer-events: none;
+      z-index: 9999;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.32), 0 2px 8px rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.07);
+      font-family: 'Outfit', sans-serif;
+      white-space: normal;
+      text-transform: none;
+      letter-spacing: normal;
+    }
+    .desk-tip::after {
+      content: '';
+      position: absolute;
+      top: 100%; left: var(--tip-arrow-x, 50%);
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1a1a2e;
     }
 
     .tip-overlay {
@@ -261,12 +293,94 @@ interface LoanItem {
       transition: background 0.15s;
     }
     .tip-close:hover { background: rgba(255,255,255,0.14); }
+
+    /* ── Dark mode overrides ────────────────────────────────────────────────── */
+    :host-context(.dark) { background-color: #09090b !important; }
+
+    :host-context(.dark) .inp {
+      background: #18181b;
+      border-color: #3f3f46;
+      color: #f4f4f5;
+    }
+    :host-context(.dark) .inp:focus {
+      background: #27272a;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+    }
+    :host-context(.dark) .inp::placeholder { color: #52525b; }
+    :host-context(.dark) select.inp { background: #18181b; }
+
+    :host-context(.dark) .item-card {
+      background: #18181b;
+      border-color: #3f3f46;
+    }
+    :host-context(.dark) .seg-active {
+      background: #27272a;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    :host-context(.dark) .seg-inactive { color: #71717a; }
+
+    :host-context(.dark) .add-btn {
+      background: rgba(79,70,229,0.08);
+      border-color: #3730a3;
+      color: #818cf8;
+    }
+    :host-context(.dark) .add-btn:hover {
+      background: rgba(79,70,229,0.15);
+      border-color: #6366f1;
+    }
+    :host-context(.dark) .add-btn-amber {
+      background: rgba(217,119,6,0.08);
+      border-color: #78350f;
+      color: #f59e0b;
+    }
+    :host-context(.dark) .add-btn-amber:hover {
+      background: rgba(217,119,6,0.15);
+      border-color: #d97706;
+    }
+    :host-context(.dark) .add-btn-sky {
+      background: rgba(2,132,199,0.08);
+      border-color: #0c4a6e;
+      color: #38bdf8;
+    }
+    :host-context(.dark) .add-btn-sky:hover {
+      background: rgba(2,132,199,0.15);
+      border-color: #0ea5e9;
+    }
+
+    :host-context(.dark) .month-inp {
+      background: #18181b;
+      border-color: #3f3f46;
+      color: #f4f4f5;
+    }
+    :host-context(.dark) .month-inp:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px rgba(99,102,241,0.12);
+    }
+
+    :host-context(.dark) .help-btn {
+      background: #27272a;
+      color: #71717a;
+      border-color: #3f3f46;
+    }
+    :host-context(.dark) .help-btn:hover,
+    :host-context(.dark) .help-btn:focus {
+      background: rgba(79,70,229,0.18);
+      color: #818cf8;
+      border-color: #4f46e5;
+    }
+
+    :host-context(.dark) .remove-btn {
+      background: rgba(239,68,68,0.12);
+      color: #f87171;
+    }
+    :host-context(.dark) .remove-btn:hover { background: rgba(239,68,68,0.22); }
   `],
   template: `
     <!-- ═══ STEPPER ══════════════════════════════════════════════════════════ -->
-    <div class="flex-shrink-0 px-4 md:px-8 pt-4 md:pt-6 pb-0 bg-white">
+    <div class="flex-shrink-0 px-4 md:px-8 pt-4 md:pt-6 pb-0 bg-white dark:bg-zinc-950">
       <div class="relative flex items-center justify-between mb-1">
-        <div class="absolute top-4 left-0 right-0 h-0.5 bg-zinc-100"></div>
+        <div class="absolute top-4 left-0 right-0 h-0.5 bg-zinc-100 dark:bg-zinc-800"></div>
         <div class="absolute top-4 left-0 h-0.5 bg-brand-500 step-track-fill"
              [style.width]="trackWidth()"></div>
 
@@ -278,9 +392,9 @@ interface LoanItem {
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold
                         transition-all duration-400 border-2"
                  [ngClass]="{
-                   'bg-brand-600 border-brand-600 text-white scale-110 shadow-md shadow-brand-500/30': currentStep() === step.id,
-                   'bg-brand-600 border-brand-600 text-white': currentStep() > step.id,
-                   'bg-white border-zinc-200 text-zinc-400': currentStep() < step.id
+                   'bg-brand-600 dark:bg-brand-400 border-brand-600 dark:border-brand-400 text-white scale-110 shadow-md shadow-brand-500/30 dark:shadow-brand-400/40': currentStep() === step.id,
+                   'bg-brand-600 dark:bg-brand-500 border-brand-600 dark:border-brand-500 text-white': currentStep() > step.id,
+                   'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-700 text-zinc-400 dark:text-zinc-500': currentStep() < step.id
                  }">
               @if (currentStep() > step.id) {
                 <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
@@ -299,7 +413,7 @@ interface LoanItem {
           </button>
         }
       </div>
-      <div class="h-px bg-zinc-100 mt-5"></div>
+      <div class="h-px bg-zinc-100 dark:bg-zinc-800 mt-5"></div>
     </div>
 
     <!-- ═══ BODY ══════════════════════════════════════════════════════════════ -->
@@ -315,29 +429,29 @@ interface LoanItem {
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-brand-50 text-brand-700 text-xs font-semibold rounded-full font-body mb-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Passo 1 di 6 · Setup
               </span>
-              <h2 class="text-xl font-bold text-zinc-900 font-display">Configurazione Globale</h2>
-              <p class="text-sm text-zinc-500 mt-1 font-body">Fondamenta fiscali e temporali del piano.</p>
+              <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display">Configurazione Globale</h2>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-body">Fondamenta fiscali e temporali del piano.</p>
             </div>
 
             <div class="space-y-4">
               <!-- Nome Progetto -->
               <div>
-                <label class="block text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide">Nome Progetto</label>
+                <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5 font-body uppercase tracking-wide">Nome Progetto</label>
                 <input type="text" [(ngModel)]="config.projectName" name="projectName"
                        placeholder="es. MyStartup SaaS" class="inp"/>
               </div>
 
               <!-- Anno Inizio -->
               <div>
-                <label class="block text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide">Anno di Avvio</label>
+                <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5 font-body uppercase tracking-wide">Anno di Avvio</label>
                 <div class="relative" style="width: 160px;">
                   <input type="number" [(ngModel)]="config.startYear" name="startYear"
                          min="2024" max="2035" class="inp text-center font-mono font-semibold"/>
-                  <div class="absolute inset-y-0 right-0 flex flex-col border-l border-zinc-200">
+                  <div class="absolute inset-y-0 right-0 flex flex-col border-l border-zinc-200 dark:border-zinc-700">
                     <button (click)="config.startYear = config.startYear + 1"
-                            class="flex-1 px-2 hover:bg-zinc-100 rounded-tr-lg text-zinc-400 hover:text-zinc-700 transition-colors text-xs">▲</button>
+                            class="flex-1 px-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-tr-lg text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors text-xs">▲</button>
                     <button (click)="config.startYear = config.startYear - 1"
-                            class="flex-1 px-2 hover:bg-zinc-100 rounded-br-lg text-zinc-400 hover:text-zinc-700 transition-colors border-t border-zinc-200 text-xs">▼</button>
+                            class="flex-1 px-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-br-lg text-zinc-400 dark:text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors border-t border-zinc-200 dark:border-zinc-700 text-xs">▼</button>
                   </div>
                 </div>
               </div>
@@ -352,7 +466,7 @@ interface LoanItem {
                   <input type="range" [(ngModel)]="config.iresRate" name="iresRate"
                          min="0" max="50" step="0.5" class="w-full mt-1"
                          [style.background]="'linear-gradient(to right, #4f46e5 ' + (config.iresRate/50*100) + '%, #e4e4e7 ' + (config.iresRate/50*100) + '%)'"/>
-                  <div class="flex justify-between text-xs text-zinc-400 font-body mt-1">
+                  <div class="flex justify-between text-xs text-zinc-400 dark:text-zinc-500 font-body mt-1">
                     <span>0%</span><span class="text-brand-600 font-semibold">std: 24%</span><span>50%</span>
                   </div>
                 </div>
@@ -364,7 +478,7 @@ interface LoanItem {
                   <input type="range" [(ngModel)]="config.irapRate" name="irapRate"
                          min="0" max="10" step="0.1" class="w-full mt-1"
                          [style.background]="'linear-gradient(to right, #4f46e5 ' + (config.irapRate/10*100) + '%, #e4e4e7 ' + (config.irapRate/10*100) + '%)'"/>
-                  <div class="flex justify-between text-xs text-zinc-400 font-body mt-1">
+                  <div class="flex justify-between text-xs text-zinc-400 dark:text-zinc-500 font-body mt-1">
                     <span>0%</span><span class="text-brand-600 font-semibold">std: 4%</span><span>10%</span>
                   </div>
                 </div>
@@ -379,15 +493,15 @@ interface LoanItem {
                            min="0" max="10" step="0.1" class="inp inp-suffix font-mono text-sm"/>
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                   </div>
-                  <p class="text-xs text-zinc-400 font-body">Default: 0.1% — fondo su crediti inesigibili</p>
+                  <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Default: 0.1% — fondo su crediti inesigibili</p>
                 </div>
               </div>
 
               <!-- Toggle Nuova Startup -->
-              <div class="flex items-center justify-between p-4 bg-zinc-50 rounded-2xl border border-zinc-100">
+              <div class="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800">
                 <div>
-                  <p class="text-sm font-semibold text-zinc-800 font-body">Sei una nuova Startup?</p>
-                  <p class="text-xs text-zinc-500 font-body mt-0.5">Disattiva per inserire saldi storici dello Stato Patrimoniale</p>
+                  <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body">Sei una nuova Startup?</p>
+                  <p class="text-xs text-zinc-500 dark:text-zinc-400 font-body mt-0.5">Disattiva per inserire saldi storici dello Stato Patrimoniale</p>
                 </div>
                 <button (click)="config.isNewStartup = !config.isNewStartup"
                         class="relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-4"
@@ -408,21 +522,21 @@ interface LoanItem {
                   </p>
                   <div class="grid grid-cols-3 gap-2">
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Cassa Iniziale</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Cassa Iniziale</label>
                       <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                         <input type="number" [(ngModel)]="config.initialCash" name="initialCash" min="0" class="inp inp-prefix font-mono text-sm"/>
                       </div>
                     </div>
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Crediti Residui</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Crediti Residui</label>
                       <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                         <input type="number" [(ngModel)]="config.residualCredits" name="residualCredits" min="0" class="inp inp-prefix font-mono text-sm"/>
                       </div>
                     </div>
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Debiti Residui</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Debiti Residui</label>
                       <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                         <input type="number" [(ngModel)]="config.residualDebts" name="residualDebts" min="0" class="inp inp-prefix font-mono text-sm"/>
@@ -453,8 +567,8 @@ interface LoanItem {
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full font-body mb-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Passo 2 di 6 · Ricavi
               </span>
-              <h2 class="text-xl font-bold text-zinc-900 font-display">Linee di Prodotto / Servizio</h2>
-              <p class="text-sm text-zinc-500 mt-1 font-body">Ogni prodotto o servizio con il suo modello di vendita.</p>
+              <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display">Linee di Prodotto / Servizio</h2>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-body">Ogni prodotto o servizio con il suo modello di vendita.</p>
             </div>
 
             <div class="space-y-4">
@@ -468,11 +582,11 @@ interface LoanItem {
                     </button>
                   }
 
-                  <p class="text-xs font-bold text-zinc-500 font-body uppercase tracking-wide mb-3">Prodotto {{ pi + 1 }}</p>
+                  <p class="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-body uppercase tracking-wide mb-3">Prodotto {{ pi + 1 }}</p>
 
                   <div class="grid grid-cols-2 gap-3 mb-3">
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Nome / Descrizione</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Nome / Descrizione</label>
                       <input type="text" [(ngModel)]="products[pi].name" [name]="'pName_' + p.id"
                              placeholder="es. Piano SaaS Pro" class="inp"/>
                     </div>
@@ -488,8 +602,8 @@ interface LoanItem {
 
                   <!-- Volume mode toggle -->
                   <div class="mb-3">
-                    <label class="block text-xs font-semibold text-zinc-500 mb-1.5 font-body">Modalità Volumi</label>
-                    <div class="flex bg-zinc-100 p-1 rounded-xl gap-1">
+                    <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1.5 font-body">Modalità Volumi</label>
+                    <div class="flex bg-zinc-100 dark:bg-zinc-800 p-1 rounded-xl gap-1">
                       <button type="button"
                               (click)="products[pi].volumeMode = 'linear'"
                               class="seg-btn"
@@ -512,11 +626,11 @@ interface LoanItem {
                         <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Volume Iniziale (mese 1)<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Volume Iniziale">?</button><span class="tt-box">Numero di unità vendute nel primo mese del piano. È il punto di partenza da cui si applica la crescita mensile percentuale per i mesi successivi.</span></span></label>
                         <div class="flex items-center gap-1.5">
                           <button type="button" (click)="products[pi].linearStart = Math.max(1, products[pi].linearStart - 10)"
-                                  class="w-8 h-8 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 flex items-center justify-center text-zinc-500 transition-all font-mono flex-shrink-0">−</button>
+                                  class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-all font-mono flex-shrink-0">−</button>
                           <input type="number" [(ngModel)]="products[pi].linearStart" [name]="'pLinStart_' + p.id"
                                  min="1" class="inp text-center font-mono font-bold"/>
                           <button type="button" (click)="products[pi].linearStart = products[pi].linearStart + 10"
-                                  class="w-8 h-8 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 flex items-center justify-center text-zinc-500 transition-all font-mono flex-shrink-0">+</button>
+                                  class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-all font-mono flex-shrink-0">+</button>
                         </div>
                       </div>
                       <div>
@@ -529,7 +643,7 @@ interface LoanItem {
                       </div>
                     </div>
                     <!-- Mini growth preview -->
-                    <div class="bg-zinc-50 rounded-xl p-3">
+                    <div class="bg-zinc-50 dark:bg-zinc-900 rounded-xl p-3">
                       <p class="text-xs text-zinc-400 font-body mb-2">Proiezione prime 6 mensilità</p>
                       <div class="flex items-end gap-1.5" style="height: 40px;">
                         @for (bar of getLinearPreview(products[pi]); track bar; let bi = $index) {
@@ -546,7 +660,7 @@ interface LoanItem {
                   <!-- Monthly mode: 12-field grid -->
                   @if (products[pi].volumeMode === 'monthly') {
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-2 font-body">Volumi Mensili (unità)</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-2 font-body">Volumi Mensili (unità)</label>
                       <div class="grid grid-cols-4 gap-1.5">
                         @for (mi of monthIndices; track mi) {
                           <div class="text-center">
@@ -595,15 +709,15 @@ interface LoanItem {
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-violet-50 text-violet-700 text-xs font-semibold rounded-full font-body mb-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span> Passo 3 di 6 · Team
               </span>
-              <h2 class="text-xl font-bold text-zinc-900 font-display">Risorse Umane</h2>
-              <p class="text-sm text-zinc-500 mt-1 font-body">Organico, RAL e struttura contrattuale.</p>
+              <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display">Risorse Umane</h2>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-body">Organico, RAL e struttura contrattuale.</p>
             </div>
 
             <!-- Parametri Aziendali collapsible -->
-            <div class="mb-5 bg-zinc-50 rounded-2xl border border-zinc-100 overflow-hidden">
+            <div class="mb-5 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 overflow-hidden">
               <button type="button"
                       (click)="hrParams.showAdvanced = !hrParams.showAdvanced"
-                      class="w-full flex items-center justify-between px-4 py-3">
+                      class="w-full flex items-center justify-between px-4 py-3 text-left">
                 <div class="flex items-center gap-2">
                   <div class="w-5 h-5 rounded-md bg-violet-100 flex items-center justify-center">
                     <svg class="w-3 h-3 text-violet-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -611,8 +725,8 @@ interface LoanItem {
                       <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                     </svg>
                   </div>
-                  <span class="text-xs font-bold text-zinc-600 font-body uppercase tracking-wide">Parametri Aziendali</span>
-                  <span class="text-xs text-zinc-400 font-body">INPS {{ hrParams.inpsPct }}% · INAIL {{ hrParams.inailPct }}% · TFR {{ hrParams.tfrPct }}% · {{ hrParams.salaryMonths }} mensilità</span>
+                  <span class="text-xs font-bold text-zinc-600 dark:text-zinc-400 font-body uppercase tracking-wide">Parametri Aziendali</span>
+                  <span class="text-xs text-zinc-400 dark:text-zinc-500 font-body">INPS {{ hrParams.inpsPct }}% · INAIL {{ hrParams.inailPct }}% · TFR {{ hrParams.tfrPct }}% · {{ hrParams.salaryMonths }} mensilità</span>
                 </div>
                 <svg class="w-4 h-4 text-zinc-400 transition-transform duration-200 flex-shrink-0"
                      [ngClass]="hrParams.showAdvanced ? 'rotate-180' : ''"
@@ -621,30 +735,30 @@ interface LoanItem {
                 </svg>
               </button>
               @if (hrParams.showAdvanced) {
-                <div class="px-4 pb-4 grid grid-cols-2 gap-3 border-t border-zinc-100 pt-3">
+                <div class="px-4 pb-4 grid grid-cols-2 gap-3 border-t border-zinc-100 dark:border-zinc-800 pt-3">
                   <div>
-                    <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">% INPS (datore)</label>
+                    <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">% INPS (datore)</label>
                     <div class="relative">
                       <input type="number" [(ngModel)]="hrParams.inpsPct" name="inpsPct" min="0" max="50" step="0.1" class="inp inp-suffix font-mono text-sm"/>
                       <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                     </div>
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">% INAIL</label>
+                    <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">% INAIL</label>
                     <div class="relative">
                       <input type="number" [(ngModel)]="hrParams.inailPct" name="inailPct" min="0" max="5" step="0.1" class="inp inp-suffix font-mono text-sm"/>
                       <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                     </div>
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">% TFR</label>
+                    <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">% TFR</label>
                     <div class="relative">
                       <input type="number" [(ngModel)]="hrParams.tfrPct" name="tfrPct" min="0" max="10" step="0.01" class="inp inp-suffix font-mono text-sm"/>
                       <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                     </div>
                   </div>
                   <div>
-                    <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Numero Mensilità</label>
+                    <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Numero Mensilità</label>
                     <select [(ngModel)]="hrParams.salaryMonths" name="salaryMonths" class="inp text-sm">
                       <option [value]="12">12 mensilità</option>
                       <option [value]="13">13ª mensilità</option>
@@ -667,11 +781,11 @@ interface LoanItem {
                     </button>
                   }
 
-                  <p class="text-xs font-bold text-zinc-500 font-body uppercase tracking-wide mb-3">Risorsa {{ ei + 1 }}</p>
+                  <p class="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-body uppercase tracking-wide mb-3">Risorsa {{ ei + 1 }}</p>
 
                   <div class="space-y-3">
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Ruolo / Livello Contrattuale</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Ruolo / Livello Contrattuale</label>
                       <input type="text" [(ngModel)]="employees[ei].role" [name]="'eRole_' + e.id"
                              placeholder="es. CTO, Sales Manager, Dev Junior" class="inp"/>
                     </div>
@@ -690,18 +804,18 @@ interface LoanItem {
                         <div class="flex items-center gap-1.5">
                           <button type="button"
                                   (click)="employees[ei].fte = +(Math.max(0.1, employees[ei].fte - 0.5)).toFixed(1)"
-                                  class="w-8 h-8 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 flex items-center justify-center text-zinc-500 transition-all font-mono flex-shrink-0">−</button>
+                                  class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-all font-mono flex-shrink-0">−</button>
                           <input type="number" [(ngModel)]="employees[ei].fte" [name]="'eFte_' + e.id"
                                  min="0.1" max="5" step="0.5" class="inp text-center font-mono font-bold text-sm"/>
                           <button type="button"
                                   (click)="employees[ei].fte = +(Math.min(5, employees[ei].fte + 0.5)).toFixed(1)"
-                                  class="w-8 h-8 rounded-lg bg-white border border-zinc-200 hover:bg-zinc-100 flex items-center justify-center text-zinc-500 transition-all font-mono flex-shrink-0">+</button>
+                                  class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-all font-mono flex-shrink-0">+</button>
                         </div>
                       </div>
                     </div>
 
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Data di Ingresso</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Data di Ingresso</label>
                       <div class="grid grid-cols-2 gap-2">
                         <select [(ngModel)]="employees[ei].startMonth" [name]="'eMonth_' + e.id" class="inp text-sm">
                           @for (m of months; track m; let mi = $index) {
@@ -713,9 +827,9 @@ interface LoanItem {
                       </div>
                     </div>
 
-                    <div class="flex justify-between items-center pt-2 border-t border-zinc-100">
-                      <span class="text-xs text-zinc-400 font-body">Costo totale/anno (incl. contributi)</span>
-                      <span class="text-sm font-bold text-zinc-700 font-mono">
+                    <div class="flex justify-between items-center pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                      <span class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Costo totale/anno (incl. contributi)</span>
+                      <span class="text-sm font-bold text-zinc-700 dark:text-zinc-300 font-mono">
                         €{{ formatNum(employees[ei].ral * employees[ei].fte * hrCostMultiplier) }}
                       </span>
                     </div>
@@ -740,8 +854,8 @@ interface LoanItem {
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-700 text-xs font-semibold rounded-full font-body mb-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Passo 4 di 6 · Costi
               </span>
-              <h2 class="text-xl font-bold text-zinc-900 font-display">Costi Operativi (OPEX)</h2>
-              <p class="text-sm text-zinc-500 mt-1 font-body">Struttura dei costi variabili e fissi.</p>
+              <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display">Costi Operativi (OPEX)</h2>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-body">Struttura dei costi variabili e fissi.</p>
             </div>
 
             <!-- Sezione A: Costi Variabili -->
@@ -752,7 +866,7 @@ interface LoanItem {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"/>
                   </svg>
                 </div>
-                <p class="text-xs font-bold text-zinc-700 font-body uppercase tracking-wide">Costi Variabili</p>
+                <p class="text-xs font-bold text-zinc-700 dark:text-zinc-300 font-body uppercase tracking-wide">Costi Variabili</p>
               </div>
 
               <div class="space-y-3">
@@ -765,7 +879,7 @@ interface LoanItem {
                     </button>
 
                     <div class="mb-3">
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Descrizione</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Descrizione</label>
                       <input type="text" [(ngModel)]="variableCosts[ci].description" [name]="'vcDesc_' + c.id"
                              placeholder="es. Hosting, Commissioni, Materiali" class="inp"/>
                     </div>
@@ -773,7 +887,7 @@ interface LoanItem {
                     <div class="grid grid-cols-2 gap-3 mb-3">
                       <div>
                         <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Tipo<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Tipo">?</button><span class="tt-box">Scegli come esprimere il costo: "% Fatt." lo calcola come percentuale del fatturato; "€/Anno" usa un importo fisso annuo indipendente dai ricavi.</span></span></label>
-                        <div class="flex bg-zinc-100 p-0.5 rounded-lg gap-0.5">
+                        <div class="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg gap-0.5">
                           <button type="button"
                                   (click)="variableCosts[ci].valueType = 'pct'"
                                   class="flex-1 py-1.5 rounded-md text-xs font-semibold font-body transition-all"
@@ -833,8 +947,8 @@ interface LoanItem {
                 }
 
                 @if (variableCosts.length === 0) {
-                  <div class="p-4 bg-zinc-50 rounded-2xl border border-dashed border-zinc-200">
-                    <p class="text-xs text-zinc-400 font-body text-center">Nessun costo variabile — es. hosting, commissioni, costi di erogazione.</p>
+                  <div class="p-4 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-700">
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body text-center">Nessun costo variabile — es. hosting, commissioni, costi di erogazione.</p>
                   </div>
                 }
 
@@ -855,7 +969,7 @@ interface LoanItem {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
                   </svg>
                 </div>
-                <p class="text-xs font-bold text-zinc-700 font-body uppercase tracking-wide">Costi Fissi di Gestione</p>
+                <p class="text-xs font-bold text-zinc-700 dark:text-zinc-300 font-body uppercase tracking-wide">Costi Fissi di Gestione</p>
               </div>
 
               <div class="space-y-3">
@@ -869,12 +983,12 @@ interface LoanItem {
 
                     <div class="grid grid-cols-2 gap-3 mb-3">
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Descrizione</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Descrizione</label>
                         <input type="text" [(ngModel)]="fixedCosts[fi].description" [name]="'fcDesc_' + c.id"
                                placeholder="es. Affitto ufficio, Software" class="inp"/>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Categoria</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Categoria</label>
                         <select [(ngModel)]="fixedCosts[fi].category" [name]="'fcCat_' + c.id" class="inp text-sm">
                           @for (cat of fixedCostCategories; track cat.value) {
                             <option [value]="cat.value">{{ cat.label }}</option>
@@ -885,7 +999,7 @@ interface LoanItem {
 
                     <div class="grid grid-cols-3 gap-2">
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Budget/Mese</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Budget/Mese</label>
                         <div class="relative">
                           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                           <input type="number" [(ngModel)]="fixedCosts[fi].monthlyBudget" [name]="'fcBudget_' + c.id"
@@ -893,7 +1007,7 @@ interface LoanItem {
                         </div>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">IVA</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">IVA</label>
                         <select [(ngModel)]="fixedCosts[fi].vatRate" [name]="'fcVat_' + c.id" class="inp text-sm">
                           <option [value]="0">0%</option>
                           <option [value]="4">4%</option>
@@ -902,7 +1016,7 @@ interface LoanItem {
                         </select>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Dilazione</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Dilazione</label>
                         <select [(ngModel)]="fixedCosts[fi].paymentDelay" [name]="'fcDel_' + c.id" class="inp text-sm">
                           <option [value]="0">0 gg</option>
                           <option [value]="30">30 gg</option>
@@ -915,8 +1029,8 @@ interface LoanItem {
                 }
 
                 @if (fixedCosts.length === 0) {
-                  <div class="p-4 bg-zinc-50 rounded-2xl border border-dashed border-zinc-200">
-                    <p class="text-xs text-zinc-400 font-body text-center">Nessun costo fisso — es. affitti, utenze, software, marketing, commerciale.</p>
+                  <div class="p-4 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-700">
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body text-center">Nessun costo fisso — es. affitti, utenze, software, marketing, commerciale.</p>
                   </div>
                 }
 
@@ -938,8 +1052,8 @@ interface LoanItem {
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full font-body mb-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Passo 5 di 6 · Investimenti
               </span>
-              <h2 class="text-xl font-bold text-zinc-900 font-display">Investimenti (CAPEX)</h2>
-              <p class="text-sm text-zinc-500 mt-1 font-body">Beni strumentali con aliquota di ammortamento automatica.</p>
+              <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display">Investimenti (CAPEX)</h2>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-body">Beni strumentali con aliquota di ammortamento automatica.</p>
             </div>
 
             <div class="space-y-3">
@@ -952,14 +1066,14 @@ interface LoanItem {
                   </button>
 
                   <div class="mb-3">
-                    <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Descrizione Bene</label>
+                    <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Descrizione Bene</label>
                     <input type="text" [(ngModel)]="investments[ii].description" [name]="'invDesc_' + inv.id"
                            placeholder="es. Server rack, Macchinario, Brevetto" class="inp"/>
                   </div>
 
                   <div class="grid grid-cols-2 gap-3 mb-3">
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Categoria</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Categoria</label>
                       <select [(ngModel)]="investments[ii].category" [name]="'invCat_' + inv.id" class="inp text-sm">
                         @for (cat of capexCategories; track cat.value) {
                           <option [value]="cat.value">{{ cat.label }}</option>
@@ -980,7 +1094,7 @@ interface LoanItem {
 
                   <div class="grid grid-cols-3 gap-2">
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Costo Netto IVA</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Costo Netto IVA</label>
                       <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                         <input type="number" [(ngModel)]="investments[ii].cost" [name]="'invCost_' + inv.id"
@@ -988,7 +1102,7 @@ interface LoanItem {
                       </div>
                     </div>
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Mese Acquisto</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Mese Acquisto</label>
                       <select [(ngModel)]="investments[ii].purchaseMonth" [name]="'invMonth_' + inv.id" class="inp text-sm">
                         @for (m of months; track m; let mi = $index) {
                           <option [value]="mi + 1">{{ m }}</option>
@@ -996,7 +1110,7 @@ interface LoanItem {
                       </select>
                     </div>
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Anno</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Anno</label>
                       <input type="number" [(ngModel)]="investments[ii].purchaseYear" [name]="'invYear_' + inv.id"
                              min="2024" max="2040" class="inp font-mono text-sm"/>
                     </div>
@@ -1004,7 +1118,7 @@ interface LoanItem {
 
                   @if (investments[ii].cost > 0) {
                     <div class="flex justify-between items-center pt-2 mt-2 border-t border-zinc-100">
-                      <span class="text-xs text-zinc-400 font-body">Ammortamento annuo</span>
+                      <span class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Ammortamento annuo</span>
                       <span class="text-sm font-bold text-amber-600 font-mono">
                         −€{{ formatNum(investments[ii].cost * getAmmRate(investments[ii].category) / 100) }}
                       </span>
@@ -1014,8 +1128,8 @@ interface LoanItem {
               }
 
               @if (investments.length === 0) {
-                <div class="p-4 bg-zinc-50 rounded-2xl border border-dashed border-zinc-200">
-                  <p class="text-xs text-zinc-400 font-body text-center">Nessun investimento — aggiungi solo se prevedi acquisti di beni strumentali significativi.</p>
+                <div class="p-4 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-700">
+                  <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body text-center">Nessun investimento — aggiungi solo se prevedi acquisti di beni strumentali significativi.</p>
                 </div>
               }
 
@@ -1036,8 +1150,8 @@ interface LoanItem {
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-sky-50 text-sky-700 text-xs font-semibold rounded-full font-body mb-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Passo 6 di 6 · Finanziamento
               </span>
-              <h2 class="text-xl font-bold text-zinc-900 font-display">Fonti di Finanziamento</h2>
-              <p class="text-sm text-zinc-500 mt-1 font-body">Equity dei soci e finanziamenti bancari/mutui.</p>
+              <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display">Fonti di Finanziamento</h2>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 mt-1 font-body">Equity dei soci e finanziamenti bancari/mutui.</p>
             </div>
 
             <!-- Sezione A: Equity -->
@@ -1062,10 +1176,10 @@ interface LoanItem {
                       </button>
                     }
 
-                    <p class="text-xs font-bold text-zinc-500 font-body uppercase tracking-wide mb-3">Iniezione {{ eqi + 1 }}</p>
+                    <p class="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-body uppercase tracking-wide mb-3">Iniezione {{ eqi + 1 }}</p>
                     <div class="grid grid-cols-3 gap-2">
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Importo</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Importo</label>
                         <div class="relative">
                           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-sky-500 font-bold text-sm pointer-events-none">€</span>
                           <input type="number" [(ngModel)]="equityInjections[eqi].amount" [name]="'eqAmt_' + eq.id"
@@ -1073,7 +1187,7 @@ interface LoanItem {
                         </div>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Mese</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Mese</label>
                         <select [(ngModel)]="equityInjections[eqi].month" [name]="'eqMonth_' + eq.id" class="inp text-sm">
                           @for (m of months; track m; let mi = $index) {
                             <option [value]="mi + 1">{{ m }}</option>
@@ -1081,7 +1195,7 @@ interface LoanItem {
                         </select>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Anno</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Anno</label>
                         <input type="number" [(ngModel)]="equityInjections[eqi].year" [name]="'eqYear_' + eq.id"
                                min="2024" max="2040" class="inp font-mono text-sm"/>
                       </div>
@@ -1106,7 +1220,7 @@ interface LoanItem {
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
                   </svg>
                 </div>
-                <p class="text-xs font-bold text-zinc-700 font-body uppercase tracking-wide">Finanziamenti Bancari / Mutui</p>
+                <p class="text-xs font-bold text-zinc-700 dark:text-zinc-300 font-body uppercase tracking-wide">Finanziamenti Bancari / Mutui</p>
               </div>
 
               <div class="space-y-3">
@@ -1118,11 +1232,11 @@ interface LoanItem {
                       </svg>
                     </button>
 
-                    <p class="text-xs font-bold text-zinc-500 font-body uppercase tracking-wide mb-3">Finanziamento {{ li + 1 }}</p>
+                    <p class="text-xs font-bold text-zinc-500 dark:text-zinc-400 font-body uppercase tracking-wide mb-3">Finanziamento {{ li + 1 }}</p>
 
                     <div class="grid grid-cols-3 gap-2 mb-3">
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Importo Erogato</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Importo Erogato</label>
                         <div class="relative">
                           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                           <input type="number" [(ngModel)]="loans[li].amount" [name]="'lnAmt_' + loan.id"
@@ -1130,7 +1244,7 @@ interface LoanItem {
                         </div>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Mese Stipula</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Mese Stipula</label>
                         <select [(ngModel)]="loans[li].month" [name]="'lnMonth_' + loan.id" class="inp text-sm">
                           @for (m of months; track m; let mi = $index) {
                             <option [value]="mi + 1">{{ m }}</option>
@@ -1138,7 +1252,7 @@ interface LoanItem {
                         </select>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Anno</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Anno</label>
                         <input type="number" [(ngModel)]="loans[li].year" [name]="'lnYear_' + loan.id"
                                min="2024" max="2040" class="inp font-mono text-sm"/>
                       </div>
@@ -1146,7 +1260,7 @@ interface LoanItem {
 
                     <div class="grid grid-cols-3 gap-2 mb-3">
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Tasso Annuo</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Tasso Annuo</label>
                         <div class="relative">
                           <input type="number" [(ngModel)]="loans[li].interestRate" [name]="'lnRate_' + loan.id"
                                  min="0" max="30" step="0.1" class="inp inp-suffix font-mono text-sm"/>
@@ -1154,19 +1268,19 @@ interface LoanItem {
                         </div>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Durata (mesi)</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Durata (mesi)</label>
                         <input type="number" [(ngModel)]="loans[li].durationMonths" [name]="'lnDur_' + loan.id"
                                min="1" max="360" class="inp font-mono text-sm"/>
                       </div>
                       <div>
-                        <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Pre-amm. (mesi)</label>
+                        <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Pre-amm. (mesi)</label>
                         <input type="number" [(ngModel)]="loans[li].preAmortizationMonths" [name]="'lnPre_' + loan.id"
                                min="0" class="inp font-mono text-sm"/>
                       </div>
                     </div>
 
                     <div class="mb-3">
-                      <label class="block text-xs font-semibold text-zinc-500 mb-1 font-body">Prima Rata</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Prima Rata</label>
                       <div class="grid grid-cols-2 gap-2">
                         <select [(ngModel)]="loans[li].firstPaymentMonth" [name]="'lnFpMonth_' + loan.id" class="inp text-sm">
                           @for (m of months; track m; let mi = $index) {
@@ -1179,8 +1293,8 @@ interface LoanItem {
                     </div>
 
                     @if (loans[li].amount > 0 && loans[li].durationMonths > 0) {
-                      <div class="flex items-center justify-between pt-2 border-t border-zinc-100">
-                        <span class="text-xs text-zinc-400 font-body">Rata mensile stimata</span>
+                      <div class="flex items-center justify-between pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                        <span class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Rata mensile stimata</span>
                         <span class="text-sm font-bold text-brand-600 font-mono">
                           €{{ formatNum(calcMonthlyPayment(loans[li])) }}/mese
                         </span>
@@ -1190,8 +1304,8 @@ interface LoanItem {
                 }
 
                 @if (loans.length === 0) {
-                  <div class="p-4 bg-zinc-50 rounded-2xl border border-dashed border-zinc-200">
-                    <p class="text-xs text-zinc-400 font-body text-center">Nessun finanziamento — aggiungi mutui o linee di credito se previsti.</p>
+                  <div class="p-4 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-700">
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body text-center">Nessun finanziamento — aggiungi mutui o linee di credito se previsti.</p>
                   </div>
                 }
 
@@ -1209,37 +1323,37 @@ interface LoanItem {
       </div>
 
       <!-- ═══ LIVE PREVIEW ══════════════════════════════════════════════════ -->
-      <div class="hidden xl:flex w-72 flex-shrink-0 border-l border-zinc-100 bg-zinc-50/50 overflow-y-auto scrollbar-thin p-5 flex-col gap-4">
+      <div class="hidden xl:flex w-72 flex-shrink-0 border-l border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/50 overflow-y-auto scrollbar-thin p-5 flex-col gap-4">
 
         <div class="flex items-center gap-2">
           <div class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
-          <p class="text-xs font-bold text-zinc-500 uppercase tracking-widest font-body">Live Preview</p>
+          <p class="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-widest font-body">Live Preview</p>
         </div>
 
         <!-- Project card -->
-        <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4">
-          <p class="text-xs text-zinc-400 font-body mb-1">Progetto</p>
-          <p class="text-base font-bold text-zinc-900 font-display truncate">{{ config.projectName || 'Il mio Progetto' }}</p>
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-4">
+          <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mb-1">Progetto</p>
+          <p class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-display truncate">{{ config.projectName || 'Il mio Progetto' }}</p>
           <p class="text-xs text-zinc-400 font-body mt-0.5">{{ config.startYear }} · IRES {{ config.iresRate }}% · IRAP {{ config.irapRate }}%</p>
         </div>
 
         <!-- Revenue -->
         @if (currentStep() >= 2) {
-          <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4">
+          <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-4">
             <p class="text-xs text-emerald-500 font-semibold font-body mb-1.5 flex items-center gap-1.5">
               <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
               </svg>
               Ricavi Anno 1
             </p>
-            <p class="text-xl font-bold text-zinc-900 font-mono">€{{ formatNum(totalRevenue) }}</p>
+            <p class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-mono">€{{ formatNum(totalRevenue) }}</p>
             <p class="text-xs text-zinc-400 font-body mt-0.5">{{ products.length }} linea/e prodotto</p>
           </div>
         }
 
         <!-- HR + EBITDA -->
         @if (currentStep() >= 3) {
-          <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4">
+          <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-4">
             <p class="text-xs text-zinc-400 font-body mb-2 font-semibold">Struttura Costi</p>
             <div class="space-y-1.5">
               <div class="flex justify-between text-xs font-body">
@@ -1256,8 +1370,8 @@ interface LoanItem {
                   <span class="text-rose-400 font-mono font-semibold">−€{{ formatNum(totalVariableCosts) }}</span>
                 </div>
               }
-              <div class="border-t border-zinc-100 pt-1.5 flex justify-between items-baseline">
-                <span class="text-xs font-semibold text-zinc-600 font-body">EBITDA stimato</span>
+              <div class="border-t border-zinc-100 dark:border-zinc-800 pt-1.5 flex justify-between items-baseline">
+                <span class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body">EBITDA stimato</span>
                 <span class="text-base font-bold font-mono" [ngClass]="estimatedEbitda >= 0 ? 'text-emerald-600' : 'text-rose-500'">
                   {{ estimatedEbitda >= 0 ? '+' : '' }}€{{ formatNum(estimatedEbitda) }}
                 </span>
@@ -1268,21 +1382,21 @@ interface LoanItem {
 
         <!-- CAPEX -->
         @if (currentStep() >= 5 && totalCapex > 0) {
-          <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4">
+          <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-4">
             <p class="text-xs text-amber-600 font-semibold font-body mb-1.5 flex items-center gap-1.5">
               <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
               </svg>
               Investimenti
             </p>
-            <p class="text-xl font-bold text-zinc-800 font-mono">€{{ formatNum(totalCapex) }}</p>
+            <p class="text-xl font-bold text-zinc-800 dark:text-zinc-200 font-mono">€{{ formatNum(totalCapex) }}</p>
             <p class="text-xs text-zinc-400 font-body mt-0.5">{{ investments.length }} bene/i</p>
           </div>
         }
 
         <!-- Financing -->
         @if (currentStep() >= 6) {
-          <div class="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4">
+          <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm p-4">
             <p class="text-xs text-sky-600 font-semibold font-body mb-2">Copertura Finanziaria</p>
             <div class="space-y-1.5">
               <div class="flex justify-between text-xs font-body">
@@ -1293,9 +1407,9 @@ interface LoanItem {
                 <span class="text-zinc-500">Finanziamenti</span>
                 <span class="text-brand-600 font-mono font-semibold">+€{{ formatNum(totalDebt) }}</span>
               </div>
-              <div class="border-t border-zinc-100 pt-1.5 flex justify-between text-xs font-body">
-                <span class="text-zinc-600 font-semibold">Totale Fonti</span>
-                <span class="text-zinc-800 font-mono font-bold">€{{ formatNum(totalEquity + totalDebt) }}</span>
+              <div class="border-t border-zinc-100 dark:border-zinc-800 pt-1.5 flex justify-between text-xs font-body">
+                <span class="text-zinc-600 dark:text-zinc-400 font-semibold">Totale Fonti</span>
+                <span class="text-zinc-800 dark:text-zinc-200 font-mono font-bold">€{{ formatNum(totalEquity + totalDebt) }}</span>
               </div>
             </div>
           </div>
@@ -1322,11 +1436,11 @@ interface LoanItem {
     </div>
 
     <!-- ═══ FOOTER NAV ══════════════════════════════════════════════════════ -->
-    <div class="flex-shrink-0 px-4 md:px-8 py-3 md:py-4 border-t border-zinc-100 bg-white flex items-center justify-between gap-3">
+    <div class="flex-shrink-0 px-4 md:px-8 py-3 md:py-4 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 flex items-center justify-between gap-3">
 
       <button (click)="prevStep()" [disabled]="currentStep() === 1"
               [ngClass]="['flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-xl transition-all duration-200 font-body',
-                          currentStep() === 1 ? 'text-zinc-300 cursor-not-allowed' : 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100']">
+                          currentStep() === 1 ? 'text-zinc-300 dark:text-zinc-700 cursor-not-allowed' : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800']">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -1340,7 +1454,7 @@ interface LoanItem {
                   [ngClass]="{
                     'w-5 h-2 bg-brand-500 rounded-full': currentStep() === step.id,
                     'w-2 h-2 bg-brand-300': currentStep() > step.id,
-                    'w-2 h-2 bg-zinc-200': currentStep() < step.id
+                    'w-2 h-2 bg-zinc-200 dark:bg-zinc-700': currentStep() < step.id
                   }">
           </button>
         }
@@ -1370,6 +1484,17 @@ interface LoanItem {
       }
     </div>
 
+    <!-- Desktop tooltip (fixed, viewport-aware, escapes overflow container) -->
+    @if (showDeskTip()) {
+      <div class="desk-tip"
+           [style.left]="deskTipPos().left"
+           [style.top]="deskTipPos().top"
+           [style.transform]="'translateY(calc(-100% - 10px))'"
+           [style.--tip-arrow-x]="deskTipPos().arrowX">
+        {{ deskTipText() }}
+      </div>
+    }
+
     <!-- Mobile tooltip modal (centered, no overflow) -->
     @if (showTip()) {
       <div class="tip-overlay" (click)="closeTip()">
@@ -1395,6 +1520,10 @@ export class WizardFormComponent {
   activeTipText = signal('');
   showTip = signal(false);
 
+  deskTipText = signal('');
+  showDeskTip = signal(false);
+  deskTipPos  = signal({ left: '0px', top: '0px', arrowX: '50%' });
+
   closeTip(): void { this.showTip.set(false); }
 
   @HostListener('click', ['$event'])
@@ -1409,6 +1538,38 @@ export class WizardFormComponent {
       this.activeTipText.set(box.textContent?.trim() ?? '');
       this.showTip.set(true);
     }
+  }
+
+  @HostListener('mouseover', ['$event'])
+  onHelpHover(event: MouseEvent): void {
+    if (window.innerWidth <= 640) return;
+    const btn = (event.target as HTMLElement).closest?.('.help-btn') as HTMLElement | null;
+    if (!btn) return;
+    const box = btn.nextElementSibling as HTMLElement;
+    if (!box?.classList.contains('tt-box')) return;
+    const TIP_W = 270;
+    const r = btn.getBoundingClientRect();
+    const btnCx = r.left + r.width / 2;
+    const rawLeft = btnCx - TIP_W / 2;
+    const clampedLeft = Math.max(8, Math.min(rawLeft, window.innerWidth - TIP_W - 8));
+    const arrowOffsetPx = btnCx - clampedLeft;
+    this.deskTipPos.set({
+      left: `${clampedLeft}px`,
+      top:  `${r.top}px`,
+      arrowX: `${arrowOffsetPx}px`,
+    });
+    this.deskTipText.set(box.textContent?.trim() ?? '');
+    this.showDeskTip.set(true);
+  }
+
+  @HostListener('mouseout', ['$event'])
+  onHelpLeave(event: MouseEvent): void {
+    if (window.innerWidth <= 640) return;
+    const btn = (event.target as HTMLElement).closest?.('.help-btn') as HTMLElement | null;
+    if (!btn) return;
+    const related = event.relatedTarget as HTMLElement | null;
+    if (related && btn.contains(related)) return;
+    this.showDeskTip.set(false);
   }
 
   readonly stepClass = computed(() =>
