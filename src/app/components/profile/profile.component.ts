@@ -40,6 +40,23 @@ import { Router } from '@angular/router';
       100% { transform: scale(1); }
     }
     .save-pop { animation: savePop 0.3s ease; }
+
+    .contrib-cell {
+      width: 11px;
+      height: 11px;
+      border-radius: 3px;
+      transition: transform 0.12s ease, box-shadow 0.12s ease;
+    }
+    .contrib-cell:hover {
+      transform: scale(1.25);
+      box-shadow: 0 0 0 1px rgba(63,63,70,0.25);
+      cursor: default;
+    }
+    .contrib-cell[data-level="0"] { background: #f1f1f3; }
+    .contrib-cell[data-level="1"] { background: #d6d4fb; }
+    .contrib-cell[data-level="2"] { background: #a5a0f5; }
+    .contrib-cell[data-level="3"] { background: #7c75ee; }
+    .contrib-cell[data-level="4"] { background: #6366f1; }
   `],
   template: `
     <div class="flex flex-col h-full overflow-y-auto scrollbar-thin">
@@ -148,6 +165,44 @@ import { Router } from '@angular/router';
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <!-- Activity / contribution graph -->
+        <div class="bg-white rounded-2xl border border-zinc-100 shadow-card p-6 pe-3">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <p class="text-xs font-semibold text-zinc-400 uppercase tracking-widest font-body">Attività</p>
+              <p class="text-sm text-zinc-600 font-body mt-1">
+                {{ totalContributions() }} aggiornamenti al piano negli ultimi 12 mesi
+              </p>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto scrollbar-thin -mx-1 px-1">
+            <div class="inline-flex flex-col gap-2 min-w-max">
+              <div class="flex gap-[3px]">
+                @for (week of contributionWeeks(); track $index) {
+                  <div class="flex flex-col gap-[3px]">
+                    @for (day of week; track $index) {
+                      <div class="contrib-cell"
+                           [attr.data-level]="day.level"
+                           [title]="day.label"></div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <div class="flex items-center justify-end gap-1.5 pt-1">
+                <span class="text-xs text-zinc-400 font-body">Meno</span>
+                <div class="contrib-cell" data-level="0"></div>
+                <div class="contrib-cell" data-level="1"></div>
+                <div class="contrib-cell" data-level="2"></div>
+                <div class="contrib-cell" data-level="3"></div>
+                <div class="contrib-cell" data-level="4"></div>
+                <span class="text-xs text-zinc-400 font-body">Più</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -275,6 +330,46 @@ export class ProfileComponent {
   confirmNewPassword = '';
 
   readonly initial = computed(() => (this.name() || 'F').charAt(0).toUpperCase());
+
+  private readonly contributionDays = this.generateFakeContributions();
+
+  readonly contributionWeeks = computed(() => {
+    const days = this.contributionDays;
+    const weeks: { level: number; label: string }[][] = [];
+    for (let i = 0; i < days.length; i += 7) {
+      weeks.push(days.slice(i, i + 7));
+    }
+    return weeks;
+  });
+
+  readonly totalContributions = computed(() =>
+    this.contributionDays.reduce((sum, d) => sum + d.count, 0)
+  );
+
+  private generateFakeContributions(): { count: number; level: number; label: string }[] {
+    const days: { count: number; level: number; label: string }[] = [];
+    const today = new Date();
+    const totalDays = 53 * 7;
+    let seed = 1234;
+    const rand = () => {
+      seed = (seed * 9301 + 49297) % 233280;
+      return seed / 233280;
+    };
+
+    for (let i = totalDays - 1; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const r = rand();
+      const count = r > 0.55 ? Math.floor(rand() * 9) : 0;
+      const level = count === 0 ? 0 : count <= 2 ? 1 : count <= 4 ? 2 : count <= 6 ? 3 : 4;
+      const dateLabel = date.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+      const label = count === 0
+        ? `Nessun aggiornamento il ${dateLabel}`
+        : `${count} aggiornament${count === 1 ? 'o' : 'i'} il ${dateLabel}`;
+      days.push({ count, level, label });
+    }
+    return days;
+  }
 
   togglePasswordSection(): void { this.showPasswordSection.update(v => !v); }
   toggleShowNewPw(): void { this.showNewPw.update(v => !v); }
