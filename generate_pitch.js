@@ -1,5 +1,5 @@
 /**
- * AirPlan - Pitch Commerciale
+ * Businext Plan - Pitch Commerciale
  * Genera pitch_clienti.pptx con pptxgenjs
  */
 const pptxgen = require("pptxgenjs");
@@ -43,8 +43,8 @@ const makeShadow = () => ({
 async function build() {
   const pres = new pptxgen();
   pres.layout = "LAYOUT_16x9";
-  pres.author  = "AirPlan";
-  pres.title   = "AirPlan – Pitch Commerciale";
+  pres.author  = "Businext Plan";
+  pres.title   = "Businext Plan – Pitch Commerciale";
   pres.subject = "Presentazione per clienti e investitori";
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -72,7 +72,7 @@ async function build() {
     });
 
     // Product name
-    s.addText("AirPlan", {
+    s.addText("Businext Plan", {
       x: 0.75, y: 1.55, w: 6, h: 1.2,
       fontSize: 64, bold: true, color: C.white,
       fontFace: "Arial Black", margin: 0, valign: "top"
@@ -211,7 +211,7 @@ async function build() {
     });
 
     // Title
-    s.addText("La Soluzione: AirPlan", {
+    s.addText("La Soluzione: Businext Plan", {
       x: 0.5, y: 0.3, w: 9, h: 0.75,
       fontSize: 36, bold: true, color: C.white, fontFace: "Arial Black", margin: 0
     });
@@ -233,7 +233,7 @@ async function build() {
         num: "2",
         icon: FaChartLine,
         title: "Proiezioni Automatiche",
-        body: "AirPlan calcola in tempo reale\nricavi, EBITDA, utile netto e cash flow\nper i prossimi 3 anni.",
+        body: "Businext Plan calcola in tempo reale\nricavi, EBITDA, utile netto e cash flow\nper i prossimi 3 anni.",
         color: C.emerald
       },
       {
@@ -383,7 +383,7 @@ async function build() {
       x: 0.5, y: 0.3, w: 9, h: 0.65,
       fontSize: 36, bold: true, color: C.white, fontFace: "Arial Black", margin: 0
     });
-    s.addText("Un piano realistico generato con AirPlan – dati del piano base incluso.", {
+    s.addText("Un piano realistico generato con Businext Plan – dati del piano base incluso.", {
       x: 0.5, y: 0.95, w: 9, h: 0.38,
       fontSize: 14, color: "A0B4CC", fontFace: "Calibri", italic: true, margin: 0
     });
@@ -495,7 +495,7 @@ async function build() {
       x: 0.5, y: 0.3, w: 9, h: 0.65,
       fontSize: 34, bold: true, color: C.textDark, fontFace: "Arial Black", margin: 0
     });
-    s.addText("Tre scenari differenti, tutti generati con AirPlan in pochi minuti.", {
+    s.addText("Tre scenari differenti, tutti generati con Businext Plan in pochi minuti.", {
       x: 0.5, y: 0.9, w: 9, h: 0.38,
       fontSize: 14, color: C.slate, fontFace: "Calibri", margin: 0
     });
@@ -535,7 +535,7 @@ async function build() {
         ebitda: "–€28K",
         netIncome: "–€42K",
         runway: "6 mesi",
-        desc: "E-commerce sostenibile\nin early stage. AirPlan ha\nidentificato la criticità sui costi."
+        desc: "E-commerce sostenibile\nin early stage. Businext Plan ha\nidentificato la criticità sui costi."
       }
     ];
 
@@ -687,7 +687,7 @@ async function build() {
     });
 
     // Contact
-    s.addText("airplan.io  ·  antonio.darrigoct@gmail.com  ·  @AirPlan", {
+    s.addText("airplan.io  ·  antonio.darrigoct@gmail.com  ·  @Businext Plan", {
       x: 0.5, y: 5.05, w: 9, h: 0.35,
       fontSize: 11, color: C.slate, fontFace: "Calibri",
       align: "center", margin: 0

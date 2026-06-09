@@ -497,7 +497,7 @@ export class UploadBusinessPlanComponent {
     },
     {
       ext: 'BXP',
-      desc: 'Formato AirPlan',
+      desc: 'Formato Businext Plan',
       pill: 'border-brand-200 bg-brand-50 text-brand-600 dark:bg-brand-950/40 dark:text-brand-400 dark:border-brand-800/40',
       iconBg: 'bg-brand-50 dark:bg-brand-900/30',
       iconColor: 'text-brand-600 dark:text-brand-400',
@@ -642,7 +642,7 @@ export class UploadBusinessPlanComponent {
   }
 
   downloadFile(file: UploadedFile): void {
-    const blob = new Blob([`[AirPlan BXP] ${file.convertedName}`], { type: 'application/octet-stream' });
+    const blob = new Blob([`[Businext Plan BXP] ${file.convertedName}`], { type: 'application/octet-stream' });
     const url  = URL.createObjectURL(blob);
     const a    = document.createElement('a');
     a.href     = url;

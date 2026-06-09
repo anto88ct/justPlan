@@ -1,0 +1,39 @@
+<svg width="420" height="128" viewBox="0 0 420 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="businext plan">
+  <defs>
+    <linearGradient id="fl-g" x1="20" y1="100" x2="100" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366F1"/>
+      <stop offset="0.55" stop-color="#818CF8"/>
+      <stop offset="1" stop-color="#0EA5E9"/>
+    </linearGradient>
+    <linearGradient id="fl-bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E293B"/>
+      <stop offset="1" stop-color="#0B1120"/>
+    </linearGradient>
+    <linearGradient id="fl-word" x1="232" y1="60" x2="370" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366F1"/>
+      <stop offset="1" stop-color="#0EA5E9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark canvas -->
+  <rect width="128" height="128" rx="26" fill="url(#fl-bg)"/>
+  <rect x="0.5" y="0.5" width="127" height="127" rx="25.5" fill="none" stroke="#334155" stroke-width="1"/>
+  <path d="M22 98 H58 V54 L96 26"
+    fill="none" stroke="url(#fl-g)" stroke-width="11"
+    stroke-linecap="round" stroke-linejoin="round"/>
+  <polygon points="96,26 89,42 79,29" fill="url(#fl-g)"/>
+  <circle cx="58" cy="98" r="7" fill="#4F46E5"/>
+  <circle cx="58" cy="54" r="7" fill="#6366F1"/>
+  <circle cx="22" cy="98" r="4.5" fill="#4338CA"/>
+
+  <!-- Wordmark: light bg version — "busi" dark + "next" gradient + "PLAN" muted -->
+  <text x="148" y="68" font-family="Inter, 'Segoe UI', system-ui, sans-serif"
+    font-size="44" font-weight="700" letter-spacing="-2" fill="#0F172A">busi</text>
+  <text x="232" y="68" font-family="Inter, 'Segoe UI', system-ui, sans-serif"
+    font-size="44" font-weight="700" letter-spacing="-2" fill="url(#fl-word)">next</text>
+
+  <line x1="148" y1="78" x2="360" y2="78" stroke="#E2E8F0" stroke-width="1"/>
+
+  <text x="149" y="100" font-family="Inter, 'Segoe UI', system-ui, sans-serif"
+    font-size="16" font-weight="500" letter-spacing="7" fill="#94A3B8">PLAN</text>
+</svg>

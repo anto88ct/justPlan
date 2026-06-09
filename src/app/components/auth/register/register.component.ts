@@ -81,7 +81,7 @@ import { Router, RouterLink } from '@angular/router';
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
               </svg>
             </div>
-            <span class="text-xl font-bold text-white tracking-tight font-display">AirPlan</span>
+            <span class="text-xl font-bold text-white tracking-tight font-display">Businext Plan</span>
           </a>
         </div>
 
@@ -142,7 +142,7 @@ import { Router, RouterLink } from '@angular/router';
               <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
             </svg>
           </div>
-          <span class="text-lg font-bold text-white font-display">AirPlan</span>
+          <span class="text-lg font-bold text-white font-display">Businext Plan</span>
         </div>
 
         <div class="w-full max-w-[380px] mx-auto">

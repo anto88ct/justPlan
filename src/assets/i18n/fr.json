@@ -241,13 +241,13 @@
           },
           "importazione": {
             "q": "Puis-je importer un Business Plan déjà rédigé ailleurs ?",
-            "a": "Oui, dans la section \"Imports\", vous pouvez glisser-déposer ou sélectionner un fichier PDF, DOC, DOCX ou .bxp (jusqu'à 50 Mo) : le système l'analyse, en extrait les données financières et le convertit au format AirPlan, en vous montrant la progression étape par étape."
+            "a": "Oui, dans la section \"Imports\", vous pouvez glisser-déposer ou sélectionner un fichier PDF, DOC, DOCX ou .bxp (jusqu'à 50 Mo) : le système l'analyse, en extrait les données financières et le convertit au format Businext Plan, en vous montrant la progression étape par étape."
           }
         }
       },
       "landing": {
         "label": "Site officiel",
-        "intro": "Découvrez toutes les fonctionnalités d'AirPlan Business Plan, les tarifs et les témoignages sur la landing page officielle.",
+        "intro": "Découvrez toutes les fonctionnalités de Businext Plan Business Plan, les tarifs et les témoignages sur la landing page officielle.",
         "cta": "Visiter airplan.io"
       }
     }

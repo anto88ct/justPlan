@@ -1,8 +1,8 @@
-# AirPlan — Backend Architecture Specification
+# Businext Plan — Backend Architecture Specification
 
 > **Stack**: Spring Boot 3.x + MongoDB + Spring Security + OAuth2
 > **Documento generato dall'analisi completa del frontend Angular 17**
-> **Target**: Creazione backend REST API per la web app AirPlan (Business Plan SaaS con AI)
+> **Target**: Creazione backend REST API per la web app Businext Plan (Business Plan SaaS con AI)
 
 ---
 
@@ -28,7 +28,7 @@
 
 ## 1. Overview del Progetto
 
-**AirPlan** è una SaaS web application per la creazione di Business Plan professionali assistiti da AI. Il frontend Angular 17 è già sviluppato e implementa:
+**Businext Plan** è una SaaS web application per la creazione di Business Plan professionali assistiti da AI. Il frontend Angular 17 è già sviluppato e implementa:
 
 - **Auth**: Login standard (email/password), Google OAuth, registrazione, forgot-password
 - **Wizard 6-step**: Configurazione globale → Ricavi/Prodotti → Team HR → Costi OPEX → Investimenti CAPEX → Finanziamenti
@@ -168,7 +168,7 @@
 
 ```
 src/main/java/com/airplan/
-├── AirPlanApplication.java
+├── Businext PlanApplication.java
 │
 ├── config/
 │   ├── SecurityConfig.java              # Spring Security filter chain
@@ -1453,7 +1453,7 @@ public class AiRateLimiter {
 
 ```java
 public static final String SYSTEM_PROMPT = """
-    Sei il CFO Virtuale di AirPlan, un assistente AI specializzato in business planning.
+    Sei il CFO Virtuale di Businext Plan, un assistente AI specializzato in business planning.
 
     ## Ruolo
     - Sei un esperto di finanza aziendale italiana (IRES, IRAP, contributi INPS, TFR)
@@ -1537,7 +1537,7 @@ public class EmailService {
 
         sendHtmlEmail(
             user.getEmail(),
-            "Benvenuto su AirPlan! 🚀",
+            "Benvenuto su Businext Plan! 🚀",
             "welcome",
             ctx
         );
@@ -1552,7 +1552,7 @@ public class EmailService {
 
         sendHtmlEmail(
             user.getEmail(),
-            "Reimposta la tua password — AirPlan",
+            "Reimposta la tua password — Businext Plan",
             "password-reset",
             ctx
         );
@@ -1566,7 +1566,7 @@ public class EmailService {
 
         sendHtmlEmail(
             user.getEmail(),
-            "Conferma il tuo indirizzo email — AirPlan",
+            "Conferma il tuo indirizzo email — Businext Plan",
             "email-verification",
             ctx
         );
@@ -1579,7 +1579,7 @@ public class EmailService {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom(fromAddress, "AirPlan");
+            helper.setFrom(fromAddress, "Businext Plan");
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
@@ -1640,7 +1640,7 @@ app:
                     <tr>
                         <td style="background:linear-gradient(135deg,#6366f1,#7c3aed);
                                    padding:32px; text-align:center;">
-                            <img th:src="'cid:logo'" alt="AirPlan" width="120"/>
+                            <img th:src="'cid:logo'" alt="Businext Plan" width="120"/>
                         </td>
                     </tr>
                     <!-- Body -->
@@ -1673,7 +1673,7 @@ app:
                         <td style="padding:16px 32px; background:#fafafa; border-top:1px solid #f4f4f5;
                                    text-align:center;">
                             <p style="color:#a1a1aa; font-size:11px; margin:0;">
-                                © 2025 AirPlan · Il tuo Business Plan, senza limiti.
+                                © 2025 Businext Plan · Il tuo Business Plan, senza limiti.
                             </p>
                         </td>
                     </tr>
@@ -1691,7 +1691,7 @@ app:
 
 ### 11.1 Specifiche del Formato
 
-Il formato `.bxp` (**Business Plan Exchange**) è un formato custom proprietario di AirPlan per esportare e importare business plan completi. Caratteristiche:
+Il formato `.bxp` (**Business Plan Exchange**) è un formato custom proprietario di Businext Plan per esportare e importare business plan completi. Caratteristiche:
 
 - **Estensione**: `.bxp`
 - **Struttura**: ZIP contenente JSON + metadata
@@ -1715,7 +1715,7 @@ myplan.bxp (ZIP archive)
 {
     "formatVersion": "1.0.0",
     "appVersion": "1.0.0",
-    "generator": "AirPlan Backend v1.0",
+    "generator": "Businext Plan Backend v1.0",
     "exportedAt": "2025-06-01T15:30:00Z",
     "planName": "TechHub Pro",
     "planId": "plan-abc123",
@@ -1770,7 +1770,7 @@ public class BxpExportService {
             BxpManifest manifest = BxpManifest.builder()
                 .formatVersion("1.0.0")
                 .appVersion("1.0.0")
-                .generator("AirPlan Backend v1.0")
+                .generator("Businext Plan Backend v1.0")
                 .exportedAt(Instant.now())
                 .planName(plan.getName())
                 .planId(plan.getId())
@@ -2584,4 +2584,4 @@ jobs:
 
 ---
 
-> **Nota**: Questo documento è stato generato analizzando il codice sorgente completo del frontend Angular 17 di AirPlan, inclusi tutti i componenti, servizi, interfacce TypeScript, routing e logica di business. Ogni endpoint, modello dati e flusso è stato derivato dalle necessità reali del frontend esistente.
+> **Nota**: Questo documento è stato generato analizzando il codice sorgente completo del frontend Angular 17 di Businext Plan, inclusi tutti i componenti, servizi, interfacce TypeScript, routing e logica di business. Ogni endpoint, modello dati e flusso è stato derivato dalle necessità reali del frontend esistente.

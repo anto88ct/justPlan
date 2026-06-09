@@ -10,7 +10,7 @@ Startup founders and SME owners building financial plans. Context: working on th
 
 ## Product Purpose
 
-AirPlan is an AI-assisted business plan tool. It lets users build a 3-year financial model through a guided wizard, visualize KPIs and cash flow, simulate what-if scenarios via an AI copilot, and export investor-ready reports. Success means a founder going from blank page to a defensible financial plan in under 10 minutes.
+Businext Plan is an AI-assisted business plan tool. It lets users build a 3-year financial model through a guided wizard, visualize KPIs and cash flow, simulate what-if scenarios via an AI copilot, and export investor-ready reports. Success means a founder going from blank page to a defensible financial plan in under 10 minutes.
 
 ## Brand Personality
 

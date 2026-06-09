@@ -57,6 +57,12 @@ import { Router } from '@angular/router';
     .contrib-cell[data-level="2"] { background: #a5a0f5; }
     .contrib-cell[data-level="3"] { background: #7c75ee; }
     .contrib-cell[data-level="4"] { background: #6366f1; }
+
+    :host-context(.dark) .contrib-cell[data-level="0"] { background: #27272a; }
+    :host-context(.dark) .contrib-cell[data-level="1"] { background: #3730a3; }
+    :host-context(.dark) .contrib-cell[data-level="2"] { background: #4338ca; }
+    :host-context(.dark) .contrib-cell[data-level="3"] { background: #6366f1; }
+    :host-context(.dark) .contrib-cell[data-level="4"] { background: #818cf8; }
   `],
   template: `
     <div class="flex flex-col h-full overflow-y-auto scrollbar-thin">
@@ -65,7 +71,7 @@ import { Router } from '@angular/router';
         <!-- Page header -->
         <div class="pe-1">
           <p class="text-xs font-medium text-brand-600 uppercase tracking-widest mb-1 font-body">Account</p>
-          <h1 class="text-2xl font-bold text-zinc-900 font-display">Il tuo Profilo</h1>
+          <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display">Il tuo Profilo</h1>
         </div>
 
         <!-- Hidden file input -->
@@ -73,7 +79,7 @@ import { Router } from '@angular/router';
                (change)="onPhotoSelect($event)"/>
 
         <!-- Avatar card -->
-        <div class="bg-white rounded-2xl border border-zinc-100 shadow-card p-6 pe-2">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-700 shadow-card p-6 pe-2">
           <div class="flex items-center gap-5">
             <!-- Avatar with upload overlay -->
             <div class="avatar-wrap relative flex-shrink-0 w-20 h-20">
@@ -98,12 +104,12 @@ import { Router } from '@angular/router';
 
             <!-- Meta -->
             <div class="flex-1 min-w-0">
-              <p class="text-lg font-bold text-zinc-900 font-display truncate">
+              <p class="text-lg font-bold text-zinc-900 dark:text-zinc-100 font-display truncate">
                 {{ name() || 'Il tuo nome' }}
               </p>
-              <p class="text-sm text-zinc-500 font-body truncate">{{ email() || 'La tua email' }}</p>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body truncate">{{ email() || 'La tua email' }}</p>
               @if (company()) {
-                <p class="text-xs text-zinc-400 font-body mt-0.5 truncate">{{ company() }}</p>
+                <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5 truncate">{{ company() }}</p>
               }
               <label for="photo-upload"
                      class="mt-2 inline-flex items-center gap-1 text-xs text-brand-600 hover:text-brand-700
@@ -120,48 +126,52 @@ import { Router } from '@angular/router';
         </div>
 
         <!-- Personal info -->
-        <div class="bg-white rounded-2xl border border-zinc-100 shadow-card p-6 pe-3">
-          <p class="text-xs font-semibold text-zinc-400 uppercase tracking-widest font-body mb-5">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-700 shadow-card p-6 pe-3">
+          <p class="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-5">
             Informazioni Personali
           </p>
           <div class="space-y-4">
 
             <div>
-              <label class="block text-xs font-semibold text-zinc-600 font-body mb-1.5">Nome completo</label>
+              <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">Nome completo</label>
               <input type="text" [ngModel]="name()" (ngModelChange)="name.set($event)"
                      placeholder="Mario Rossi" autocomplete="name"
-                     class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900
-                            border border-zinc-200 bg-zinc-50"/>
+                     class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                            border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
+                            placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
             </div>
 
             <div>
-              <label class="block text-xs font-semibold text-zinc-600 font-body mb-1.5">Email</label>
+              <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">Email</label>
               <input type="email" [ngModel]="email()" (ngModelChange)="email.set($event)"
                      placeholder="mario@startup.it" autocomplete="email"
-                     class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900
-                            border border-zinc-200 bg-zinc-50"/>
+                     class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                            border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
+                            placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label class="block text-xs font-semibold text-zinc-600 font-body mb-1.5">
+                <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">
                   Nome azienda
-                  <span class="text-zinc-400 font-normal ml-1">(opzionale)</span>
+                  <span class="text-zinc-400 dark:text-zinc-500 font-normal ml-1">(opzionale)</span>
                 </label>
                 <input type="text" [ngModel]="company()" (ngModelChange)="company.set($event)"
                        placeholder="La tua startup"
-                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900
-                              border border-zinc-200 bg-zinc-50"/>
+                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                              border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
+                              placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-zinc-600 font-body mb-1.5">
+                <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">
                   Ruolo
-                  <span class="text-zinc-400 font-normal ml-1">(opzionale)</span>
+                  <span class="text-zinc-400 dark:text-zinc-500 font-normal ml-1">(opzionale)</span>
                 </label>
                 <input type="text" [ngModel]="role()" (ngModelChange)="role.set($event)"
                        placeholder="CEO / Founder"
-                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900
-                              border border-zinc-200 bg-zinc-50"/>
+                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                              border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
+                              placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
               </div>
             </div>
 
@@ -169,11 +179,11 @@ import { Router } from '@angular/router';
         </div>
 
         <!-- Activity / contribution graph -->
-        <div class="bg-white rounded-2xl border border-zinc-100 shadow-card p-6 pe-3">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-700 shadow-card p-6 pe-3">
           <div class="flex items-center justify-between mb-5">
             <div>
-              <p class="text-xs font-semibold text-zinc-400 uppercase tracking-widest font-body">Attività</p>
-              <p class="text-sm text-zinc-600 font-body mt-1">
+              <p class="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body">Attività</p>
+              <p class="text-sm text-zinc-600 dark:text-zinc-400 font-body mt-1">
                 {{ totalContributions() }} aggiornamenti al piano negli ultimi 12 mesi
               </p>
             </div>
@@ -194,36 +204,36 @@ import { Router } from '@angular/router';
               </div>
 
               <div class="flex items-center justify-end gap-1.5 pt-1">
-                <span class="text-xs text-zinc-400 font-body">Meno</span>
+                <span class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Meno</span>
                 <div class="contrib-cell" data-level="0"></div>
                 <div class="contrib-cell" data-level="1"></div>
                 <div class="contrib-cell" data-level="2"></div>
                 <div class="contrib-cell" data-level="3"></div>
                 <div class="contrib-cell" data-level="4"></div>
-                <span class="text-xs text-zinc-400 font-body">Più</span>
+                <span class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Più</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Security -->
-        <div class="bg-white rounded-2xl border border-zinc-100 shadow-card overflow-hidden pe-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-700 shadow-card overflow-hidden pe-4">
           <button type="button"
                   (click)="togglePasswordSection()"
-                  class="w-full flex items-center justify-between px-6 py-4 hover:bg-zinc-50 transition-colors">
+                  class="w-full flex items-center justify-between px-6 py-4 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
             <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <div class="w-8 h-8 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                <svg class="w-4 h-4 text-zinc-600 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round"
                         d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
               </div>
               <div class="text-left">
-                <p class="text-sm font-semibold text-zinc-800 font-body">Modifica password</p>
-                <p class="text-xs text-zinc-400 font-body">Aggiorna le credenziali di accesso</p>
+                <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body">Modifica password</p>
+                <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Aggiorna le credenziali di accesso</p>
               </div>
             </div>
-            <svg class="w-4 h-4 text-zinc-400 transition-transform duration-200"
+            <svg class="w-4 h-4 text-zinc-400 dark:text-zinc-500 transition-transform duration-200"
                  [class.rotate-180]="showPasswordSection()"
                  fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
@@ -231,30 +241,32 @@ import { Router } from '@angular/router';
           </button>
 
           @if (showPasswordSection()) {
-            <div class="px-6 pt-4 pb-5 border-t border-zinc-100 space-y-4">
+            <div class="px-6 pt-4 pb-5 border-t border-zinc-100 dark:border-zinc-700 space-y-4">
               <div>
-                <label class="block text-xs font-semibold text-zinc-600 font-body mb-1.5">Password attuale</label>
+                <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">Password attuale</label>
                 <input type="password" [(ngModel)]="currentPassword" name="currentPw"
                        placeholder="••••••••"
-                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900
-                              border border-zinc-200 bg-zinc-50"/>
+                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                              border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
+                              placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-zinc-600 font-body mb-1.5">Nuova password</label>
+                <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">Nuova password</label>
                 <input [type]="showNewPw() ? 'text' : 'password'" [(ngModel)]="newPassword" name="newPw"
                        placeholder="Min. 8 caratteri"
-                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900
-                              border border-zinc-200 bg-zinc-50"/>
+                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                              border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
+                              placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-zinc-600 font-body mb-1.5">Conferma nuova password</label>
+                <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">Conferma nuova password</label>
                 <input [type]="showNewPw() ? 'text' : 'password'" [(ngModel)]="confirmNewPassword" name="confirmNewPw"
                        placeholder="Ripeti la password"
                        [ngClass]="[
-                         'profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 bg-zinc-50',
+                         'profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500',
                          confirmNewPassword && newPassword !== confirmNewPassword
                            ? 'border-rose-400'
-                           : 'border border-zinc-200'
+                           : 'border border-zinc-200 dark:border-zinc-600'
                        ]"/>
                 @if (confirmNewPassword && newPassword !== confirmNewPassword) {
                   <p class="text-xs text-rose-500 font-body mt-1">Le password non coincidono</p>
@@ -262,18 +274,18 @@ import { Router } from '@angular/router';
               </div>
               <label class="inline-flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" [checked]="showNewPw()" (change)="toggleShowNewPw()"
-                       class="rounded border-zinc-300 text-brand-600 focus:ring-brand-500"/>
-                <span class="text-xs text-zinc-500 font-body">Mostra password</span>
+                       class="rounded border-zinc-300 dark:border-zinc-600 text-brand-600 focus:ring-brand-500"/>
+                <span class="text-xs text-zinc-500 dark:text-zinc-400 font-body">Mostra password</span>
               </label>
             </div>
           }
         </div>
 
         <!-- Logout -->
-        <div class="bg-white rounded-2xl border border-zinc-100 shadow-card px-6 py-4 flex items-center justify-between pe-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-700 shadow-card px-6 py-4 flex items-center justify-between pe-4">
           <div>
-            <p class="text-sm font-semibold text-zinc-800 font-body">Esci dall'account</p>
-            <p class="text-xs text-zinc-400 font-body mt-0.5">Verrai reindirizzato alla pagina di login</p>
+            <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body">Esci dall'account</p>
+            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Verrai reindirizzato alla pagina di login</p>
           </div>
           <button type="button" (click)="logout()"
                   class="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold font-body
@@ -289,7 +301,7 @@ import { Router } from '@angular/router';
 
         <!-- Actions -->
         <div class="flex items-center justify-between pt-1">
-          <p class="text-xs text-zinc-400 font-body">Modifiche salvate localmente</p>
+          <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Modifiche salvate localmente</p>
           <button type="button" (click)="save()"
                   [ngClass]="[
                     'flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold font-body transition-all duration-200',

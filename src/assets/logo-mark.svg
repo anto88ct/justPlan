@@ -1,0 +1,35 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="businext plan">
+  <defs>
+    <linearGradient id="mk-g" x1="20" y1="100" x2="100" y2="24" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6366F1"/>
+      <stop offset="0.55" stop-color="#818CF8"/>
+      <stop offset="1" stop-color="#38BDF8"/>
+    </linearGradient>
+    <linearGradient id="mk-bg" x1="0" y1="0" x2="128" y2="128" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E293B"/>
+      <stop offset="1" stop-color="#0B1120"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Canvas -->
+  <rect width="128" height="128" rx="26" fill="url(#mk-bg)"/>
+  <rect x="0.5" y="0.5" width="127" height="127" rx="25.5" fill="none" stroke="#334155" stroke-width="1"/>
+
+  <!-- Step-up trajectory: base → rise → launch diagonal -->
+  <path d="M22 98 H58 V54 L96 26"
+    fill="none" stroke="url(#mk-g)" stroke-width="11"
+    stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Arrowhead at tip (96,26) — direction from (58,54)→(96,26): unit=(0.806,-0.592), perp=(0.592,0.806) -->
+  <!-- base = tip - unit*15 = (96-12.1, 26+8.9) = (83.9, 34.9) -->
+  <!-- wing1 = base + perp*8 = (83.9+4.7, 34.9+6.4) = (88.6, 41.3) -->
+  <!-- wing2 = base - perp*8 = (83.9-4.7, 34.9-6.4) = (79.2, 28.5) -->
+  <polygon points="96,26 89,42 79,29" fill="url(#mk-g)"/>
+
+  <!-- Neural nodes at joints (AI signal points) -->
+  <circle cx="58" cy="98" r="7" fill="#4F46E5"/>
+  <circle cx="58" cy="54" r="7" fill="#6366F1"/>
+
+  <!-- Start dot -->
+  <circle cx="22" cy="98" r="4.5" fill="#4338CA"/>
+</svg>
