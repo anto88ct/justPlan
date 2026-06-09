@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, HostBinding, OnInit } from '@angular/core';
+import { Component, signal, computed, inject, HostBinding, OnInit, OnDestroy, effect, ViewChildren, QueryList, ElementRef, NgZone } from '@angular/core';
 import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
 import { CommonModule, NgClass } from '@angular/common';
@@ -152,51 +152,29 @@ interface SettingItem {
     }
     .orbit-line-2 { animation: orbitPulse 2.2s cubic-bezier(0.4,0,0.6,1) 1.1s infinite; }
 
-    @keyframes solarOrbitCw {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-    @keyframes solarOrbitCcw {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(-360deg); }
-    }
     @keyframes solarCenterBreathe {
       0%, 100% { transform: scale(1);    opacity: 0.38; }
       50%       { transform: scale(1.28); opacity: 0.14; }
     }
 
-    .solar-orbit-group {
+    /* Orbit nodes & lines are driven by RAF (direct DOM transform updates).
+       GPU-friendly: only the transform attribute changes, no filters on movers. */
+    .orbit-node-g {
       transform-box: view-box;
-      transform-origin: 50% 50%;
-      animation-name: solarOrbitCw;
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
       will-change: transform;
     }
-    .solar-orbit-ccw {
-      transform-box: fill-box;
-      transform-origin: center;
-      animation-name: solarOrbitCcw;
-      animation-timing-function: linear;
-      animation-iteration-count: infinite;
-      will-change: transform;
+    .orbit-line {
+      transition: stroke 0.4s ease;
     }
     .solar-center-ring {
       transform-box: fill-box;
       transform-origin: center;
-      animation: solarCenterBreathe 3.5s ease-in-out infinite;
+      animation: solarCenterBreathe 4.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
     }
     .solar-center-ring-2 {
       transform-box: fill-box;
       transform-origin: center;
-      animation: solarCenterBreathe 3.5s ease-in-out -1.75s infinite;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .network-node-enter, .member-row-enter, .status-badge-in { animation: none; opacity: 1; transform: none; }
-      .pending-ring, .pending-ring-2, .joined-glow, .orbit-line, .orbit-line-2 { animation: none; }
-      .solar-orbit-group, .solar-orbit-ccw, .solar-center-ring, .solar-center-ring-2 { animation: none !important; }
-      .comment-bubble-anim { animation: none !important; opacity: 1; }
+      animation: solarCenterBreathe 4.2s cubic-bezier(0.45, 0, 0.55, 1) -2.1s infinite;
     }
 
     @keyframes commentPop {
@@ -204,7 +182,18 @@ interface SettingItem {
       14%, 74%  { opacity: 1; transform: translateY(0) scale(1); }
       90%       { opacity: 0; transform: translateY(-4px) scale(0.94); }
     }
-    .comment-bubble-anim { animation: commentPop 9s ease-in-out infinite; }
+    .comment-bubble-anim {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+      animation: commentPop 9s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .network-node-enter, .member-row-enter, .status-badge-in { animation: none; opacity: 1; transform: none; }
+      .pending-ring, .pending-ring-2, .joined-glow { animation: none; }
+      .solar-center-ring, .solar-center-ring-2 { animation: none !important; }
+      .comment-bubble-anim { animation: none !important; opacity: 1; }
+    }
   `],
   template: `
     <!-- Mobile backdrop -->
@@ -890,6 +879,16 @@ interface SettingItem {
                     <filter id="cw-blur2" x="-80%" y="-80%" width="260%" height="260%">
                       <feGaussianBlur in="SourceGraphic" stdDeviation="5"/>
                     </filter>
+                    <radialGradient id="cw-node-halo-joined" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#6366f1" stop-opacity="0.55"/>
+                      <stop offset="55%" stop-color="#6366f1" stop-opacity="0.18"/>
+                      <stop offset="100%" stop-color="#6366f1" stop-opacity="0"/>
+                    </radialGradient>
+                    <radialGradient id="cw-node-halo-pending" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#f59e0b" stop-opacity="0.5"/>
+                      <stop offset="55%" stop-color="#f59e0b" stop-opacity="0.16"/>
+                      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+                    </radialGradient>
                   </defs>
 
                   <!-- Center ambient glow -->
@@ -906,83 +905,78 @@ interface SettingItem {
                           [attr.stroke]="themeService.dark() ? 'rgba(99,102,241,0.05)' : 'rgba(99,102,241,0.03)'"
                           stroke-width="0.5"/>
 
-                  <!-- Orbiting member nodes -->
-                  <ng-container *ngFor="let node of orbitalNodes(); let i = index">
-                    <g class="solar-orbit-group"
-                       [style.animation-duration]="node.orbitDuration + 's'"
-                       [style.animation-delay]="node.orbitDelay + 's'">
+                  <!-- Orbiting member nodes (RAF-driven, see _runOrbitLoop) -->
+                  <ng-container *ngFor="let node of orbitalNodes(); let i = index; trackBy: trackOrbitNode">
+                    <!-- Connection line: x1,y1 fixed at sun; x2,y2 updated each frame -->
+                    <line #orbitLine
+                          x1="350" y1="350"
+                          [attr.x2]="node.x0" [attr.y2]="node.y0"
+                          class="orbit-line"
+                          [attr.stroke]="node.status === 'joined'
+                            ? (themeService.dark() ? 'rgba(99,102,241,0.28)' : 'rgba(99,102,241,0.18)')
+                            : (themeService.dark() ? 'rgba(245,158,11,0.22)' : 'rgba(245,158,11,0.14)')"
+                          stroke-width="0.8" stroke-linecap="round"/>
 
-                      <!-- Single clean connection line -->
-                      <line x1="350" y1="350"
-                            [attr.x2]="350 + node.orbitRadius" y2="350"
-                            [attr.stroke]="node.status === 'joined'
-                              ? (themeService.dark() ? 'rgba(99,102,241,0.28)' : 'rgba(99,102,241,0.18)')
-                              : (themeService.dark() ? 'rgba(245,158,11,0.22)' : 'rgba(245,158,11,0.14)')"
-                            stroke-width="0.8" stroke-linecap="round"/>
+                    <!-- Node group: transform updated each frame by RAF -->
+                    <g #orbitNodeG
+                       class="orbit-node-g"
+                       [attr.transform]="'translate(' + node.x0 + ',' + node.y0 + ')'"
+                       style="pointer-events: auto; cursor: pointer;"
+                       (mouseenter)="hoveredCoworkNode.set(node)"
+                       (mouseleave)="hoveredCoworkNode.set(null)">
 
-                      <!-- Node: translate to orbit position, then counter-rotate -->
-                      <g [attr.transform]="'translate(' + (350 + node.orbitRadius) + ',350)'">
-                        <g class="solar-orbit-ccw"
-                           [style.animation-duration]="node.orbitDuration + 's'"
-                           [style.animation-delay]="node.orbitDelay + 's'"
-                           style="pointer-events: auto; cursor: pointer;"
-                           (mouseenter)="hoveredCoworkNode.set(node)"
-                           (mouseleave)="hoveredCoworkNode.set(null)">
+                      <!-- Pending pulse rings -->
+                      <circle r="28" fill="none" stroke="#f59e0b" stroke-width="1.2"
+                              class="pending-ring"
+                              [style.display]="node.status === 'pending' ? '' : 'none'"/>
+                      <circle r="28" fill="none" stroke="#f59e0b" stroke-width="0.8"
+                              class="pending-ring-2"
+                              [style.display]="node.status === 'pending' ? '' : 'none'"/>
 
-                          <!-- Pending pulse rings -->
-                          <circle r="28" fill="none" stroke="#f59e0b" stroke-width="1.2"
-                                  class="pending-ring"
-                                  [style.display]="node.status === 'pending' ? '' : 'none'"/>
-                          <circle r="28" fill="none" stroke="#f59e0b" stroke-width="0.8"
-                                  class="pending-ring-2"
-                                  [style.display]="node.status === 'pending' ? '' : 'none'"/>
+                      <!-- Joined glow ring -->
+                      <circle r="27" fill="none" stroke="#6366f1" stroke-width="1.5"
+                              class="joined-glow"
+                              [style.display]="node.status === 'joined' ? '' : 'none'"
+                              [attr.opacity]="themeService.dark() ? '0.45' : '0.30'"/>
 
-                          <!-- Joined glow ring -->
-                          <circle r="27" fill="none" stroke="#6366f1" stroke-width="1.5"
-                                  class="joined-glow"
-                                  [style.display]="node.status === 'joined' ? '' : 'none'"
-                                  [attr.opacity]="themeService.dark() ? '0.45' : '0.30'"/>
+                      <!-- Soft halo (gradient fill, no filter — GPU-friendly) -->
+                      <circle r="34"
+                              [attr.fill]="node.status === 'joined' ? 'url(#cw-node-halo-joined)' : 'url(#cw-node-halo-pending)'"
+                              [attr.opacity]="themeService.dark() ? '0.85' : '0.65'"/>
 
-                          <!-- Avatar glow halo -->
-                          <circle r="22" [attr.fill]="node.avatarColor" opacity="0.20"
-                                  filter="url(#cw-blur2)"/>
+                      <!-- Avatar bg + initials (no filter; clean stroke handles depth) -->
+                      <circle r="22"
+                              [attr.fill]="themeService.dark() ? '#18181b' : '#ffffff'"
+                              [attr.stroke]="node.status === 'joined' ? '#6366f1' : '#f59e0b'"
+                              stroke-width="2"
+                              [attr.stroke-opacity]="node.status === 'joined' ? '0.82' : '0.58'"/>
+                      <circle r="20" [attr.fill]="node.avatarColor" opacity="0.95"/>
+                      <text text-anchor="middle" dy="0.38em" font-size="10" font-weight="700" fill="white"
+                            font-family="system-ui,-apple-system,sans-serif">{{ node.initials }}</text>
 
-                          <!-- Avatar bg + initials -->
-                          <circle r="22"
-                                  [attr.fill]="themeService.dark() ? '#18181b' : '#ffffff'"
-                                  [attr.stroke]="node.status === 'joined' ? '#6366f1' : '#f59e0b'"
-                                  stroke-width="2"
-                                  [attr.stroke-opacity]="node.status === 'joined' ? '0.82' : '0.58'"
-                                  filter="url(#cw-node-glow2)"/>
-                          <circle r="20" [attr.fill]="node.avatarColor" opacity="0.95"/>
-                          <text text-anchor="middle" dy="0.38em" font-size="10" font-weight="700" fill="white"
-                                font-family="system-ui,-apple-system,sans-serif">{{ node.initials }}</text>
+                      <!-- Status dot -->
+                      <circle cx="15" cy="-15" r="5.5"
+                              [attr.fill]="node.status === 'joined' ? '#10b981' : '#f59e0b'"
+                              [attr.stroke]="themeService.dark() ? '#09090b' : '#f8fafc'"
+                              stroke-width="1.5"/>
 
-                          <!-- Status dot -->
-                          <circle cx="15" cy="-15" r="5.5"
-                                  [attr.fill]="node.status === 'joined' ? '#10b981' : '#f59e0b'"
-                                  [attr.stroke]="themeService.dark() ? '#09090b' : '#f8fafc'"
-                                  stroke-width="1.5"/>
-
-                          <!-- Floating comment bubble -->
-                          <g class="comment-bubble-anim"
-                             [style.animation-delay]="(i * 2.8) + 's'"
-                             style="pointer-events: none;">
-                            <rect x="-44" y="-62" width="88" height="22" rx="5.5"
-                                  [attr.fill]="themeService.dark() ? '#1e1b4b' : '#ffffff'"
-                                  fill-opacity="0.97"
-                                  [attr.stroke]="node.status === 'joined' ? '#6366f1' : '#f59e0b'"
-                                  stroke-width="0.8" stroke-opacity="0.55"/>
-                            <polygon points="-4,-40 4,-40 0,-34"
-                                     [attr.fill]="themeService.dark() ? '#1e1b4b' : '#ffffff'"
-                                     fill-opacity="0.97"/>
-                            <circle cx="-32" cy="-51" r="2.8"
-                                    [attr.fill]="node.status === 'joined' ? '#6366f1' : '#f59e0b'"/>
-                            <text x="-22" y="-47" text-anchor="start" font-size="7.5" font-weight="600"
-                                  [attr.fill]="themeService.dark() ? '#c7d2fe' : '#3730a3'"
-                                  font-family="system-ui,-apple-system,sans-serif">{{ coworkCommentTexts[i % coworkCommentTexts.length] }}</text>
-                          </g>
-                        </g>
+                      <!-- Floating comment bubble -->
+                      <g class="comment-bubble-anim"
+                         [style.animation-delay]="(i * 2.8) + 's'"
+                         style="pointer-events: none;">
+                        <rect x="-44" y="-62" width="88" height="22" rx="5.5"
+                              [attr.fill]="themeService.dark() ? '#1e1b4b' : '#ffffff'"
+                              fill-opacity="0.97"
+                              [attr.stroke]="node.status === 'joined' ? '#6366f1' : '#f59e0b'"
+                              stroke-width="0.8" stroke-opacity="0.55"/>
+                        <polygon points="-4,-40 4,-40 0,-34"
+                                 [attr.fill]="themeService.dark() ? '#1e1b4b' : '#ffffff'"
+                                 fill-opacity="0.97"/>
+                        <circle cx="-32" cy="-51" r="2.8"
+                                [attr.fill]="node.status === 'joined' ? '#6366f1' : '#f59e0b'"/>
+                        <text x="-22" y="-47" text-anchor="start" font-size="7.5" font-weight="600"
+                              [attr.fill]="themeService.dark() ? '#c7d2fe' : '#3730a3'"
+                              font-family="system-ui,-apple-system,sans-serif">{{ coworkCommentTexts[i % coworkCommentTexts.length] }}</text>
                       </g>
                     </g>
                   </ng-container>
@@ -1331,6 +1325,127 @@ interface SettingItem {
                     </div>
                   </div>
 
+                  <!-- SEZIONE CONTATTI -->
+                  <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-card"
+                       [style.animation-delay]="((settingSections.length + 1) * 70 + 50) + 'ms'"
+                       style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;">
+                    <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-4">{{ 'settings.sections.contatti.label' | translate }}</p>
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mb-4 leading-relaxed">{{ 'settings.sections.contatti.intro' | translate }}</p>
+
+                    <!-- Canali email -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-5">
+                      @for (channel of contactEmails; track channel.address) {
+                        <div class="flex flex-col gap-1 px-3 py-2.5 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-800/40">
+                          <span class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500 font-body">{{ channel.labelKey | translate }}</span>
+                          <span class="text-xs font-mono text-zinc-700 dark:text-zinc-300 truncate">{{ channel.address }}</span>
+                        </div>
+                      }
+                    </div>
+
+                    <!-- Form di contatto supporto -->
+                    @if (contactSent()) {
+                      <div class="flex items-center gap-3 px-4 py-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/40"
+                           style="animation: viewEnter 0.3s cubic-bezier(0.16,1,0.3,1) both;">
+                        <div class="w-9 h-9 flex items-center justify-center rounded-full bg-emerald-500 text-white flex-shrink-0">
+                          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                          </svg>
+                        </div>
+                        <div>
+                          <p class="text-sm font-semibold text-emerald-700 dark:text-emerald-300 font-body">{{ 'settings.sections.contatti.form.inviato.title' | translate }}</p>
+                          <p class="text-xs text-emerald-600/80 dark:text-emerald-400/70 font-body mt-0.5">{{ 'settings.sections.contatti.form.inviato.desc' | translate }}</p>
+                        </div>
+                      </div>
+                    } @else {
+                      <form (submit)="$event.preventDefault(); submitContactForm()" class="space-y-3">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5 block">{{ 'settings.sections.contatti.form.nome' | translate }}</label>
+                            <input type="text" [placeholder]="'settings.sections.contatti.form.nomePlaceholder' | translate"
+                                   [value]="contactName()"
+                                   (input)="contactName.set($any($event.target).value)"
+                                   class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
+                          </div>
+                          <div>
+                            <label class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5 block">{{ 'settings.sections.contatti.form.email' | translate }}</label>
+                            <input type="email" placeholder="nome@azienda.com"
+                                   [value]="contactEmail()"
+                                   (input)="contactEmail.set($any($event.target).value)"
+                                   class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
+                          </div>
+                        </div>
+                        <div>
+                          <label class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5 block">{{ 'settings.sections.contatti.form.oggetto' | translate }}</label>
+                          <input type="text" [placeholder]="'settings.sections.contatti.form.oggettoPlaceholder' | translate"
+                                 [value]="contactSubject()"
+                                 (input)="contactSubject.set($any($event.target).value)"
+                                 class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
+                        </div>
+                        <div>
+                          <label class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5 block">{{ 'settings.sections.contatti.form.messaggio' | translate }}</label>
+                          <textarea rows="4" [placeholder]="'settings.sections.contatti.form.messaggioPlaceholder' | translate"
+                                    [value]="contactMessage()"
+                                    (input)="contactMessage.set($any($event.target).value)"
+                                    class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all resize-none"></textarea>
+                        </div>
+                        <button type="submit"
+                                [disabled]="!contactEmail().trim() || !contactMessage().trim()"
+                                class="w-full flex items-center justify-center gap-2 py-2.5 bg-brand-600 hover:bg-brand-500 disabled:bg-zinc-200 disabled:dark:bg-zinc-800 disabled:text-zinc-400 disabled:dark:text-zinc-600 disabled:cursor-not-allowed text-white text-sm font-semibold rounded-xl transition-all duration-200 font-body">
+                          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                          </svg>
+                          {{ 'settings.sections.contatti.form.invia' | translate }}
+                        </button>
+                      </form>
+                    }
+                  </div>
+
+                  <!-- SEZIONE FAQ -->
+                  <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-card"
+                       [style.animation-delay]="((settingSections.length + 2) * 70 + 50) + 'ms'"
+                       style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;">
+                    <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-4">{{ 'settings.sections.faq.label' | translate }}</p>
+                    <div class="space-y-2">
+                      @for (faq of faqItems; track faq.qKey; let fi = $index) {
+                        <div class="rounded-xl border border-zinc-100 dark:border-zinc-800 overflow-hidden">
+                          <button (click)="toggleFaq(fi)"
+                                  class="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                            <span class="text-sm font-medium text-zinc-700 dark:text-zinc-300 font-body">{{ faq.qKey | translate }}</span>
+                            <svg [ngClass]="openFaqIndex() === fi ? 'rotate-180' : ''"
+                                 class="w-4 h-4 text-zinc-400 dark:text-zinc-500 flex-shrink-0 transition-transform duration-300 ease-out"
+                                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                          </button>
+                          <div class="grid transition-all duration-300 ease-out"
+                               [ngClass]="openFaqIndex() === fi ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'"
+                               style="display: grid;">
+                            <div class="overflow-hidden">
+                              <p class="px-4 pb-4 text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 font-body">{{ faq.aKey | translate }}</p>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  </div>
+
+                  <!-- SEZIONE LANDING / SITO UFFICIALE -->
+                  <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-card flex items-center justify-between gap-4 flex-wrap"
+                       [style.animation-delay]="((settingSections.length + 2) * 70 + 50) + 'ms'"
+                       style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;">
+                    <div>
+                      <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-1">{{ 'settings.sections.landing.label' | translate }}</p>
+                      <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body leading-relaxed max-w-md">{{ 'settings.sections.landing.intro' | translate }}</p>
+                    </div>
+                    <a href="https://airplan.io" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-semibold font-body transition-colors whitespace-nowrap">
+                      {{ 'settings.sections.landing.cta' | translate }}
+                      <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                      </svg>
+                    </a>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -1623,7 +1738,7 @@ interface SettingItem {
     }
   `,
 })
-export class AppLayoutComponent implements OnInit {
+export class AppLayoutComponent implements OnInit, OnDestroy {
   readonly planService     = inject(BusinessPlanService);
   readonly themeService    = inject(ThemeService);
   readonly languageService = inject(LanguageService);
@@ -1651,6 +1766,15 @@ export class AppLayoutComponent implements OnInit {
   linkCopied           = signal(false);
   emailSent            = signal(false);
 
+  // ── Settings: Contatti & FAQ ─────────────────────────────────────────────────
+  contactName    = signal('');
+  contactEmail   = signal('');
+  contactSubject = signal('');
+  contactMessage = signal('');
+  contactSent    = signal(false);
+
+  openFaqIndex = signal<number | null>(0);
+
   // ── Co-Work ─────────────────────────────────────────────────────────────────
   coworkEmailInput  = signal('');
   coworkRoleInput   = signal<'editor' | 'reader'>('editor');
@@ -1666,16 +1790,16 @@ export class AppLayoutComponent implements OnInit {
   readonly coworkJoinedCount  = computed(() => this.coworkMembers().filter(m => m.status === 'joined').length);
   readonly coworkPendingCount = computed(() => this.coworkMembers().filter(m => m.status === 'pending').length);
 
-  hoveredCoworkNode = signal<(CoworkMember & { orbitRadius: number; orbitDuration: number; orbitDelay: number }) | null>(null);
+  hoveredCoworkNode = signal<(CoworkMember & { orbitRadius: number; orbitDuration: number; initialAngle: number; x0: number; y0: number }) | null>(null);
   coworkTooltipX    = signal(0);
   coworkTooltipY    = signal(0);
 
   readonly orbitalNodes = computed(() => {
     const members = this.coworkMembers();
     const orbits = [
-      { r: 145, dur: 24 },
-      { r: 248, dur: 38 },
-      { r: 340, dur: 56 },
+      { r: 145, dur: 32 },
+      { r: 248, dur: 54 },
+      { r: 340, dur: 78 },
     ];
     const assign = (i: number) => i < 2 ? 0 : i < 5 ? 1 : 2;
     return members.map((m, i) => {
@@ -1683,11 +1807,20 @@ export class AppLayoutComponent implements OnInit {
       const orbit   = orbits[Math.min(orbitIdx, 2)];
       const peers   = members.filter((_, j) => assign(j) === orbitIdx);
       const pos     = peers.findIndex(p => p.id === m.id);
-      const start   = (pos / Math.max(peers.length, 1)) * 360;
-      const delay   = parseFloat((-(orbit.dur * start / 360)).toFixed(2));
-      return { ...m, orbitRadius: orbit.r, orbitDuration: orbit.dur, orbitDelay: delay };
+      const initialAngle = (pos / Math.max(peers.length, 1)) * Math.PI * 2;
+      const x0 = +(350 + orbit.r * Math.cos(initialAngle)).toFixed(2);
+      const y0 = +(350 + orbit.r * Math.sin(initialAngle)).toFixed(2);
+      return { ...m, orbitRadius: orbit.r, orbitDuration: orbit.dur, initialAngle, x0, y0 };
     });
   });
+
+  trackOrbitNode = (_: number, n: { id: string }) => n.id;
+
+  @ViewChildren('orbitNodeG') private _orbitNodeEls!: QueryList<ElementRef<SVGGElement>>;
+  @ViewChildren('orbitLine')  private _orbitLineEls!: QueryList<ElementRef<SVGLineElement>>;
+  private _zone   = inject(NgZone);
+  private _rafId  = 0;
+  private _animT0 = 0;
 
   demoCollaborators = [
     { initials: 'MR', color: 'linear-gradient(135deg, #6366f1, #8b5cf6)', name: 'Marco Rossi',      role: 'editor' },
@@ -1795,11 +1928,77 @@ export class AppLayoutComponent implements OnInit {
     }
   ];
 
+  contactEmails: { labelKey: string; address: string }[] = [
+    { labelKey: 'settings.sections.contatti.canali.supporto', address: 'supporto@airplan.io' },
+    { labelKey: 'settings.sections.contatti.canali.vendite',  address: 'vendite@airplan.io' },
+    { labelKey: 'settings.sections.contatti.canali.stampa',   address: 'stampa@airplan.io' },
+  ];
+
+  faqItems: { qKey: string; aKey: string }[] = [
+    { qKey: 'settings.sections.faq.items.businessPlan.q', aKey: 'settings.sections.faq.items.businessPlan.a' },
+    { qKey: 'settings.sections.faq.items.aiCopilot.q',    aKey: 'settings.sections.faq.items.aiCopilot.a' },
+    { qKey: 'settings.sections.faq.items.datiSalvati.q',  aKey: 'settings.sections.faq.items.datiSalvati.a' },
+    { qKey: 'settings.sections.faq.items.coWork.q',       aKey: 'settings.sections.faq.items.coWork.a' },
+    { qKey: 'settings.sections.faq.items.exportPdf.q',    aKey: 'settings.sections.faq.items.exportPdf.a' },
+    { qKey: 'settings.sections.faq.items.importazione.q', aKey: 'settings.sections.faq.items.importazione.a' },
+  ];
+
   ngOnInit(): void {
     const darkItem = this.settingSections
       .flatMap(s => s.items)
       .find(i => i.key === 'dark');
     if (darkItem) darkItem.enabled = this.themeService.dark();
+  }
+
+  ngOnDestroy(): void {
+    if (this._rafId) cancelAnimationFrame(this._rafId);
+  }
+
+  constructor() {
+    // Drive the orbital animation via RAF only when the Co-Work view is mounted.
+    // Direct DOM transform updates outside Angular zone = no CD churn, smooth 60fps.
+    effect((onCleanup) => {
+      const view = this.currentView();
+      // touch orbitalNodes() so we restart RAF when members change
+      const nodes = this.orbitalNodes();
+      if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = 0; }
+      if (view !== 'co-work' || nodes.length === 0) return;
+
+      const reduced = typeof window !== 'undefined'
+        && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      if (reduced) return; // keep static initial positions from template
+
+      this._zone.runOutsideAngular(() => {
+        this._animT0 = 0;
+        const tick = (t: number) => {
+          if (!this._animT0) this._animT0 = t;
+          const elapsed = (t - this._animT0) / 1000;
+          const ns  = this.orbitalNodes();
+          const gs  = this._orbitNodeEls?.toArray() ?? [];
+          const lns = this._orbitLineEls?.toArray() ?? [];
+          for (let i = 0; i < ns.length; i++) {
+            const n = ns[i];
+            const omega = (Math.PI * 2) / n.orbitDuration;
+            // gentle radial breath: ±2.5px sinus, phase per node
+            const bob = Math.sin(elapsed * 0.55 + i * 1.7) * 2.5;
+            const r = n.orbitRadius + bob;
+            const angle = n.initialAngle + omega * elapsed;
+            const x = 350 + r * Math.cos(angle);
+            const y = 350 + r * Math.sin(angle);
+            const g  = gs[i]?.nativeElement;
+            const ln = lns[i]?.nativeElement;
+            if (g)  g.setAttribute('transform', `translate(${x.toFixed(2)},${y.toFixed(2)})`);
+            if (ln) { ln.setAttribute('x2', x.toFixed(2)); ln.setAttribute('y2', y.toFixed(2)); }
+          }
+          this._rafId = requestAnimationFrame(tick);
+        };
+        this._rafId = requestAnimationFrame(tick);
+      });
+
+      onCleanup(() => {
+        if (this._rafId) { cancelAnimationFrame(this._rafId); this._rafId = 0; }
+      });
+    });
   }
 
   // ── Tutorial steps (reactive to hasPlan) ────────────────────────────────────
@@ -1975,6 +2174,22 @@ export class AppLayoutComponent implements OnInit {
     } else {
       item.enabled = !item.enabled;
     }
+  }
+
+  submitContactForm(): void {
+    if (!this.contactEmail().trim() || !this.contactMessage().trim() || this.contactSent()) return;
+    this.contactSent.set(true);
+    setTimeout(() => {
+      this.contactSent.set(false);
+      this.contactName.set('');
+      this.contactEmail.set('');
+      this.contactSubject.set('');
+      this.contactMessage.set('');
+    }, 3200);
+  }
+
+  toggleFaq(index: number): void {
+    this.openFaqIndex.update(curr => curr === index ? null : index);
   }
 
   onResizeStart(event: MouseEvent): void {

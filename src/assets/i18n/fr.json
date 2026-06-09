@@ -192,6 +192,63 @@
       },
       "lingua": {
         "label": "Langue"
+      },
+      "contatti": {
+        "label": "Contact",
+        "intro": "Besoin d'aide ? Écrivez-nous via l'un de nos canaux ou remplissez le formulaire : nous répondons sous 24 heures ouvrées.",
+        "canali": {
+          "supporto": "Support",
+          "vendite": "Ventes",
+          "stampa": "Presse"
+        },
+        "form": {
+          "nome": "Nom",
+          "nomePlaceholder": "Votre nom",
+          "email": "Email",
+          "oggetto": "Objet",
+          "oggettoPlaceholder": "Ex. Problème avec l'export PDF",
+          "messaggio": "Message",
+          "messaggioPlaceholder": "Décrivez le problème ou la question que vous souhaitez poser…",
+          "invia": "Envoyer la demande",
+          "inviato": {
+            "title": "Demande envoyée",
+            "desc": "Merci, notre équipe support vous répondra par email sous 24 heures ouvrées."
+          }
+        }
+      },
+      "faq": {
+        "label": "Questions fréquentes",
+        "items": {
+          "businessPlan": {
+            "q": "Comment créer mon premier Business Plan ?",
+            "a": "Allez dans \"Business Plan\" et suivez l'assistant guidé en 6 étapes : configuration initiale, revenus, personnel, coûts opérationnels, investissements et financement. En quelques minutes, vous obtenez une projection sur trois ans complète avec tableau de bord et indicateurs clés."
+          },
+          "aiCopilot": {
+            "q": "À quoi sert l'AI Copilot et comment l'utiliser ?",
+            "a": "Le Copilot (\"CFO Virtuel\") simule des scénarios hypothétiques : hausses de prix, nouvelles embauches ou réductions de coûts. Ouvrez-le depuis le bouton AI de la barre supérieure ou avec Ctrl+K, posez votre question et le plan se met à jour en montrant l'impact sur le chiffre d'affaires, l'EBITDA, le bénéfice et la trésorerie. Vous pouvez toujours revenir aux valeurs d'origine avec \"Réinitialiser\"."
+          },
+          "datiSalvati": {
+            "q": "Où sont enregistrés mes plans et comment les retrouver ?",
+            "a": "Chaque plan enregistré apparaît dans la section \"Plans enregistrés\" avec sa date, ses indicateurs clés et un repère de viabilité. Vous pouvez le rouvrir pour continuer à y travailler ou le supprimer. La sauvegarde automatique, si elle est activée dans les paramètres, enregistre les modifications au fil du travail."
+          },
+          "coWork": {
+            "q": "Comment inviter mon équipe à collaborer sur un plan ?",
+            "a": "Dans la section \"Co-Work\", vous pouvez inviter des collègues par email en choisissant leur rôle (Lecteur ou Éditeur), ou générer un lien d'invitation partageable qui expire au bout de 2 heures. Vous verrez qui a accepté et qui est encore en attente, et vous pourrez gérer ou retirer des membres de l'équipe à tout moment."
+          },
+          "exportPdf": {
+            "q": "Comment exporter mon plan en PDF ?",
+            "a": "Ouvrez le rapport ou le tableau de bord du plan et cliquez sur \"Exporter en PDF\" dans la barre supérieure : la vue se prépare automatiquement pour l'impression et vous pouvez l'enregistrer en PDF depuis la fenêtre d'impression du navigateur."
+          },
+          "importazione": {
+            "q": "Puis-je importer un Business Plan déjà rédigé ailleurs ?",
+            "a": "Oui, dans la section \"Imports\", vous pouvez glisser-déposer ou sélectionner un fichier PDF, DOC, DOCX ou .bxp (jusqu'à 50 Mo) : le système l'analyse, en extrait les données financières et le convertit au format AirPlan, en vous montrant la progression étape par étape."
+          }
+        }
+      },
+      "landing": {
+        "label": "Site officiel",
+        "intro": "Découvrez toutes les fonctionnalités d'AirPlan Business Plan, les tarifs et les témoignages sur la landing page officielle.",
+        "cta": "Visiter airplan.io"
       }
     }
   }

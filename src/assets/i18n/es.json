@@ -192,6 +192,63 @@
       },
       "lingua": {
         "label": "Idioma"
+      },
+      "contatti": {
+        "label": "Contacto",
+        "intro": "¿Necesitas ayuda? Escríbenos por uno de nuestros canales o completa el formulario: te responderemos en un plazo de 24 horas laborables.",
+        "canali": {
+          "supporto": "Soporte",
+          "vendite": "Ventas",
+          "stampa": "Prensa"
+        },
+        "form": {
+          "nome": "Nombre",
+          "nomePlaceholder": "Tu nombre",
+          "email": "Email",
+          "oggetto": "Asunto",
+          "oggettoPlaceholder": "Ej. Problema con la exportación a PDF",
+          "messaggio": "Mensaje",
+          "messaggioPlaceholder": "Describe el problema o la pregunta que quieres hacernos…",
+          "invia": "Enviar solicitud",
+          "inviato": {
+            "title": "Solicitud enviada",
+            "desc": "Gracias, nuestro equipo de soporte te responderá por email en un plazo de 24 horas laborables."
+          }
+        }
+      },
+      "faq": {
+        "label": "Preguntas frecuentes",
+        "items": {
+          "businessPlan": {
+            "q": "¿Cómo creo mi primer Business Plan?",
+            "a": "Ve a \"Business Plan\" y sigue el asistente guiado de 6 pasos: configuración inicial, ingresos, personal, costes operativos, inversiones y financiación. En pocos minutos obtendrás una proyección a tres años completa con dashboard y KPIs."
+          },
+          "aiCopilot": {
+            "q": "¿Para qué sirve el AI Copilot y cómo lo uso?",
+            "a": "El Copilot (\"CFO Virtual\") simula escenarios hipotéticos: subidas de precio, nuevas contrataciones o recortes de costes. Ábrelo desde el botón AI de la barra superior o con Ctrl+K, escribe tu pregunta y el plan se actualiza mostrando el impacto en ingresos, EBITDA, beneficio y cash runway. Siempre puedes volver a los valores originales con \"Restablecer\"."
+          },
+          "datiSalvati": {
+            "q": "¿Dónde se guardan mis planes y cómo los encuentro de nuevo?",
+            "a": "Cada plan guardado aparece en la sección \"Planes guardados\" con su fecha, los KPIs principales y un indicador de sostenibilidad. Desde ahí puedes volver a abrirlo para seguir trabajando o eliminarlo. El guardado automático, si está activado en los ajustes, registra los cambios mientras trabajas."
+          },
+          "coWork": {
+            "q": "¿Cómo invito a mi equipo a colaborar en un plan?",
+            "a": "En la sección \"Co-Work\" puedes invitar a colegas por email eligiendo su rol (Lector o Editor), o generar un enlace de invitación compartible que caduca a las 2 horas. Verás quién ha aceptado y quién sigue pendiente, y podrás gestionar o eliminar miembros del equipo en cualquier momento."
+          },
+          "exportPdf": {
+            "q": "¿Cómo exporto mi plan en PDF?",
+            "a": "Abre el informe o el dashboard del plan y pulsa \"Exportar PDF\" en la barra superior: la vista se prepara automáticamente para imprimir y podrás guardarla como PDF desde el cuadro de impresión del navegador."
+          },
+          "importazione": {
+            "q": "¿Puedo importar un Business Plan que ya redacté en otro sitio?",
+            "a": "Sí, en la sección \"Cargas\" puedes arrastrar o seleccionar un archivo PDF, DOC, DOCX o .bxp (hasta 50MB): el sistema lo analiza, extrae los datos financieros y lo convierte al formato AirPlan, mostrándote el progreso paso a paso."
+          }
+        }
+      },
+      "landing": {
+        "label": "Sitio web oficial",
+        "intro": "Descubre todas las funciones de AirPlan Business Plan, los precios y los testimonios en la landing page oficial.",
+        "cta": "Visitar airplan.io"
       }
     }
   }

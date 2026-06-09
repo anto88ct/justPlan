@@ -192,6 +192,63 @@
       },
       "lingua": {
         "label": "Language"
+      },
+      "contatti": {
+        "label": "Contact",
+        "intro": "Need help? Reach us through one of our channels or fill out the form below: we reply within 24 business hours.",
+        "canali": {
+          "supporto": "Support",
+          "vendite": "Sales",
+          "stampa": "Press"
+        },
+        "form": {
+          "nome": "Name",
+          "nomePlaceholder": "Your name",
+          "email": "Email",
+          "oggetto": "Subject",
+          "oggettoPlaceholder": "E.g. Issue with PDF export",
+          "messaggio": "Message",
+          "messaggioPlaceholder": "Describe the problem or question you'd like to ask…",
+          "invia": "Send request",
+          "inviato": {
+            "title": "Request sent",
+            "desc": "Thanks, our support team will reply by email within 24 business hours."
+          }
+        }
+      },
+      "faq": {
+        "label": "Frequently asked questions",
+        "items": {
+          "businessPlan": {
+            "q": "How do I create my first Business Plan?",
+            "a": "Go to \"Business Plan\" and follow the guided 6-step wizard: initial setup, revenue, staff, operating costs, investments and financing. In a few minutes you'll get a complete three-year projection with dashboard and KPIs."
+          },
+          "aiCopilot": {
+            "q": "What is the AI Copilot for and how do I use it?",
+            "a": "The Copilot (\"Virtual CFO\") simulates what-if scenarios: price increases, new hires or cost cuts. Open it from the AI button in the top bar or with Ctrl+K, type your question and the plan updates showing the impact on revenue, EBITDA, profit and cash runway. You can always go back to the original figures with \"Reset\"."
+          },
+          "datiSalvati": {
+            "q": "Where are my plans saved and how do I find them again?",
+            "a": "Every saved plan appears in the \"Saved Plans\" section with its date, key KPIs and a sustainability indicator. From there you can reopen it to keep working or delete it. Auto-save, when enabled in settings, records changes as you work."
+          },
+          "coWork": {
+            "q": "How do I invite my team to collaborate on a plan?",
+            "a": "In the \"Co-Work\" section you can invite colleagues by email choosing their role (Reader or Editor), or generate a shareable invite link that expires after 2 hours. You'll see who has accepted and who is still pending, and you can manage or remove team members at any time."
+          },
+          "exportPdf": {
+            "q": "How do I export my plan as a PDF?",
+            "a": "Open the plan's report or dashboard and click \"Export PDF\" in the top bar: the view automatically prepares for printing and you can save it as a PDF from your browser's print dialog."
+          },
+          "importazione": {
+            "q": "Can I import a Business Plan I already wrote elsewhere?",
+            "a": "Yes, in the \"Uploads\" section you can drag and drop or pick a PDF, DOC, DOCX or .bxp file (up to 50MB): the system analyzes it, extracts the financial data and converts it into the AirPlan format, showing you the progress step by step."
+          }
+        }
+      },
+      "landing": {
+        "label": "Official website",
+        "intro": "Discover all AirPlan Business Plan features, pricing and testimonials on the official landing page.",
+        "cta": "Visit airplan.io"
       }
     }
   }
