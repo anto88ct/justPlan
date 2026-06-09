@@ -3,7 +3,7 @@
     "panoramica": "Overview",
     "wizard": "Wizard",
     "dashboard": "Dashboard",
-    "scenari": "What-If Scenarios",
+    "scenari": "AI Agents",
     "report": "Report",
     "impostazioni": "Settings",
     "pianiSalvati": "My Plans",
@@ -11,7 +11,7 @@
     "profilo": "Profile",
     "businessPlan": "Business Plan",
     "caricamenti": "Uploads",
-    "scenariLabel": "Scenarios",
+    "scenariLabel": "Agents",
     "menu": "Menu"
   },
   "sidebar": {
@@ -250,6 +250,66 @@
         "intro": "Discover all Businext Plan Business Plan features, pricing and testimonials on the official landing page.",
         "cta": "Visit airplan.io"
       }
+    }
+  },
+  "agenti": {
+    "title": "AI Agents",
+    "desc": "Select a specialized agent to explore, analyze, or learn more about your Business Plan.",
+    "noPlanWarn": "Agents have more context when a Business Plan is active.",
+    "goToWizard": "Create a plan →",
+    "elio": {
+      "name": "Elio",
+      "role": "Future Outlook",
+      "desc": "Simulate future scenarios: what happens if you change prices, volumes, or costs? Elio regenerates the plan and compares projections.",
+      "cta": "Talk to Elio",
+      "example": "What happens if I raise the price to €59 from Q2?"
+    },
+    "argon": {
+      "name": "Argon",
+      "role": "Critical Analysis",
+      "desc": "Identify inconsistencies, gaps, and risks in your Business Plan. Argon flags anything that may not add up.",
+      "cta": "Talk to Argon",
+      "example": "Are there issues in my revenue data?"
+    },
+    "xeno": {
+      "name": "Xeno",
+      "role": "Advice & Info",
+      "desc": "Explains financial terminology, tax definitions, and app fields with concrete examples from your plan.",
+      "cta": "Talk to Xeno",
+      "example": "What is IRPEF and how does it affect my plan?"
+    }
+  },
+  "chatbot": {
+    "scenarioApplied": "Scenario applied",
+    "resetPlan": "Reset",
+    "tryAsk": "Try asking me:",
+    "elaborating": "is processing...",
+    "elio": {
+      "role": "Future Outlook",
+      "placeholder": "Ask a 'What-If' scenario...",
+      "welcome": "Hi! I'm Elio.\n\nTell me what to change in the plan and I'll show how projections shift.",
+      "s1": "What if I raise the price to €59 from Q2?",
+      "s2": "Simulate 2 more employees from Q3",
+      "s3": "Projection with +30% volume in the UK market",
+      "mockReply": "I've updated the Business Plan with the requested scenario.\n\n• Revenue → €{{fatturato}} (+18%)\n• EBITDA → €{{ebitda}} (+15%)\n• Net Income → €{{utileNetto}} (+22%)\n• Cash Runway → {{cashRunway}} months (+4)\n\nThe chart is updated in green. Want to explore more scenarios?"
+    },
+    "argon": {
+      "role": "Critical Analysis",
+      "placeholder": "Ask me to analyze the plan...",
+      "welcome": "Hi. I'm Argon.\n\nI scan the Business Plan to identify inconsistencies, risks, and anomalous data.",
+      "s1": "Are there issues in my revenue data?",
+      "s2": "Is my EBITDA realistic?",
+      "s3": "What are the main risks in my plan?",
+      "mockReply": "I analyzed the Business Plan. Found 2 issues.\n\n🔴 Revenue growth uses an exponential compound formula, not linear. At the current rate, revenue triples unrealistically by year three.\n\n🟠 IRAP is calculated on profit (EBT). The correct base is net production value, which includes labor costs.\n\nWould you like to explore one of these points?"
+    },
+    "xeno": {
+      "role": "Advice & Info",
+      "placeholder": "Ask for a definition or explanation...",
+      "welcome": "Hi! I'm Xeno.\n\nI'm here to explain any financial or tax term: IRPEF, EBITDA, TFR, depreciation.",
+      "s1": "What is IRPEF?",
+      "s2": "What does EBITDA mean?",
+      "s3": "How does cash runway work?",
+      "mockReply": "I've updated the example Business Plan. Current values:\n\n• Revenue → €{{fatturato}}\n• EBITDA → €{{ebitda}}\n\nAsk me to define any term you find in the plan."
     }
   }
 }

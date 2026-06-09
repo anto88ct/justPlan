@@ -3,7 +3,7 @@
     "panoramica": "Resumen",
     "wizard": "Asistente",
     "dashboard": "Panel",
-    "scenari": "Escenarios What-If",
+    "scenari": "Agentes IA",
     "report": "Informe",
     "impostazioni": "Configuración",
     "pianiSalvati": "Mis Planes",
@@ -11,7 +11,7 @@
     "profilo": "Perfil",
     "businessPlan": "Plan de Negocio",
     "caricamenti": "Cargas",
-    "scenariLabel": "Escenarios",
+    "scenariLabel": "Agentes",
     "menu": "Menú"
   },
   "sidebar": {
@@ -250,6 +250,66 @@
         "intro": "Descubre todas las funciones de Businext Plan Business Plan, los precios y los testimonios en la landing page oficial.",
         "cta": "Visitar airplan.io"
       }
+    }
+  },
+  "agenti": {
+    "title": "Agentes IA",
+    "desc": "Selecciona un agente especializado para explorar, analizar o profundizar en tu Plan de Negocio.",
+    "noPlanWarn": "Los agentes tienen más contexto con un Plan de Negocio activo.",
+    "goToWizard": "Crear un plan →",
+    "elio": {
+      "name": "Elio",
+      "role": "Perspectiva futura",
+      "desc": "Simula escenarios futuros: ¿qué pasa si cambias precios, volúmenes o costes? Elio regenera el plan y compara proyecciones.",
+      "cta": "Hablar con Elio",
+      "example": "¿Qué pasa si subo el precio a 59 € desde el T2?"
+    },
+    "argon": {
+      "name": "Argon",
+      "role": "Análisis crítico",
+      "desc": "Identifica inconsistencias, fallos y riesgos en tu Plan de Negocio. Argon señala lo que no cuadra.",
+      "cta": "Hablar con Argon",
+      "example": "¿Hay problemas en mis datos de ingresos?"
+    },
+    "xeno": {
+      "name": "Xeno",
+      "role": "Asesoría & Info",
+      "desc": "Explica terminología financiera, definiciones fiscales y campos de la app con ejemplos concretos de tu plan.",
+      "cta": "Hablar con Xeno",
+      "example": "¿Qué es el IRPEF y cómo afecta a mi plan?"
+    }
+  },
+  "chatbot": {
+    "scenarioApplied": "Escenario aplicado",
+    "resetPlan": "Restablecer",
+    "tryAsk": "Prueba a preguntarme:",
+    "elaborating": "está procesando...",
+    "elio": {
+      "role": "Perspectiva futura",
+      "placeholder": "Pregunta un escenario 'What-If'...",
+      "welcome": "Hola! Soy Elio.\n\nDime qué quieres cambiar en el plan y te muestro cómo cambian las proyecciones.",
+      "s1": "¿Qué pasa si subo el precio a 59 € desde el T2?",
+      "s2": "Simular 2 empleados más desde el T3",
+      "s3": "Proyección con +30 % de volumen en el mercado UK",
+      "mockReply": "He actualizado el Plan de Negocio con el escenario solicitado.\n\n• Facturación → €{{fatturato}} (+18%)\n• EBITDA → €{{ebitda}} (+15%)\n• Beneficio Neto → €{{utileNetto}} (+22%)\n• Cash Runway → {{cashRunway}} meses (+4)\n\nEl gráfico se ha actualizado en verde. ¿Quieres explorar otros escenarios?"
+    },
+    "argon": {
+      "role": "Análisis crítico",
+      "placeholder": "Pídeme que analice el plan...",
+      "welcome": "Hola. Soy Argon.\n\nEscaneo el Plan de Negocio para identificar inconsistencias, riesgos y datos anómalos.",
+      "s1": "¿Hay problemas en mis datos de ingresos?",
+      "s2": "¿Es realista mi EBITDA?",
+      "s3": "¿Cuáles son los principales riesgos?",
+      "mockReply": "He analizado el Plan de Negocio. Encontré 2 problemas.\n\n🔴 El crecimiento de ingresos usa una fórmula exponencial compuesta, no lineal. Con la tasa actual, la facturación se triplica de forma no realista en el tercer año.\n\n🟠 El IRAP se calcula sobre el beneficio (EBT). La base correcta es el valor neto de producción, que incluye los costes laborales.\n\n¿Quieres profundizar en alguno de estos puntos?"
+    },
+    "xeno": {
+      "role": "Asesoría & Info",
+      "placeholder": "Pregunta una definición o explicación...",
+      "welcome": "¡Hola! Soy Xeno.\n\nEstoy aquí para explicarte cualquier término financiero o fiscal: IRPEF, EBITDA, TFR, amortización.",
+      "s1": "¿Qué es el IRPEF?",
+      "s2": "¿Qué significa EBITDA?",
+      "s3": "¿Cómo funciona el cash runway?",
+      "mockReply": "He actualizado el Plan de Negocio de ejemplo. Valores actuales:\n\n• Facturación → €{{fatturato}}\n• EBITDA → €{{ebitda}}\n\nPídeme la definición de cualquier término que encuentres en el plan."
     }
   }
 }

@@ -12,6 +12,7 @@ interface ProductLine {
   linearGrowthPct: number;
   monthlyVolumes: number[];
   collectionDelay: number;
+  annualGrowthPct: number;
 }
 
 interface Employee {
@@ -26,6 +27,7 @@ interface Employee {
 interface VariableCost {
   id: number;
   description: string;
+  costType: 'cogs' | 'opex';
   valueType: 'pct' | 'abs';
   value: number;
   vatRate: number;
@@ -486,7 +488,7 @@ interface LoanItem {
 
               <!-- Accantonamento Rischi Crediti -->
               <div>
-                <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide w-full">Accantonamento Rischi Crediti<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Accantonamento">?</button><span class="tt-box">Percentuale dei ricavi accantonata come riserva per crediti non incassabili (clienti insolventi). Tipicamente 0.1%–1% per PMI. Deduce dall'utile imponibile.</span></span></label>
+                <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-600 mb-1.5 font-body uppercase tracking-wide w-full">Accantonamento Rischi Crediti<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Accantonamento">?</button><span class="tt-box">Percentuale dei ricavi stimata come crediti inesigibili. Appare nel Conto Economico come "Svalutazione Crediti" (riduce EBITDA) e riduce proporzionalmente gli incassi nel cash flow. Tipicamente 0.1%–1% per PMI.</span></span></label>
                 <div class="flex items-center gap-3">
                   <div class="relative" style="width: 160px;">
                     <input type="number" [(ngModel)]="config.badDebtPct" name="badDebtPct"
@@ -608,7 +610,7 @@ interface LoanItem {
                               (click)="products[pi].volumeMode = 'linear'"
                               class="seg-btn"
                               [ngClass]="products[pi].volumeMode === 'linear' ? 'seg-active' : 'seg-inactive'">
-                        📈 Crescita Lineare
+                        📈 Crescita Composta
                       </button>
                       <button type="button"
                               (click)="products[pi].volumeMode = 'monthly'"
@@ -634,7 +636,7 @@ interface LoanItem {
                         </div>
                       </div>
                       <div>
-                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Crescita Mensile<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Crescita Mensile">?</button><span class="tt-box">Tasso % di crescita dei volumi mese su mese. Es. 10% = ogni mese vendi il 10% in più del mese precedente. Inserisci 0% per volumi costanti.</span></span></label>
+                        <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Crescita Mensile Composta<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Crescita Mensile">?</button><span class="tt-box">Tasso % di crescita composta mese su mese (formula: vol₀ × (1+r)^mese). Attenzione: tassi elevati generano volumi molto alti in 36 mesi — usa "Mese per Mese" per proiezioni più realistiche.</span></span></label>
                         <div class="relative">
                           <input type="number" [(ngModel)]="products[pi].linearGrowthPct" [name]="'pGrowth_' + p.id"
                                  min="0" max="200" step="0.5" class="inp inp-suffix font-mono font-semibold"/>
@@ -657,10 +659,10 @@ interface LoanItem {
                     </div>
                   }
 
-                  <!-- Monthly mode: 12-field grid -->
+                  <!-- Monthly mode: 12-field grid + annual growth (fix 2.3) -->
                   @if (products[pi].volumeMode === 'monthly') {
                     <div>
-                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-2 font-body">Volumi Mensili (unità)</label>
+                      <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-2 font-body">Volumi Mensili Anno 1 (unità)</label>
                       <div class="grid grid-cols-4 gap-1.5">
                         @for (mi of monthIndices; track mi) {
                           <div class="text-center">
@@ -669,6 +671,17 @@ interface LoanItem {
                                    [name]="'vol_' + p.id + '_' + mi" min="0" class="month-inp"/>
                           </div>
                         }
+                      </div>
+                    </div>
+                    <div class="mt-3">
+                      <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">
+                        Crescita Anno su Anno
+                        <span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Crescita Anno su Anno">?</button><span class="tt-box">Percentuale di crescita annua applicata ai volumi dell'Anno 1. Anno 2 = volumi Anno 1 × (1+r); Anno 3 = volumi Anno 1 × (1+r)². Inserisci 0% per replicare lo stesso pattern ogni anno.</span></span>
+                      </label>
+                      <div class="relative" style="width: 160px;">
+                        <input type="number" [(ngModel)]="products[pi].annualGrowthPct" [name]="'pAnnGrowth_' + p.id"
+                               min="0" max="200" step="1" class="inp inp-suffix font-mono font-semibold"/>
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                       </div>
                     </div>
                   }
@@ -688,6 +701,15 @@ interface LoanItem {
                         </button>
                       }
                     </div>
+                  </div>
+                  <div class="flex justify-end mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <button type="button" (click)="duplicateProduct(p)"
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-brand-50 dark:bg-zinc-800 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-zinc-700 text-xs font-semibold font-body transition-all hover:bg-brand-100 dark:hover:bg-zinc-700">
+                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                      </svg>
+                      Duplica
+                    </button>
                   </div>
                 </div>
               }
@@ -834,6 +856,15 @@ interface LoanItem {
                       </span>
                     </div>
                   </div>
+                  <div class="flex justify-end mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <button type="button" (click)="duplicateEmployee(e)"
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-brand-50 dark:bg-zinc-800 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-zinc-700 text-xs font-semibold font-body transition-all hover:bg-brand-100 dark:hover:bg-zinc-700">
+                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                      </svg>
+                      Duplica
+                    </button>
+                  </div>
                 </div>
               }
 
@@ -922,6 +953,28 @@ interface LoanItem {
                       </div>
                     </div>
 
+                    <!-- Classificazione CE (fix 4.2) -->
+                    <div class="mb-3">
+                      <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">
+                        Classificazione CE
+                        <span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Classificazione CE">?</button><span class="tt-box">Dove appare nel Conto Economico: "Costo del Venduto" riduce il Gross Profit (costi direttamente collegati alla produzione/erogazione); "OPEX" riduce l'EBITDA senza toccare il Gross Margin.</span></span>
+                      </label>
+                      <div class="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg gap-0.5">
+                        <button type="button"
+                                (click)="variableCosts[ci].costType = 'cogs'"
+                                class="flex-1 py-1.5 rounded-md text-xs font-semibold font-body transition-all"
+                                [ngClass]="variableCosts[ci].costType === 'cogs' ? 'bg-white dark:bg-zinc-700 text-brand-600 shadow-sm' : 'text-zinc-400'">
+                          Costo del Venduto
+                        </button>
+                        <button type="button"
+                                (click)="variableCosts[ci].costType = 'opex'"
+                                class="flex-1 py-1.5 rounded-md text-xs font-semibold font-body transition-all"
+                                [ngClass]="variableCosts[ci].costType === 'opex' ? 'bg-white dark:bg-zinc-700 text-brand-600 shadow-sm' : 'text-zinc-400'">
+                          OPEX
+                        </button>
+                      </div>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3">
                       <div>
                         <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Aliquota IVA<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info IVA">?</button><span class="tt-box">Percentuale IVA applicata a questo costo. 22% per la maggior parte di beni/servizi, 10% o 4% per categorie agevolate, 0% se esente.</span></span></label>
@@ -942,6 +995,15 @@ interface LoanItem {
                           <option [value]="120">120 giorni</option>
                         </select>
                       </div>
+                    </div>
+                    <div class="flex justify-end mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                      <button type="button" (click)="duplicateVariableCost(c)"
+                              class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-brand-50 dark:bg-zinc-800 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-zinc-700 text-xs font-semibold font-body transition-all hover:bg-brand-100 dark:hover:bg-zinc-700">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Duplica
+                      </button>
                     </div>
                   </div>
                 }
@@ -1024,6 +1086,15 @@ interface LoanItem {
                           <option [value]="90">90 gg</option>
                         </select>
                       </div>
+                    </div>
+                    <div class="flex justify-end mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                      <button type="button" (click)="duplicateFixedCost(c)"
+                              class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-brand-50 dark:bg-zinc-800 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-zinc-700 text-xs font-semibold font-body transition-all hover:bg-brand-100 dark:hover:bg-zinc-700">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Duplica
+                      </button>
                     </div>
                   </div>
                 }
@@ -1124,6 +1195,15 @@ interface LoanItem {
                       </span>
                     </div>
                   }
+                  <div class="flex justify-end mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                    <button type="button" (click)="duplicateCapex(inv)"
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-brand-50 dark:bg-zinc-800 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-zinc-700 text-xs font-semibold font-body transition-all hover:bg-brand-100 dark:hover:bg-zinc-700">
+                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                      </svg>
+                      Duplica
+                    </button>
+                  </div>
                 </div>
               }
 
@@ -1199,6 +1279,15 @@ interface LoanItem {
                         <input type="number" [(ngModel)]="equityInjections[eqi].year" [name]="'eqYear_' + eq.id"
                                min="2024" max="2040" class="inp font-mono text-sm"/>
                       </div>
+                    </div>
+                    <div class="flex justify-end mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                      <button type="button" (click)="duplicateEquity(eq)"
+                              class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-brand-50 dark:bg-zinc-800 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-zinc-700 text-xs font-semibold font-body transition-all hover:bg-brand-100 dark:hover:bg-zinc-700">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Duplica
+                      </button>
                     </div>
                   </div>
                 }
@@ -1300,6 +1389,15 @@ interface LoanItem {
                         </span>
                       </div>
                     }
+                    <div class="flex justify-end mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                      <button type="button" (click)="duplicateLoan(loan)"
+                              class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-brand-50 dark:bg-zinc-800 text-brand-600 dark:text-brand-400 border border-brand-200 dark:border-zinc-700 text-xs font-semibold font-body transition-all hover:bg-brand-100 dark:hover:bg-zinc-700">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        Duplica
+                      </button>
+                    </div>
                   </div>
                 }
 
@@ -1628,6 +1726,7 @@ export class WizardFormComponent {
       linearGrowthPct: 10,
       monthlyVolumes: Array(12).fill(0),
       collectionDelay: 30,
+      annualGrowthPct: 0,
     };
   }
 
@@ -1687,7 +1786,7 @@ export class WizardFormComponent {
   fixedCosts:    FixedCost[]    = [];
 
   private _newVariableCost(): VariableCost {
-    return { id: this._id++, description: '', valueType: 'pct', value: 0, vatRate: 22, paymentDelay: 30 };
+    return { id: this._id++, description: '', costType: 'opex', valueType: 'pct', value: 0, vatRate: 22, paymentDelay: 30 };
   }
   addVariableCost(): void  { this.variableCosts.push(this._newVariableCost()); }
   removeVariableCost(id: number): void { this.variableCosts = this.variableCosts.filter(c => c.id !== id); }
@@ -1718,6 +1817,29 @@ export class WizardFormComponent {
   }
   addCapex(): void  { this.investments.push(this._newCapex()); }
   removeCapex(id: number): void { this.investments = this.investments.filter(i => i.id !== id); }
+
+  // ─── Duplicate helpers ────────────────────────────────────────────────────
+  duplicateProduct(p: ProductLine): void {
+    this.products.push({ ...p, id: this._id++, monthlyVolumes: [...p.monthlyVolumes] });
+  }
+  duplicateEmployee(e: Employee): void {
+    this.employees.push({ ...e, id: this._id++ });
+  }
+  duplicateVariableCost(c: VariableCost): void {
+    this.variableCosts.push({ ...c, id: this._id++ });
+  }
+  duplicateFixedCost(c: FixedCost): void {
+    this.fixedCosts.push({ ...c, id: this._id++ });
+  }
+  duplicateCapex(inv: CapexItem): void {
+    this.investments.push({ ...inv, id: this._id++ });
+  }
+  duplicateEquity(eq: EquityInjection): void {
+    this.equityInjections.push({ ...eq, id: this._id++ });
+  }
+  duplicateLoan(loan: LoanItem): void {
+    this.loans.push({ ...loan, id: this._id++ });
+  }
 
   // ─── Step 6: Financing ────────────────────────────────────────────────────
   equityInjections: EquityInjection[] = [this._newEquity()];
@@ -1833,6 +1955,7 @@ export class WizardFormComponent {
         linearGrowthPct:  p.linearGrowthPct,
         monthlyVolumes:   [...p.monthlyVolumes],
         collectionDelay:  p.collectionDelay,
+        annualGrowthPct:  p.annualGrowthPct,
       })),
       employees: this.employees.map(e => ({
         role:        e.role,
@@ -1848,6 +1971,7 @@ export class WizardFormComponent {
         salaryMonths: this.hrParams.salaryMonths,
       },
       variableCosts: this.variableCosts.map(c => ({
+        costType:     c.costType,
         valueType:    c.valueType,
         value:        c.value,
         paymentDelay: c.paymentDelay,

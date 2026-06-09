@@ -3,7 +3,7 @@
     "panoramica": "Aperçu",
     "wizard": "Assistant",
     "dashboard": "Tableau de bord",
-    "scenari": "Scénarios What-If",
+    "scenari": "Agents IA",
     "report": "Rapport",
     "impostazioni": "Paramètres",
     "pianiSalvati": "Mes Plans",
@@ -11,7 +11,7 @@
     "profilo": "Profil",
     "businessPlan": "Plan d'affaires",
     "caricamenti": "Chargements",
-    "scenariLabel": "Scénarios",
+    "scenariLabel": "Agents",
     "menu": "Menu"
   },
   "sidebar": {
@@ -250,6 +250,66 @@
         "intro": "Découvrez toutes les fonctionnalités de Businext Plan Business Plan, les tarifs et les témoignages sur la landing page officielle.",
         "cta": "Visiter airplan.io"
       }
+    }
+  },
+  "agenti": {
+    "title": "Agents IA",
+    "desc": "Sélectionnez un agent spécialisé pour explorer, analyser ou approfondir votre Business Plan.",
+    "noPlanWarn": "Les agents ont plus de contexte avec un Business Plan actif.",
+    "goToWizard": "Créer un plan →",
+    "elio": {
+      "name": "Elio",
+      "role": "Perspective future",
+      "desc": "Simulez des scénarios futurs : que se passe-t-il si vous modifiez prix, volumes ou coûts ? Elio régénère le plan et compare les projections.",
+      "cta": "Parler à Elio",
+      "example": "Que se passe-t-il si j'augmente le prix à 59 € dès le T2 ?"
+    },
+    "argon": {
+      "name": "Argon",
+      "role": "Analyse critique",
+      "desc": "Identifie incohérences, lacunes et risques dans votre Business Plan. Argon signale ce qui pourrait ne pas coller.",
+      "cta": "Parler à Argon",
+      "example": "Y a-t-il des problèmes dans mes données de revenus ?"
+    },
+    "xeno": {
+      "name": "Xeno",
+      "role": "Conseil & Info",
+      "desc": "Explique la terminologie financière, les définitions fiscales et les champs de l'app avec des exemples concrets.",
+      "cta": "Parler à Xeno",
+      "example": "Qu'est-ce que l'IRPEF et comment affecte-t-il mon plan ?"
+    }
+  },
+  "chatbot": {
+    "scenarioApplied": "Scénario appliqué",
+    "resetPlan": "Réinitialiser",
+    "tryAsk": "Essayez de me demander :",
+    "elaborating": "traite votre demande...",
+    "elio": {
+      "role": "Perspective future",
+      "placeholder": "Demandez un scénario 'What-If'...",
+      "welcome": "Bonjour ! Je suis Elio.\n\nDites-moi ce que vous voulez modifier et je vous montre comment les projections changent.",
+      "s1": "Que se passe-t-il si j'augmente le prix à 59 € au T2 ?",
+      "s2": "Simuler 2 employés supplémentaires dès le T3",
+      "s3": "Projection avec +30 % de volume sur le marché UK",
+      "mockReply": "J'ai mis à jour le Plan d'Affaires avec le scénario demandé.\n\n• Chiffre d'affaires → €{{fatturato}} (+18%)\n• EBITDA → €{{ebitda}} (+15%)\n• Résultat Net → €{{utileNetto}} (+22%)\n• Cash Runway → {{cashRunway}} mois (+4)\n\nLe graphique est mis à jour en vert. Voulez-vous explorer d'autres scénarios ?"
+    },
+    "argon": {
+      "role": "Analyse critique",
+      "placeholder": "Demandez-moi d'analyser le plan...",
+      "welcome": "Bonjour. Je suis Argon.\n\nJe scanne le Business Plan pour identifier incohérences, risques et anomalies.",
+      "s1": "Y a-t-il des problèmes dans mes revenus ?",
+      "s2": "Mon EBITDA est-il réaliste ?",
+      "s3": "Quels sont les principaux risques ?",
+      "mockReply": "J'ai analysé le Plan d'Affaires. 2 problèmes détectés.\n\n🔴 La croissance des revenus utilise une formule exponentielle composée, non linéaire. Au taux actuel, le chiffre d'affaires triple de façon irréaliste en troisième année.\n\n🟠 L'IRAP est calculée sur le résultat (EBT). La base correcte est la valeur nette de production, qui inclut les charges de personnel.\n\nVoulez-vous approfondir l'un de ces points ?"
+    },
+    "xeno": {
+      "role": "Conseil & Info",
+      "placeholder": "Demandez une définition ou explication...",
+      "welcome": "Bonjour ! Je suis Xeno.\n\nJe suis ici pour expliquer tout terme financier ou fiscal : IRPEF, EBITDA, TFR, amortissement.",
+      "s1": "Qu'est-ce que l'IRPEF ?",
+      "s2": "Que signifie EBITDA ?",
+      "s3": "Comment fonctionne le cash runway ?",
+      "mockReply": "J'ai mis à jour l'exemple de Plan d'Affaires. Valeurs actuelles :\n\n• Chiffre d'affaires → €{{fatturato}}\n• EBITDA → €{{ebitda}}\n\nDemandez-moi la définition de n'importe quel terme du plan."
     }
   }
 }

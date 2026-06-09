@@ -6,7 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { WizardFormComponent } from '../wizard-form/wizard-form.component';
 import { DashboardCruscottoComponent } from '../dashboard-cruscotto/dashboard-cruscotto.component';
-import { AiChatbotComponent } from '../ai-chatbot/ai-chatbot.component';
+import { AiChatbotComponent, AgentId } from '../ai-chatbot/ai-chatbot.component';
 import { ReportComponent } from '../report/report.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { UploadBusinessPlanComponent } from '../upload-business-plan/upload-business-plan.component';
@@ -193,6 +193,145 @@ interface SettingItem {
       .pending-ring, .pending-ring-2, .joined-glow { animation: none; }
       .solar-center-ring, .solar-center-ring-2 { animation: none !important; }
       .comment-bubble-anim { animation: none !important; opacity: 1; }
+    }
+
+    /* =============================================
+       AGENTI AI — Animations
+       ============================================= */
+
+    /* --- ELIO (solar orbit) --- */
+    @keyframes elio-breathe {
+      0%, 100% { transform: scale(1);    opacity: 0.18; }
+      50%       { transform: scale(1.45); opacity: 0.06; }
+    }
+    @keyframes elio-orbit-1 {
+      from { transform: scaleY(0.357) rotate(0deg); }
+      to   { transform: scaleY(0.357) rotate(360deg); }
+    }
+    @keyframes elio-orbit-2 {
+      from { transform: scaleY(0.35) rotate(0deg); }
+      to   { transform: scaleY(0.35) rotate(360deg); }
+    }
+    @keyframes elio-orbit-3 {
+      from { transform: scaleY(0.346) rotate(0deg); }
+      to   { transform: scaleY(0.346) rotate(360deg); }
+    }
+    .elio-sun-glow {
+      transform-box: fill-box; transform-origin: center;
+      animation: elio-breathe 3.2s ease-in-out infinite;
+    }
+    .elio-sun-glow-2 {
+      transform-box: fill-box; transform-origin: center;
+      animation: elio-breathe 3.2s ease-in-out -1.6s infinite;
+    }
+    .elio-orbit-1-g {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: elio-orbit-1 13s linear infinite;
+    }
+    .elio-orbit-2-g {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: elio-orbit-2 8.5s linear infinite;
+    }
+    .elio-orbit-3-g {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: elio-orbit-3 5.5s linear infinite;
+    }
+
+    /* --- ARGON (radar scanner) --- */
+    @keyframes argon-scan-rotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes argon-ring-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes argon-anomaly-pulse {
+      0%, 100% { transform: scale(1);   opacity: 0.9; }
+      50%       { transform: scale(1.8); opacity: 0.15; }
+    }
+    .argon-scan-g {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: argon-scan-rotate 4s linear infinite;
+    }
+    .argon-ring-dash {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: argon-ring-spin 14s linear infinite;
+    }
+    .argon-ring-dash-2 {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: argon-ring-spin 10s linear infinite reverse;
+    }
+    .argon-anomaly-1 {
+      transform-box: fill-box; transform-origin: center;
+      animation: argon-anomaly-pulse 2.0s ease-in-out infinite;
+    }
+    .argon-anomaly-2 {
+      transform-box: fill-box; transform-origin: center;
+      animation: argon-anomaly-pulse 2.0s ease-in-out -0.67s infinite;
+    }
+    .argon-anomaly-3 {
+      transform-box: fill-box; transform-origin: center;
+      animation: argon-anomaly-pulse 2.0s ease-in-out -1.33s infinite;
+    }
+
+    /* --- XENO (crystal knowledge) --- */
+    @keyframes xeno-outer-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    @keyframes xeno-mid-spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(-360deg); }
+    }
+    @keyframes xeno-core-pulse {
+      0%, 100% { transform: scale(1);    opacity: 0.9; }
+      50%       { transform: scale(1.2);  opacity: 0.5; }
+    }
+    @keyframes xeno-particle-orbit {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .xeno-outer-g {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: xeno-outer-spin 22s linear infinite;
+    }
+    .xeno-mid-g {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: xeno-mid-spin 15s linear infinite;
+    }
+    .xeno-inner-g {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: xeno-outer-spin 9s linear infinite;
+    }
+    .xeno-core {
+      transform-box: fill-box; transform-origin: center;
+      animation: xeno-core-pulse 2.8s ease-in-out infinite;
+    }
+    .xeno-particle-g {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: xeno-particle-orbit 7s linear infinite;
+    }
+    .xeno-particle-g-2 {
+      transform-box: view-box; transform-origin: 80px 80px;
+      animation: xeno-particle-orbit 11s linear infinite reverse;
+    }
+
+    /* Agent card lift on hover */
+    .agent-card {
+      transition: transform 0.22s cubic-bezier(0.16,1,0.3,1),
+                  box-shadow 0.22s cubic-bezier(0.16,1,0.3,1);
+    }
+    .agent-card:hover { transform: translateY(-4px); }
+
+    /* Reduced motion for all agent animations */
+    @media (prefers-reduced-motion: reduce) {
+      .elio-sun-glow, .elio-sun-glow-2,
+      .elio-orbit-1-g, .elio-orbit-2-g, .elio-orbit-3-g { animation: none !important; }
+      .argon-scan-g, .argon-ring-dash, .argon-ring-dash-2,
+      .argon-anomaly-1, .argon-anomaly-2, .argon-anomaly-3 { animation: none !important; }
+      .xeno-outer-g, .xeno-mid-g, .xeno-inner-g, .xeno-core,
+      .xeno-particle-g, .xeno-particle-g-2 { animation: none !important; }
     }
   `],
   template: `
@@ -667,57 +806,290 @@ interface SettingItem {
             </div>
           }
 
-          <!-- SCENARI -->
+          <!-- AGENTI AI (ex Scenari) -->
           @if (currentView() === 'scenari') {
             <div class="view-enter h-full overflow-y-auto scrollbar-thin p-8">
-              <div class="max-w-xl mx-auto">
-                <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">{{ 'scenari.label' | translate }}</p>
-                <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display mb-1">{{ 'scenari.title' | translate }}</h1>
-                <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mb-7">{{ 'scenari.desc' | translate }}</p>
-                <div class="space-y-3">
-                  @for (s of scenariExamples; track s.titleKey; let i = $index) {
-                    <button
-                      class="w-full bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-4 shadow-card text-left
-                             hover:border-brand-200 dark:hover:border-brand-800 hover:shadow-card-hover hover:-translate-y-0.5
-                             transition-all duration-200 group"
-                      [style.animation-delay]="(i * 65 + 50) + 'ms'"
-                      style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;"
-                      (click)="openAiWithScenario(translate.instant(s.qKey))">
-                      <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                             [ngClass]="s.iconBg">
-                          <svg class="w-5 h-5" [ngClass]="s.iconColor"
-                               fill="none" stroke="currentColor" stroke-width="1.5"
-                               viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="s.iconPath"/>
-                          </svg>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                          <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body group-hover:text-brand-700 dark:group-hover:text-brand-400 transition-colors">
-                            {{ s.titleKey | translate }}
-                          </p>
-                          <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5 italic truncate">"{{ s.qKey | translate }}"</p>
-                        </div>
-                        <svg class="w-4 h-4 text-zinc-300 dark:text-zinc-600 group-hover:text-brand-500 dark:group-hover:text-brand-400 group-hover:translate-x-0.5
-                                    transition-all flex-shrink-0"
-                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <div class="max-w-5xl mx-auto">
+
+                <!-- Header -->
+                <div class="mb-10" style="animation: viewEnter 0.4s cubic-bezier(0.16,1,0.3,1) both;">
+                  <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display mb-2 text-balance">
+                    {{ 'agenti.title' | translate }}
+                  </h1>
+                  <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body max-w-lg">
+                    {{ 'agenti.desc' | translate }}
+                  </p>
+                </div>
+
+                <!-- Agent cards -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                  <!-- ===== ELIO ===== -->
+                  <div class="agent-card bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                               shadow-card hover:shadow-card-hover overflow-hidden flex flex-col"
+                       style="animation: viewEnter 0.5s 60ms cubic-bezier(0.16,1,0.3,1) both;">
+                    <!-- SVG stage -->
+                    <div class="flex items-center justify-center pt-7 pb-3 bg-amber-50/60 dark:bg-amber-950/20">
+                      <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"
+                           width="140" height="140" aria-hidden="true">
+                        <defs>
+                          <radialGradient id="elio-bg-g" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%"   stop-color="#fbbf24" stop-opacity="0.25"/>
+                            <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+                          </radialGradient>
+                          <filter id="elio-gf" x="-40%" y="-40%" width="180%" height="180%">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
+                            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                          </filter>
+                        </defs>
+                        <!-- Ambient -->
+                        <circle cx="80" cy="80" r="62" fill="url(#elio-bg-g)"/>
+                        <!-- Orbit tracks (static perspective ellipses) -->
+                        <ellipse cx="80" cy="80" rx="56" ry="20" stroke="#fde68a" stroke-width="1" stroke-opacity="0.55"/>
+                        <ellipse cx="80" cy="80" rx="40" ry="14" stroke="#fbbf24" stroke-width="1" stroke-opacity="0.45"/>
+                        <ellipse cx="80" cy="80" rx="26" ry="9"  stroke="#fb923c" stroke-width="1" stroke-opacity="0.4"/>
+                        <!-- Sun glow rings -->
+                        <circle class="elio-sun-glow"   cx="80" cy="80" r="22" fill="#fbbf24" opacity="0.14"/>
+                        <circle class="elio-sun-glow-2" cx="80" cy="80" r="15" fill="#fbbf24" opacity="0.22"/>
+                        <!-- Planet orbit 1 (outer) — 13s -->
+                        <g class="elio-orbit-1-g">
+                          <circle cx="136" cy="80" r="5.5" fill="#fb923c" filter="url(#elio-gf)"/>
+                          <circle cx="136" cy="80" r="2.5" fill="#fed7aa" opacity="0.9"/>
+                        </g>
+                        <!-- Planet orbit 2 (mid) — 8.5s -->
+                        <g class="elio-orbit-2-g">
+                          <circle cx="120" cy="80" r="4"   fill="#fbbf24" filter="url(#elio-gf)"/>
+                          <circle cx="120" cy="80" r="1.8" fill="#fef9c3" opacity="0.9"/>
+                        </g>
+                        <!-- Planet orbit 3 (inner) — 5.5s -->
+                        <g class="elio-orbit-3-g">
+                          <circle cx="106" cy="80" r="2.5" fill="#fde68a"/>
+                        </g>
+                        <!-- Central sun -->
+                        <circle cx="80" cy="80" r="9" fill="#fbbf24" filter="url(#elio-gf)"/>
+                        <circle cx="80" cy="80" r="5.5" fill="#fef9c3"/>
+                      </svg>
+                    </div>
+                    <!-- Info -->
+                    <div class="flex flex-col flex-1 p-5 gap-3">
+                      <div>
+                        <span class="text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-[0.15em] font-body">
+                          {{ 'agenti.elio.role' | translate }}
+                        </span>
+                        <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display leading-tight mt-0.5">
+                          {{ 'agenti.elio.name' | translate }}
+                        </h2>
+                      </div>
+                      <p class="text-xs text-zinc-500 dark:text-zinc-400 font-body leading-relaxed flex-1">
+                        {{ 'agenti.elio.desc' | translate }}
+                      </p>
+                      <p class="text-[11px] text-amber-600/80 dark:text-amber-400/70 font-body italic">
+                        "{{ 'agenti.elio.example' | translate }}"
+                      </p>
+                      <button
+                        (click)="openAiWithScenario(translate.instant('agenti.elio.example'), 'elio')"
+                        class="mt-1 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl
+                               bg-amber-500 hover:bg-amber-400 active:bg-amber-600
+                               text-white text-sm font-semibold font-body
+                               transition-colors duration-150 shadow-sm">
+                        {{ 'agenti.elio.cta' | translate }}
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
                         </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- ===== ARGON ===== -->
+                  <div class="agent-card bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                               shadow-card hover:shadow-card-hover overflow-hidden flex flex-col"
+                       style="animation: viewEnter 0.5s 140ms cubic-bezier(0.16,1,0.3,1) both;">
+                    <!-- SVG stage -->
+                    <div class="flex items-center justify-center pt-7 pb-3 bg-blue-50/60 dark:bg-blue-950/20">
+                      <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"
+                           width="140" height="140" aria-hidden="true">
+                        <defs>
+                          <radialGradient id="argon-bg-g" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%"   stop-color="#3b82f6" stop-opacity="0.15"/>
+                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="0"/>
+                          </radialGradient>
+                          <filter id="argon-gf" x="-60%" y="-60%" width="220%" height="220%">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="2.5" result="b"/>
+                            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                          </filter>
+                        </defs>
+                        <!-- Ambient -->
+                        <circle cx="80" cy="80" r="62" fill="url(#argon-bg-g)"/>
+                        <!-- Rotating dashed ring -->
+                        <circle class="argon-ring-dash"   cx="80" cy="80" r="55" stroke="#3b82f6"
+                                stroke-width="1" stroke-opacity="0.3" stroke-dasharray="9 7"/>
+                        <circle class="argon-ring-dash-2" cx="80" cy="80" r="38" stroke="#22d3ee"
+                                stroke-width="1" stroke-opacity="0.4" stroke-dasharray="5 6"/>
+                        <!-- Static inner ring -->
+                        <circle cx="80" cy="80" r="22" stroke="#3b82f6" stroke-width="1.5" stroke-opacity="0.5"/>
+                        <!-- Crosshair ticks -->
+                        <line x1="80" y1="56" x2="80" y2="62" stroke="#3b82f6" stroke-width="1"   stroke-opacity="0.5"/>
+                        <line x1="80" y1="98" x2="80" y2="104" stroke="#3b82f6" stroke-width="1"  stroke-opacity="0.5"/>
+                        <line x1="56" y1="80" x2="62" y2="80"  stroke="#3b82f6" stroke-width="1"  stroke-opacity="0.5"/>
+                        <line x1="98" y1="80" x2="104" y2="80" stroke="#3b82f6" stroke-width="1"  stroke-opacity="0.5"/>
+                        <!-- Rotating scan beam -->
+                        <g class="argon-scan-g">
+                          <polygon points="80,80 135,73 135,87" fill="#22d3ee" fill-opacity="0.07"/>
+                          <line x1="80" y1="80" x2="135" y2="80"
+                                stroke="#22d3ee" stroke-width="1.5" stroke-opacity="0.85"
+                                filter="url(#argon-gf)"/>
+                        </g>
+                        <!-- Anomaly nodes (pulsing) -->
+                        <circle class="argon-anomaly-1" cx="121" cy="52" r="3.5" fill="#f97316" opacity="0.9"/>
+                        <circle cx="121" cy="52" r="1.8" fill="#fed7aa"/>
+                        <circle class="argon-anomaly-2" cx="43"  cy="99" r="3"   fill="#ef4444" opacity="0.9"/>
+                        <circle cx="43"  cy="99" r="1.5" fill="#fecaca"/>
+                        <circle class="argon-anomaly-3" cx="113" cy="117" r="2.5" fill="#f97316" opacity="0.8"/>
+                        <!-- Cardinal data points on outer ring -->
+                        <circle cx="135" cy="80" r="2" fill="#3b82f6" opacity="0.6"/>
+                        <circle cx="25"  cy="80" r="2" fill="#3b82f6" opacity="0.6"/>
+                        <circle cx="80"  cy="25" r="2" fill="#3b82f6" opacity="0.6"/>
+                        <circle cx="80"  cy="135" r="2" fill="#3b82f6" opacity="0.6"/>
+                        <!-- Central node -->
+                        <circle cx="80" cy="80" r="4.5" fill="#22d3ee" opacity="0.8" filter="url(#argon-gf)"/>
+                        <circle cx="80" cy="80" r="2"   fill="#e0f2fe"/>
+                      </svg>
+                    </div>
+                    <!-- Info -->
+                    <div class="flex flex-col flex-1 p-5 gap-3">
+                      <div>
+                        <span class="text-[10px] font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-[0.15em] font-body">
+                          {{ 'agenti.argon.role' | translate }}
+                        </span>
+                        <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display leading-tight mt-0.5">
+                          {{ 'agenti.argon.name' | translate }}
+                        </h2>
                       </div>
-                    </button>
-                  }
-                </div>
+                      <p class="text-xs text-zinc-500 dark:text-zinc-400 font-body leading-relaxed flex-1">
+                        {{ 'agenti.argon.desc' | translate }}
+                      </p>
+                      <p class="text-[11px] text-blue-600/80 dark:text-blue-400/70 font-body italic">
+                        "{{ 'agenti.argon.example' | translate }}"
+                      </p>
+                      <button
+                        (click)="openAiWithScenario(translate.instant('agenti.argon.example'), 'argon')"
+                        class="mt-1 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl
+                               bg-blue-500 hover:bg-blue-400 active:bg-blue-600
+                               text-white text-sm font-semibold font-body
+                               transition-colors duration-150 shadow-sm">
+                        {{ 'agenti.argon.cta' | translate }}
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- ===== XENO ===== -->
+                  <div class="agent-card bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800
+                               shadow-card hover:shadow-card-hover overflow-hidden flex flex-col"
+                       style="animation: viewEnter 0.5s 220ms cubic-bezier(0.16,1,0.3,1) both;">
+                    <!-- SVG stage -->
+                    <div class="flex items-center justify-center pt-7 pb-3 bg-violet-50/60 dark:bg-violet-950/20">
+                      <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg"
+                           width="140" height="140" aria-hidden="true">
+                        <defs>
+                          <radialGradient id="xeno-bg-g" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%"   stop-color="#8b5cf6" stop-opacity="0.2"/>
+                            <stop offset="100%" stop-color="#8b5cf6" stop-opacity="0"/>
+                          </radialGradient>
+                          <filter id="xeno-gf" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur in="SourceGraphic" stdDeviation="3" result="b"/>
+                            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                          </filter>
+                        </defs>
+                        <!-- Ambient -->
+                        <circle cx="80" cy="80" r="62" fill="url(#xeno-bg-g)"/>
+                        <!-- Outer hexagon — slow CW -->
+                        <g class="xeno-outer-g">
+                          <polygon
+                            points="80,28 106.4,44 106.4,76 80,92 53.6,76 53.6,44"
+                            stroke="#8b5cf6" stroke-width="1.2" stroke-opacity="0.55" fill="none"/>
+                        </g>
+                        <!-- Particle orbit A (CW) — offset dot -->
+                        <g class="xeno-particle-g">
+                          <circle cx="134" cy="80" r="3"   fill="#c084fc" opacity="0.8"/>
+                          <circle cx="26"  cy="80" r="2"   fill="#c084fc" opacity="0.5"/>
+                        </g>
+                        <!-- Mid hexagon — CCW -->
+                        <g class="xeno-mid-g">
+                          <polygon
+                            points="80,46 100,57.5 100,80.5 80,92 60,80.5 60,57.5"
+                            stroke="#c084fc" stroke-width="1" stroke-opacity="0.5" fill="none"/>
+                          <!-- Connector spokes -->
+                          <line x1="80" y1="46"  x2="80" y2="60"  stroke="#a78bfa" stroke-width="0.7" stroke-opacity="0.4"/>
+                          <line x1="80" y1="92"  x2="80" y2="104" stroke="#a78bfa" stroke-width="0.7" stroke-opacity="0.4"/>
+                          <line x1="60" y1="69"  x2="46" y2="69"  stroke="#a78bfa" stroke-width="0.7" stroke-opacity="0.4"/>
+                          <line x1="100" y1="69" x2="114" y2="69" stroke="#a78bfa" stroke-width="0.7" stroke-opacity="0.4"/>
+                        </g>
+                        <!-- Inner hexagon — CW fast -->
+                        <g class="xeno-inner-g">
+                          <polygon
+                            points="80,60 92,66.9 92,80.9 80,87.8 68,80.9 68,66.9"
+                            stroke="#ddd6fe" stroke-width="1" stroke-opacity="0.6" fill="none"/>
+                        </g>
+                        <!-- Particle orbit B (CCW) -->
+                        <g class="xeno-particle-g-2">
+                          <circle cx="80" cy="28" r="2.5" fill="#8b5cf6" opacity="0.7"/>
+                          <circle cx="80" cy="132" r="1.8" fill="#8b5cf6" opacity="0.45"/>
+                        </g>
+                        <!-- Core glow -->
+                        <circle class="xeno-core" cx="80" cy="80" r="12" fill="#8b5cf6" opacity="0.12" filter="url(#xeno-gf)"/>
+                        <circle cx="80" cy="80" r="6"  fill="#8b5cf6" filter="url(#xeno-gf)"/>
+                        <circle cx="80" cy="80" r="3"  fill="#ede9fe"/>
+                      </svg>
+                    </div>
+                    <!-- Info -->
+                    <div class="flex flex-col flex-1 p-5 gap-3">
+                      <div>
+                        <span class="text-[10px] font-semibold text-violet-600 dark:text-violet-400 uppercase tracking-[0.15em] font-body">
+                          {{ 'agenti.xeno.role' | translate }}
+                        </span>
+                        <h2 class="text-xl font-bold text-zinc-900 dark:text-zinc-100 font-display leading-tight mt-0.5">
+                          {{ 'agenti.xeno.name' | translate }}
+                        </h2>
+                      </div>
+                      <p class="text-xs text-zinc-500 dark:text-zinc-400 font-body leading-relaxed flex-1">
+                        {{ 'agenti.xeno.desc' | translate }}
+                      </p>
+                      <p class="text-[11px] text-violet-600/80 dark:text-violet-400/70 font-body italic">
+                        "{{ 'agenti.xeno.example' | translate }}"
+                      </p>
+                      <button
+                        (click)="openAiWithScenario(translate.instant('agenti.xeno.example'), 'xeno')"
+                        class="mt-1 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl
+                               bg-violet-500 hover:bg-violet-400 active:bg-violet-600
+                               text-white text-sm font-semibold font-body
+                               transition-colors duration-150 shadow-sm">
+                        {{ 'agenti.xeno.cta' | translate }}
+                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+
+                </div><!-- /grid -->
+
+                <!-- No plan warning -->
                 @if (!hasPlan()) {
-                  <div class="mt-6 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-100 dark:border-amber-900/40"
-                       style="animation: viewEnter 0.5s 0.3s cubic-bezier(0.16,1,0.3,1) both;">
+                  <div class="mt-8 p-4 bg-amber-50 dark:bg-amber-950/30 rounded-2xl border border-amber-100 dark:border-amber-900/40"
+                       style="animation: viewEnter 0.5s 0.35s cubic-bezier(0.16,1,0.3,1) both;">
                     <p class="text-sm text-amber-700 dark:text-amber-400 font-body">
-                      <strong>{{ 'scenari.noPlanStrong' | translate }}</strong> {{ 'scenari.noPlan' | translate }}
-                      <button (click)="goToWizard()" class="ml-1 underline font-bold hover:text-amber-900 dark:hover:text-amber-200 transition-colors">
-                        {{ 'scenari.goToWizard' | translate }}
+                      {{ 'agenti.noPlanWarn' | translate }}
+                      <button (click)="goToWizard()"
+                              class="ml-1.5 underline font-bold hover:text-amber-900 dark:hover:text-amber-200 transition-colors">
+                        {{ 'agenti.goToWizard' | translate }}
                       </button>
                     </p>
                   </div>
                 }
+
               </div>
             </div>
           }
@@ -1538,7 +1910,7 @@ interface SettingItem {
               </div>
 
               <div class="flex-1 overflow-hidden min-w-0">
-                <app-ai-chatbot/>
+                <app-ai-chatbot [agentId]="currentAiAgent()"/>
               </div>
             </div>
           </div>
@@ -1751,7 +2123,8 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   hasPlan          = signal(false);
   justSaved        = signal(false);
 
-  chatWidth             = signal(320);
+  chatWidth             = signal(480);
+  currentAiAgent        = signal<AgentId>('xeno');
   isLargeScreen         = signal(typeof window !== 'undefined' && window.innerWidth >= 1024);
   chatDesktopFullscreen = signal(false);
 
@@ -2217,7 +2590,8 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
     if (!next) this.chatDesktopFullscreen.set(false);
   }
 
-  openAiWithScenario(_q: string): void {
+  openAiWithScenario(_q: string, agentId: AgentId = 'xeno'): void {
+    this.currentAiAgent.set(agentId);
     this.aiOpen.set(true);
   }
 

@@ -5,6 +5,9 @@ export interface KpiData {
   ebitda: number;
   utileNetto: number;
   cashRunway: number;
+  grossMarginPct?: number;
+  ebitdaPct?: number;
+  breakevenRevenue?: number;
 }
 
 export interface CashFlowPoint {
@@ -52,6 +55,7 @@ export interface WizardProduct {
   linearGrowthPct: number;
   monthlyVolumes: number[];
   collectionDelay: number;
+  annualGrowthPct?: number;
 }
 
 export interface WizardEmployee {
@@ -70,6 +74,7 @@ export interface WizardHrParams {
 }
 
 export interface WizardVariableCost {
+  costType?: 'cogs' | 'opex';
   valueType: 'pct' | 'abs';
   value: number;
   paymentDelay: number;
@@ -134,7 +139,9 @@ export class BusinessPlanService {
 
   private readonly CALCULATED_ROWS = ['Gross Profit', 'EBITDA', 'Imposte', 'Utile Netto'];
 
-  private _taxRate = 0.28;
+  private _taxRate  = 0.28;
+  private _iresRate = 0.24;
+  private _irapRate = 0.04;
 
   private _computedBase: { kpi: KpiData; cashFlow: CashFlowPoint[]; incomeStatement: IncomeRow[] } | null = null;
 
@@ -272,21 +279,25 @@ export class BusinessPlanService {
     const r = rows.map(row => ({ ...row }));
     const by = (label: string) => r.find(row => row.label === label);
 
-    const rev  = by('Ricavi Totali')!;
-    const cogs = by('Costo del Venduto')!;
-    const gp   = by('Gross Profit')!;
-    const mktg = by('Marketing & Sales')!;
-    const per  = by('Personale')!;
-    const ga   = by('G&A')!;
-    const ebi  = by('EBITDA')!;
-    const amm  = by('Ammortamenti')!;
-    const fin  = by('Oneri Finanziari');
-    const tax  = by('Imposte');
-    const net  = by('Utile Netto')!;
+    const rev   = by('Ricavi Totali')!;
+    const cogs  = by('Costo del Venduto')!;
+    const gp    = by('Gross Profit')!;
+    const mktg  = by('Marketing & Sales')!;
+    const per   = by('Personale')!;
+    const ga    = by('G&A')!;
+    const opexV = by('OPEX Variabili');
+    const sval  = by('Svalutazione Crediti');
+    const ebi   = by('EBITDA')!;
+    const amm   = by('Ammortamenti')!;
+    const fin   = by('Oneri Finanziari');
+    const tax   = by('Imposte');
+    const net   = by('Utile Netto')!;
 
     for (const y of ['anno1', 'anno2', 'anno3'] as const) {
       gp[y]  = rev[y] + cogs[y];
-      ebi[y] = gp[y] + mktg[y] + per[y] + ga[y];
+      ebi[y] = gp[y] + mktg[y] + per[y] + ga[y]
+             + (opexV ? opexV[y] : 0)
+             + (sval  ? sval[y]  : 0);
       const ebt = ebi[y] + amm[y] + (fin ? fin[y] : 0);
       if (tax) tax[y] = -Math.round(Math.max(0, ebt) * this._taxRate);
       net[y] = ebt + (tax ? tax[y] : 0);
@@ -327,7 +338,11 @@ export class BusinessPlanService {
         if (p.volumeMode === 'linear') {
           vol = Math.round(p.linearStart * Math.pow(1 + p.linearGrowthPct / 100, m));
         } else {
-          vol = p.monthlyVolumes[m % 12] ?? 0;
+          // fix 2.3: apply annual growth factor per year on monthly pattern
+          const yearIdx    = Math.floor(m / 12);
+          const baseVol    = p.monthlyVolumes[m % 12] ?? 0;
+          const annGrowth  = p.annualGrowthPct ?? 0;
+          vol = Math.round(baseVol * Math.pow(1 + annGrowth / 100, yearIdx));
         }
         revenue[m] += vol * p.unitPrice;
         const cashM = m + delayMonths;
@@ -335,6 +350,7 @@ export class BusinessPlanService {
       }
     }
 
+    // Bad debt reduces cash collections only (CE row added separately below)
     const badDebtFactor = 1 - config.badDebtPct / 100;
     for (let m = 0; m < N; m++) cashRevenue[m] = Math.round(cashRevenue[m] * badDebtFactor);
 
@@ -351,15 +367,17 @@ export class BusinessPlanService {
       }
     }
 
-    // ── Variable costs ─────────────────────────────────────────────────────
-    const varCosts     = new Array(N).fill(0) as number[];
+    // ── Variable costs: COGS vs OPEX (fix 4.2) ────────────────────────────
+    const varCogs      = new Array(N).fill(0) as number[];
+    const varOpex      = new Array(N).fill(0) as number[];
     const cashVarCosts = new Array(N).fill(0) as number[];
 
     for (const vc of variableCosts) {
       const delayMonths = Math.round(vc.paymentDelay / 30);
+      const isCogs      = (vc.costType ?? 'opex') === 'cogs';
       for (let m = 0; m < N; m++) {
         const cost = vc.valueType === 'pct' ? revenue[m] * vc.value / 100 : vc.value / 12;
-        varCosts[m] += cost;
+        if (isCogs) varCogs[m] += cost; else varOpex[m] += cost;
         const cashM = m + delayMonths;
         if (cashM < N) cashVarCosts[cashM] += cost;
       }
@@ -384,7 +402,7 @@ export class BusinessPlanService {
       }
     }
 
-    // ── CAPEX & Depreciation ───────────────────────────────────────────────
+    // ── CAPEX & Depreciation (fix 5.1: half rate first fiscal year) ────────
     const capexPayments = new Array(N).fill(0) as number[];
     const depreciation  = new Array(N).fill(0) as number[];
 
@@ -392,9 +410,12 @@ export class BusinessPlanService {
       const purchAbs = absMonth(inv.purchaseYear, inv.purchaseMonth);
       if (purchAbs >= 0 && purchAbs < N) {
         capexPayments[purchAbs] += inv.cost;
-        const monthlyDep = (inv.cost * (AMMO_RATES[inv.category] ?? 0) / 100) / 12;
+        const annualRate       = (AMMO_RATES[inv.category] ?? 0) / 100;
+        const fullMonthlyDep   = (inv.cost * annualRate) / 12;
+        const halfMonthlyDep   = fullMonthlyDep / 2;
+        const firstFiscalYrEnd = (Math.floor(purchAbs / 12) + 1) * 12;
         for (let m = purchAbs; m < N; m++) {
-          depreciation[m] += monthlyDep;
+          depreciation[m] += m < firstFiscalYrEnd ? halfMonthlyDep : fullMonthlyDep;
         }
       }
     }
@@ -429,7 +450,7 @@ export class BusinessPlanService {
         }
       }
 
-      // Amortization: full installment
+      // Amortization: full installment (fix 6.1: french amortization preserved)
       for (let i = 0; i < nAmort; i++) {
         const m = firstAbs + loan.preAmortizationMonths + i;
         if (m >= 0 && m < N) {
@@ -451,46 +472,96 @@ export class BusinessPlanService {
     }
 
     // ── Annual P&L aggregation ─────────────────────────────────────────────
-    this._taxRate = (config.iresRate + config.irapRate) / 100;
+    this._iresRate = config.iresRate / 100;
+    this._irapRate = config.irapRate / 100;
+    this._taxRate  = this._iresRate + this._irapRate; // kept for recompute compat
 
     const annualRevenue  = [0, 1, 2].map(y => Math.round(sumY(revenue, y)));
-    const annualCogs     = [0, 1, 2].map(y => -Math.round(sumY(varCosts, y)));
+    const annualVarCogs  = [0, 1, 2].map(y => -Math.round(sumY(varCogs, y)));
+    const annualVarOpex  = [0, 1, 2].map(y => -Math.round(sumY(varOpex, y)));
+    const annualBadDebt  = [0, 1, 2].map(y => -Math.round(annualRevenue[y] * config.badDebtPct / 100));
     const annualMktg     = [0, 1, 2].map(y => -Math.round(sumY(mktgCosts, y)));
     const annualPersonal = [0, 1, 2].map(y => -Math.round(sumY(hrCosts, y)));
     const annualGA       = [0, 1, 2].map(y => -Math.round(sumY(gaCosts, y)));
     const annualAmm      = [0, 1, 2].map(y => -Math.round(sumY(depreciation, y)));
     const annualFin      = [0, 1, 2].map(y => -Math.round(sumY(interestExpense, y)));
 
-    const annualGP  = [0, 1, 2].map(y => annualRevenue[y] + annualCogs[y]);
-    const annualEbi = [0, 1, 2].map(y => annualGP[y] + annualMktg[y] + annualPersonal[y] + annualGA[y]);
+    const annualGP  = [0, 1, 2].map(y => annualRevenue[y] + annualVarCogs[y]);
+    const annualEbi = [0, 1, 2].map(y =>
+      annualGP[y] + annualBadDebt[y] + annualMktg[y] + annualPersonal[y] + annualGA[y] + annualVarOpex[y]
+    );
     const annualEBT = [0, 1, 2].map(y => annualEbi[y] + annualAmm[y] + annualFin[y]);
-    const annualTax = [0, 1, 2].map(y => -Math.round(Math.max(0, annualEBT[y]) * this._taxRate));
+
+    // fix 1.1: IRAP base excludes personale and oneri finanziari
+    const annualIrap = [0, 1, 2].map(y => {
+      const irapBase = annualRevenue[y]
+        + annualVarCogs[y]
+        + annualVarOpex[y]
+        + annualBadDebt[y]
+        + annualMktg[y]
+        + annualGA[y]
+        + annualAmm[y]; // annualPersonal and annualFin intentionally excluded
+      return -Math.round(Math.max(0, irapBase) * this._irapRate);
+    });
+
+    // fix 1.2: IRES with loss carryforward (100% offset for startup/first 3yr, 80% otherwise)
+    let lossCarryforward = 0;
+    const annualIres: number[] = [];
+    for (let y = 0; y < 3; y++) {
+      const ebt = annualEBT[y];
+      if (ebt <= 0) {
+        lossCarryforward += Math.abs(ebt);
+        annualIres.push(0);
+      } else {
+        const maxOffset = config.isNewStartup && y < 3 ? lossCarryforward : lossCarryforward * 0.8;
+        const offset    = Math.min(maxOffset, ebt);
+        lossCarryforward = Math.max(0, lossCarryforward - offset);
+        annualIres.push(-Math.round((ebt - offset) * this._iresRate));
+      }
+    }
+
+    const annualTax = [0, 1, 2].map(y => annualIres[y] + annualIrap[y]);
     const annualNet = [0, 1, 2].map(y => annualEBT[y] + annualTax[y]);
 
     // ── Income statement ───────────────────────────────────────────────────
     const incomeRows: IncomeRow[] = [
       { label: 'Ricavi Totali',     anno1: annualRevenue[0],  anno2: annualRevenue[1],  anno3: annualRevenue[2],  isHighlight: true },
-      { label: 'Costo del Venduto', anno1: annualCogs[0],     anno2: annualCogs[1],     anno3: annualCogs[2],     isCost: true },
+      { label: 'Costo del Venduto', anno1: annualVarCogs[0],  anno2: annualVarCogs[1],  anno3: annualVarCogs[2],  isCost: true },
       { label: 'Gross Profit',      anno1: annualGP[0],       anno2: annualGP[1],       anno3: annualGP[2],       isHighlight: true },
       { label: 'Marketing & Sales', anno1: annualMktg[0],     anno2: annualMktg[1],     anno3: annualMktg[2],     isCost: true },
       { label: 'Personale',         anno1: annualPersonal[0], anno2: annualPersonal[1], anno3: annualPersonal[2], isCost: true },
       { label: 'G&A',               anno1: annualGA[0],       anno2: annualGA[1],       anno3: annualGA[2],       isCost: true },
-      { label: 'EBITDA',            anno1: annualEbi[0],      anno2: annualEbi[1],      anno3: annualEbi[2],      isHighlight: true },
-      { label: 'Ammortamenti',      anno1: annualAmm[0],      anno2: annualAmm[1],      anno3: annualAmm[2],      isCost: true },
     ];
+
+    // fix 4.2: show OPEX variabili as separate row when classified as such
+    if (annualVarOpex.some(v => v !== 0)) {
+      incomeRows.push({ label: 'OPEX Variabili', anno1: annualVarOpex[0], anno2: annualVarOpex[1], anno3: annualVarOpex[2], isCost: true });
+    }
+
+    // fix 1.4: bad debt now appears in CE as accrual
+    if (config.badDebtPct > 0) {
+      incomeRows.push({ label: 'Svalutazione Crediti', anno1: annualBadDebt[0], anno2: annualBadDebt[1], anno3: annualBadDebt[2], isCost: true });
+    }
+
+    incomeRows.push(
+      { label: 'EBITDA',       anno1: annualEbi[0], anno2: annualEbi[1], anno3: annualEbi[2], isHighlight: true },
+      { label: 'Ammortamenti', anno1: annualAmm[0], anno2: annualAmm[1], anno3: annualAmm[2], isCost: true },
+    );
 
     if (loans.length > 0) {
       incomeRows.push({ label: 'Oneri Finanziari', anno1: annualFin[0], anno2: annualFin[1], anno3: annualFin[2], isCost: true });
     }
 
-    incomeRows.push({ label: 'Imposte',     anno1: annualTax[0], anno2: annualTax[1], anno3: annualTax[2], isCost: true });
-    incomeRows.push({ label: 'Utile Netto', anno1: annualNet[0], anno2: annualNet[1], anno3: annualNet[2], isHighlight: true });
+    incomeRows.push(
+      { label: 'Imposte',     anno1: annualTax[0], anno2: annualTax[1], anno3: annualTax[2], isCost: true },
+      { label: 'Utile Netto', anno1: annualNet[0], anno2: annualNet[1], anno3: annualNet[2], isHighlight: true },
+    );
 
-    // ── Cash flow Y1 (cumulative monthly position) ─────────────────────────
+    // ── Cash flow 36 months (fix 7.2) ─────────────────────────────────────
     let cash = config.isNewStartup ? 0 : config.initialCash + config.residualCredits - config.residualDebts;
     const cashFlowPoints: CashFlowPoint[] = [];
 
-    for (let m = 0; m < 12; m++) {
+    for (let m = 0; m < N; m++) {
       cash += equityCashIn[m]
             + loanDisbursements[m]
             + cashRevenue[m]
@@ -499,31 +570,37 @@ export class BusinessPlanService {
             - cashFixedCosts[m]
             - capexPayments[m]
             - loanRepayments[m];
-      cashFlowPoints.push({ month: MONTHS_IT[m], value: Math.round(cash) });
+      const yr    = config.startYear + Math.floor(m / 12);
+      const label = `${MONTHS_IT[m % 12]} '${String(yr).slice(-2)}`;
+      cashFlowPoints.push({ month: label, value: Math.round(cash) });
     }
 
-    // ── Cash runway (36-month horizon) ────────────────────────────────────
-    let runningCash = config.isNewStartup ? 0 : config.initialCash + config.residualCredits - config.residualDebts;
-    let cashRunway  = 36;
+    // Cash runway: first month where cumulative cash goes negative
+    const firstNeg = cashFlowPoints.findIndex(p => p.value <= 0);
+    const cashRunway = firstNeg === -1 ? 36 : firstNeg;
 
-    for (let m = 0; m < N; m++) {
-      runningCash += equityCashIn[m]
-                  + loanDisbursements[m]
-                  + cashRevenue[m]
-                  - hrCosts[m]
-                  - cashVarCosts[m]
-                  - cashFixedCosts[m]
-                  - capexPayments[m]
-                  - loanRepayments[m];
-      if (runningCash <= 0) { cashRunway = m; break; }
-    }
+    // ── Investor KPIs (fix 7.3) ────────────────────────────────────────────
+    const rev1           = annualRevenue[0];
+    const gp1            = annualGP[0];
+    const ebi1           = annualEbi[0];
+    const totalVarCosts1 = Math.abs(annualVarCogs[0]) + Math.abs(annualVarOpex[0]);
+    const fixedBase1     = Math.abs(annualPersonal[0]) + Math.abs(annualMktg[0]) + Math.abs(annualGA[0])
+                         + Math.abs(annualAmm[0]) + Math.abs(annualFin[0]);
+
+    const grossMarginPct    = rev1 > 0 ? Math.round(gp1 / rev1 * 1000) / 10 : 0;
+    const ebitdaPct         = rev1 > 0 ? Math.round(ebi1 / rev1 * 1000) / 10 : 0;
+    const contribMargin     = rev1 > 0 ? (rev1 - totalVarCosts1) / rev1 : 1;
+    const breakevenRevenue  = contribMargin > 0 ? Math.round(fixedBase1 / contribMargin) : 0;
 
     // ── KPI ────────────────────────────────────────────────────────────────
     const kpiResult: KpiData = {
-      fatturatoTotale: annualRevenue[0],
-      ebitda:          annualEbi[0],
+      fatturatoTotale: rev1,
+      ebitda:          ebi1,
       utileNetto:      annualNet[0],
       cashRunway,
+      grossMarginPct,
+      ebitdaPct,
+      breakevenRevenue,
     };
 
     // ── Store project metadata ────────────────────────────────────────────
@@ -532,8 +609,8 @@ export class BusinessPlanService {
 
     // ── Persist as base for reset/AI scenario ──────────────────────────────
     this._computedBase = {
-      kpi:            { ...kpiResult },
-      cashFlow:       cashFlowPoints.map(p => ({ ...p })),
+      kpi:             { ...kpiResult },
+      cashFlow:        cashFlowPoints.map(p => ({ ...p })),
       incomeStatement: incomeRows.map(r => ({ ...r })),
     };
 

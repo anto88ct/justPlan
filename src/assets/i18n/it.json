@@ -3,7 +3,7 @@
     "panoramica": "Panoramica",
     "wizard": "Wizard",
     "dashboard": "Dashboard",
-    "scenari": "Scenari What-If",
+    "scenari": "Agenti AI",
     "report": "Report",
     "impostazioni": "Impostazioni",
     "pianiSalvati": "I Miei Piani",
@@ -11,7 +11,7 @@
     "profilo": "Profilo",
     "businessPlan": "Business Plan",
     "caricamenti": "Caricamenti",
-    "scenariLabel": "Scenari",
+    "scenariLabel": "Agenti",
     "menu": "Menu"
   },
   "sidebar": {
@@ -250,6 +250,66 @@
         "intro": "Scopri tutte le funzionalità di Businext Plan Business Plan, i prezzi e le testimonianze sulla landing page ufficiale.",
         "cta": "Visita airplan.io"
       }
+    }
+  },
+  "agenti": {
+    "title": "Agenti AI",
+    "desc": "Seleziona un agente specializzato per esplorare, analizzare o approfondire il tuo Business Plan.",
+    "noPlanWarn": "Gli agenti hanno più contesto con un Business Plan attivo.",
+    "goToWizard": "Crea un piano →",
+    "elio": {
+      "name": "Elio",
+      "role": "Prospettiva Futura",
+      "desc": "Simula scenari futuri: cosa succede se modifichi prezzi, volumi o costi? Elio rigenera il piano e confronta le proiezioni.",
+      "cta": "Parla con Elio",
+      "example": "Cosa succede se alzo il prezzo a 59€ dal Q2?"
+    },
+    "argon": {
+      "name": "Argon",
+      "role": "Analisi Critica",
+      "desc": "Identifica incoerenze, falle e rischi nel Business Plan. Argon segnala ciò che potrebbe non tornare.",
+      "cta": "Parla con Argon",
+      "example": "Ci sono problemi nei miei dati di ricavi?"
+    },
+    "xeno": {
+      "name": "Xeno",
+      "role": "Consulenza & Info",
+      "desc": "Spiega terminologia finanziaria, definizioni fiscali e campi dell’app con esempi concreti sul tuo piano.",
+      "cta": "Parla con Xeno",
+      "example": "Cos’è l’IRPEF e come influisce sul mio piano?"
+    }
+  },
+  "chatbot": {
+    "scenarioApplied": "Scenario applicato",
+    "resetPlan": "Ripristina",
+    "tryAsk": "Prova a chiedermi:",
+    "elaborating": "sta elaborando...",
+    "elio": {
+      "role": "Prospettiva Futura",
+      "placeholder": "Chiedi uno scenario 'What-If'...",
+      "welcome": "Ciao! Sono Elio.\n\nDimmi cosa vuoi modificare nel piano e ti mostro come cambiano le proiezioni.",
+      "s1": "Cosa succede se alzo il prezzo a 59€ dal Q2?",
+      "s2": "Simula 2 dipendenti in più dal Q3",
+      "s3": "Proiezione con volume +30% nel mercato UK",
+      "mockReply": "Ho aggiornato il Business Plan con lo scenario richiesto.\n\n• Fatturato → €{{fatturato}} (+18%)\n• EBITDA → €{{ebitda}} (+15%)\n• Utile Netto → €{{utileNetto}} (+22%)\n• Cash Runway → {{cashRunway}} mesi (+4)\n\nIl grafico è aggiornato in verde. Vuoi esplorare altri scenari?"
+    },
+    "argon": {
+      "role": "Analisi Critica",
+      "placeholder": "Chiedimi di analizzare il piano...",
+      "welcome": "Ciao. Sono Argon.\n\nScansiono il Business Plan per individuare incoerenze, rischi e dati anomali.",
+      "s1": "Ci sono problemi nei miei ricavi?",
+      "s2": "Il mio EBITDA è realistico?",
+      "s3": "Quali sono i rischi principali del piano?",
+      "mockReply": "Ho analizzato il Business Plan. Trovate 2 criticità.\n\n🔴 La crescita ricavi usa una formula esponenziale composta, non lineare. Con il tasso attuale il fatturato triplica in modo non realistico al terzo anno.\n\n🟠 L'IRAP è calcolata sull'utile (EBT). La base corretta è il valore della produzione netta, che include il costo del lavoro.\n\nVuoi approfondire uno di questi punti?"
+    },
+    "xeno": {
+      "role": "Consulenza & Info",
+      "placeholder": "Chiedi una definizione o spiegazione...",
+      "welcome": "Ciao! Sono Xeno.\n\nSono qui per spiegarti qualsiasi termine finanziario o fiscale: IRPEF, EBITDA, TFR, ammortamento.",
+      "s1": "Cos'è l'IRPEF?",
+      "s2": "Cosa significa EBITDA?",
+      "s3": "Come funziona il cash runway?",
+      "mockReply": "Ho aggiornato il Business Plan di esempio. Ecco i valori correnti:\n\n• Fatturato → €{{fatturato}}\n• EBITDA → €{{ebitda}}\n\nChiedimi la definizione di qualsiasi termine che trovi nel piano."
     }
   }
 }
