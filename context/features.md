@@ -53,7 +53,7 @@ All lazy-loaded standalone components.
 
 ---
 
-## 3. App Shell (`app-layout.component.ts` — 2106 lines)
+## 3. App Shell (`app-layout.component.ts` — 2695 lines)
 
 Central orchestrator: navigation, view switching (signal-based, not routed), AI copilot panel, sharing, collaboration, settings.
 
@@ -94,6 +94,8 @@ Central orchestrator: navigation, view switching (signal-based, not routed), AI 
 - Project section: Notifications toggle, Auto-save toggle
 - Display section: Currency-format toggle, Dark mode toggle (delegates to `themeService.toggle()`)
 - Language section: 4-language grid (flag + label), select → `languageService.setLanguage(code)`
+- **Contatti** form: name/email/subject/message → `contactSent` confirmation state
+- **FAQ** accordion (`openFaqIndex` single-open)
 
 ### 3.8 Top Bar
 - Breadcrumb "Businext Plan > [View]"
@@ -102,7 +104,7 @@ Central orchestrator: navigation, view switching (signal-based, not routed), AI 
 ### 3.9 AI Copilot Panel
 - Desktop: docked right, resizable (240–640px drag handle), fullscreen toggle, Ctrl+K shortcut
 - Mobile: full-screen overlay
-- Hosts `<app-ai-chatbot/>`
+- Hosts `<app-ai-chatbot/>` with `[agentId]="currentAiAgent()"`; **multi-agent** — switching agent in chat syncs the shell's `currentAiAgent` signal (Elio/Argon/Xeno, see §8)
 
 ### 3.10 Key Computed/Methods
 - `hasPlan()`, `liveKpis()`, `tutorialSteps()`, `projectDisplayName()`, `isActive()`, `orbitalNodes()`
@@ -116,77 +118,117 @@ Central orchestrator: navigation, view switching (signal-based, not routed), AI 
 
 ---
 
-## 4. Wizard (`wizard-form.component.ts` — 1893 lines, 6 steps)
+## 4. Business Plan Creation — Wizard (`wizard-form.component.ts` — 2017 lines, 6 steps)
 
-Generates a 3-year business plan from structured user input; emits `planGenerated()` on completion.
+> **The core feature.** A 6-step guided flow that turns structured Italian-fiscal input into a full 36-month, 3-year financial projection. Emits `planGenerated()` on completion; the parent shell flips `hasPlan` and routes to the Dashboard.
 
-### Step 1 — Setup (Global Config)
-- Project name, start year (2024–2035)
-- IRES rate slider (0–50%, default 24), IRAP rate slider (0–10%, default 4), bad-debt % (0–10%, default 0.1)
-- "New Startup" toggle — when off, reveals: initial cash, residual receivables, residual payables
-- Contextual tooltips for Italian fiscal terms
+### Data model (per-step interfaces)
+Each editable item is a typed object with a monotonic `id` (`_id++` counter, shared across all lists). Lists held as plain arrays (zone-based change detection — getters recompute on every keystroke, no signals inside the form).
 
-### Step 2 — Revenue (Products)
-- Add/remove product lines: name, unit price, volume mode (Linear vs Monthly)
-  - Linear: starting volume + monthly growth %
-  - Monthly: 12 explicit monthly volumes
-- Collection delay (0/30/60/90 days, affects cash timing)
-- Live 6-month volume bar-chart preview per product (`getLinearPreview()`)
-- Right-panel Y1 revenue forecast preview
+| Interface | Key fields |
+|-----------|-----------|
+| `ProductLine` | name, unitPrice, `volumeMode: 'linear'\|'monthly'`, linearStart, linearGrowthPct, monthlyVolumes[12], collectionDelay, **annualGrowthPct** |
+| `Employee` | role, ral, fte, startMonth, startYear |
+| `VariableCost` | description, **`costType: 'cogs'\|'opex'`**, `valueType: 'pct'\|'abs'`, value, vatRate, paymentDelay |
+| `FixedCost` | description, category, monthlyBudget, vatRate, paymentDelay |
+| `CapexItem` | description, category, cost, purchaseMonth, purchaseYear |
+| `EquityInjection` | amount, month, year |
+| `LoanItem` | amount, month, year, interestRate, durationMonths, preAmortizationMonths, firstPaymentMonth, firstPaymentYear |
 
-### Step 3 — HR & Payroll
-- Global HR params: INPS % (default 28.0), INAIL % (default 0.5), TFR % (default 7.41), salary months (12/13/14)
-- Add/remove employees: role, RAL, FTE (0.1–5.0), start month/year
-- Computed total annual cost per employee = RAL × FTE × multiplier
-- HR multiplier = (1 + INPS% + INAIL% + TFR%) × (salaryMonths / 12)
+### Step 1 — Setup (Configurazione Globale)
+- **Nome Progetto**, **Anno di Avvio** (2024–2035, with ▲▼ stepper buttons)
+- **IRES** slider 0–50% step 0.5 (default 24, gradient-fill track, "std: 24%" marker)
+- **IRAP** slider 0–10% step 0.1 (default 4, "std: 4%" marker)
+- **Accantonamento Rischi Crediti** (badDebtPct) 0–10% step 0.1, default 0.1 — feeds the "Svalutazione Crediti" P&L row + reduces cash collections
+- **"Sei una nuova Startup?"** toggle — when OFF, reveals *Saldi Storici* card: Cassa Iniziale, Crediti Residui, Debiti Residui (seed the opening cash balance)
+- Contextual `?` tooltips on every fiscal term (IRES/IRAP/accantonamento)
+
+### Step 2 — Revenue (Linee di Prodotto / Servizio)
+- Add/remove/**duplicate** product lines: name, unit price (€, net VAT)
+- **Volume mode** segmented toggle:
+  - **📈 Crescita Composta** (linear): Volume Iniziale (mese 1, with −10/+10 steppers) + Crescita Mensile Composta % → `vol₀ × (1+r)^m`. Tooltip warns high rates explode over 36 months
+  - **📅 Mese per Mese** (monthly): 12-field grid of explicit Y1 monthly volumes **+ Crescita Anno su Anno %** (`annualGrowthPct`) — Y2 = Y1×(1+r), Y3 = Y1×(1+r)²
+- **Dilazione Incassi Clienti** (collectionDelay) — segmented 0/30/60/90 gg, shifts cash timing
+- **Live 6-month volume bar-chart preview** per product (`getLinearPreview()`, linear mode only)
+- Right-panel Y1 revenue forecast preview (from `currentStep() >= 2`)
+
+### Step 3 — HR & Payroll (Risorse Umane)
+- **Parametri Aziendali** — collapsible advanced section (`hrParams.showAdvanced`): INPS % (default 28.0), INAIL % (default 0.5), TFR % (default 7.41), Numero Mensilità (12 / 13ª / 14ª — **default 13**). Collapsed header shows live summary.
+- Add/remove/**duplicate** employees: Ruolo, RAL (€/anno, step 500), FTE (0.1–5.0, ±0.5 steppers), Data di Ingresso (month select + year)
+- Per-employee **costo totale/anno** = `RAL × FTE × hrCostMultiplier`
+- `hrCostMultiplier` = `(1 + INPS% + INAIL% + TFR%) × (salaryMonths / 12)` (getter)
 
 ### Step 4 — Operating Costs (OPEX)
-- Variable costs: description, type (% of revenue or €/year), value, VAT (0/4/10/22%), payment delay (0–120 days)
-- Fixed costs: description, category (Affitti/Spese Generali/Marketing/Commerciali), monthly budget, VAT, payment delay (categories route into Marketing&Sales vs G&A buckets)
-- Right panel: structure summary with estimated EBITDA
+Two sub-sections, each with add/remove/**duplicate**:
+- **Costi Variabili** (`VariableCost`): description, Tipo (% Fatt. vs €/Anno), value, **Classificazione CE** toggle (**Costo del Venduto** → reduces Gross Profit, vs **OPEX** → reduces EBITDA only), Aliquota IVA (0/4/10/22), Dilazione Fornitori (0–120 gg). Empty-state allowed.
+- **Costi Fissi di Gestione** (`FixedCost`): description, Categoria (🏠 Affitti / ⚙️ Spese Generali / 📣 Marketing / 🤝 Commerciali), Budget/Mese, IVA, Dilazione. Categories route into **Marketing & Sales** (marketing/commerciali) vs **G&A** (affitti/spese_generali) P&L buckets. Empty-state allowed.
+- Right-panel: live cost structure + estimated EBITDA
 
-### Step 5 — CAPEX (Investments)
-- Add/remove investments: description, category (Fabbricati 3%, Impianti 15%, Attrezzature 25%, Impianto/setup 20%, R&D 20% — auto depreciation rate badges), cost, purchase month/year
-- Computed annual depreciation = cost × rate / 100
+### Step 5 — CAPEX (Investimenti)
+- Add/remove/**duplicate** investments: descrizione, **Categoria** with auto depreciation-rate badge — Fabbricati **3%**, Impianti/Macchinari **15%**, Attrezzature **25%**, Costi d'Impianto **20%**, R&S **20%** (`getAmmRate()`)
+- Costo Netto IVA, Mese + Anno Acquisto
+- Per-item **Ammortamento annuo** = `cost × rate / 100`. Empty-state allowed (encouraged to skip if no significant capex).
 
-### Step 6 — Financing
-- Equity injections: amount, month/year (labeled "Round 1, 2…")
-- Bank loans: amount, month/year, annual interest rate, duration months, pre-amortization months, first payment month/year
-- Computed estimated monthly installment via standard annuity formula `calcMonthlyPayment()`
+### Step 6 — Financing (Fonti di Finanziamento)
+Two sub-sections:
+- **Capitale Sociale / Equity** (`EquityInjection`): amount, month, year, labeled "Iniezione 1, 2…" (each = a funding round). Add/remove/**duplicate**.
+- **Finanziamenti Bancari / Mutui** (`LoanItem`): Importo Erogato, Mese+Anno Stipula, Tasso Annuo %, Durata mesi, **Pre-amm. mesi** (interest-only grace), Prima Rata month+year. Per-loan **Rata mensile stimata** via French annuity `calcMonthlyPayment()` = `P·r·(1+r)ⁿ / ((1+r)ⁿ−1)` over `n = durationMonths − preAmortizationMonths` (or `P/n` if rate 0). Empty-state allowed.
 
 ### Cross-cutting
-- **Live preview panel** (XL screens): real-time totals (Y1 revenue, HR cost, OPEX fixed/variable, CAPEX, equity, debt, estimated EBITDA w/ sustainability verdict)
-- **Navigation**: forward/back buttons, stepper dots (locked until `maxReachedStep` advanced), animated progress bar, slide transitions
-- **Help system**: desktop fixed tooltips, mobile fullscreen modals
-- `generate()` → builds `WizardInput`, calls `planService.computeFromWizard()`, emits `planGenerated`
-- `formatNum()` formats €X.XM / €XXXK / €XXX
+- **Live preview panel** (XL screens, progressive by `currentStep()`): Progetto card, Ricavi Y1, Struttura Costi (Personale/OPEX fissi/variabili) + **EBITDA stimato**, Investimenti, Copertura Finanziaria (Equity + Debt = Totale Fonti), and a **sustainability verdict** ("✅ Piano sostenibile" vs "⚠️ Rivedere i costi" by EBITDA sign)
+- **Live KPI getters** (recompute every input): `totalRevenue`, `totalHRCost`, `totalFixedCosts`, `totalVariableCosts`, `totalCapex`, `totalEquity`, `totalDebt`, `estimatedEbitda`
+- **Navigation**: Avanti/Indietro, numbered stepper + footer dots (locked beyond `maxReachedStep`), `jumpToStep()`, animated progress track + slide-fwd/bwd transitions
+- **Help system**: viewport-aware fixed desktop tooltips (JS-positioned, `onHelpHover`/`onHelpLeave`, escapes overflow), centered fullscreen modal on mobile (`onHelpClick`, ≤640px)
+- `generate()` → maps form arrays into `WizardInput` (passes `costType`, `annualGrowthPct` through) → `planService.computeFromWizard()` → `planGenerated.emit()`
+- `formatNum()` formats €X.XM / it-IT thousands / €XXX
 
 ---
 
-## 5. Financial Engine (`business-plan.service.ts` — 609 lines)
+## 5. Financial Engine (`business-plan.service.ts` — 686 lines)
 
-Core state + calculation engine. Exposes reactive signals: `kpi`, `cashFlow`, `incomeStatement`, `isAiUpdated`, `currentProjectName`, `currentStartYear`, `savedPlans`.
+Core state + calculation engine. Reactive signals: `kpi`, `cashFlow`, `incomeStatement`, `isAiUpdated`, `currentProjectName`, `currentStartYear`, `savedPlans`, plus computed `kpiDelta`.
 
-### `computeFromWizard(input)` — 36-month projection engine
-- **Revenue**: per product, linear (`start × (1+growth)^m`) or monthly volumes; accrual vs cash (shifted by `collectionDelay`); bad-debt reserve applied to cash revenue
-- **HR costs**: monthly = RAL × FTE × multiplier / 12, accrued from `startMonth`
-- **Variable costs**: % of revenue or €/year, cash-shifted by `paymentDelay`
-- **Fixed costs**: routed to Marketing&Sales or G&A by category, cash-shifted
-- **CAPEX/Depreciation**: lump cash outflow at purchase, monthly depreciation = cost × rate / 100 / 12, accrues from purchase month for 36 months
-- **Loans**: annuity amortization; `r = annualRate/100/12`; pre-amortization phase = interest-only; `payment = P·r·(1+r)^n / ((1+r)^n − 1)` (or `P/n` if rate = 0)
-- **Equity**: lump cash inflow, no repayment
-- **Annual P&L rows**: Ricavi Totali, Costo del Venduto, Gross Profit (calc), Marketing&Sales, Personale, G&A, EBITDA (calc), Ammortamenti, Oneri Finanziari, Imposte (calc = max(0,EBT)×(IRES%+IRAP%)), Utile Netto (calc)
-- **Cash flow (Y1, 12 months)**: starting cash = 0 (new startup) or `initialCash + residualCredits − residualDebts`; tracks inflows/outflows and cumulative position; **cash runway** = months until cash ≤ 0 (cap 36)
-- **KPIs**: fatturatoTotale (Y1 revenue), ebitda (Y1), utileNetto (Y1), cashRunway
+### `KpiData` (extended)
+`fatturatoTotale`, `ebitda`, `utileNetto`, `cashRunway`, plus investor metrics **`grossMarginPct`**, **`ebitdaPct`**, **`breakevenRevenue`**.
+
+### `computeFromWizard(input)` — 36-month (N=36) projection engine
+Builds per-month arrays over 36 months, then aggregates to 3 annual columns via `sumY()`. `absMonth(year, month)` maps a calendar date to a 0-based month index from `startYear`.
+
+- **Revenue** (`revenue[]` accrual + `cashRevenue[]`): per product. Linear = `linearStart × (1+growth)^m`; Monthly = `monthlyVolumes[m%12] × (1+annualGrowthPct)^yearIdx` (**YoY growth per fiscal year**). Cash shifted by `round(collectionDelay/30)` months.
+- **Bad debt**: `cashRevenue` scaled by `(1 − badDebtPct/100)` (cash impact); a separate **"Svalutazione Crediti"** accrual row added to the P&L (only if badDebtPct > 0).
+- **HR** (`hrCosts[]`): monthly = `RAL × FTE × hrMult / 12`, accrues from employee `startAbs`.
+- **Variable costs** split into **`varCogs[]` vs `varOpex[]`** by `costType` (default opex); `% of revenue[m]` or `value/12`; cash shifted by `paymentDelay`.
+- **Fixed costs**: routed to `mktgCosts[]` (marketing/commerciali) or `gaCosts[]` (else); cash shifted.
+- **CAPEX / Depreciation**: lump cash outflow at purchase month; **half-rate first fiscal year** — `halfMonthlyDep` until `firstFiscalYrEnd`, then `fullMonthlyDep = cost × rate /100 /12` (Italian "primo esercizio" convention).
+- **Loans** (French amortization): pre-amortization phase = interest-only (`balance × r`); then full installment with declining interest and principal reducing `balance`. Tracks `loanDisbursements[]`, `interestExpense[]`, `loanRepayments[]` (cash).
+- **Equity**: `equityCashIn[]` lump inflow, no repayment.
+
+### Annual P&L (3 columns) — dynamic rows
+Fixed rows: Ricavi Totali, Costo del Venduto, **Gross Profit** (calc), Marketing & Sales, Personale, G&A. Then conditionally:
+- **OPEX Variabili** — only if any `varOpex` ≠ 0
+- **Svalutazione Crediti** — only if badDebtPct > 0
+- **EBITDA** (calc), **Ammortamenti**
+- **Oneri Finanziari** — only if loans exist
+- **Imposte** (calc), **Utile Netto** (calc)
+
+**Taxes split into IRES + IRAP** (no longer a single blended rate):
+- **IRAP** base = revenue + COGS + varOpex + badDebt + Marketing + G&A + Ammortamenti — **excludes Personale and Oneri Finanziari** (Italian IRAP rules); `−max(0, base) × irapRate`.
+- **IRES** with **loss carryforward**: losses accumulate; offset is **100%** for new startups in first 3 years, **80%** otherwise; `−(ebt − offset) × iresRate`.
+
+### Cash flow — full 36 months
+Opening cash = 0 (new startup) or `initialCash + residualCredits − residualDebts`. Each month: `+equity +loanDisb +cashRevenue −hr −cashVar −cashFixed −capex −loanRepay`, cumulative. Labels `"Mmm 'YY"`. **Cash runway** = first month index where cumulative ≤ 0 (else 36).
+
+### Investor KPIs
+- `grossMarginPct` = GP₁ / Rev₁
+- `ebitdaPct` = EBITDA₁ / Rev₁
+- `breakevenRevenue` = `fixedBase₁ / contribMargin`, where `contribMargin = (Rev₁ − variableCosts₁)/Rev₁` and `fixedBase₁` = personnel + marketing + G&A + ammortamenti + oneri finanziari
 
 ### Other methods
-- `updateCell(rowLabel, year, value)` — inline-edit a P&L cell, recomputes dependents
-- `recompute(rows)` — recalculates Gross Profit/EBITDA/Taxes/Net Income
+- `updateCell()` / `recompute()` — inline P&L edit; `recompute` now handles the dynamic OPEX Variabili / Svalutazione Crediti rows when present
 - `syncKpiFromStatement()`
-- `savePlan(name)`, `loadPlan(plan)`, `deletePlan(id)` — saved-plan archive CRUD (in-memory `savedPlans` signal)
-- `applyAiScenario()` — simulated AI effect: scales revenue ×1.18, EBITDA ×1.15, net ×1.22, runway ×1.3, recomputes
-- `reset()` — restores pre-AI baseline
-- Includes a default demo plan (BaseKpi/BaseIncome: ~€485K Y1 revenue, €97K EBITDA, 14-month runway) as fallback/mockup
+- `savePlan()`, `loadPlan()`, `deletePlan()` — in-memory `savedPlans` signal (seeded with 3 demo plans: TechHub Pro, FoodieApp, EcoStore)
+- `applyAiScenario()` — simulated: ×1.18 revenue/cash, ×1.15 EBITDA, ×1.22 net, ×1.3 runway; negatives scaled by 1/m; recomputes calc rows
+- `reset()` — restores `_computedBase` snapshot (post-generate baseline) or static demo fallback (~€485K Y1, €97K EBITDA, 14-mo runway)
 
 ---
 
@@ -217,16 +259,19 @@ Core state + calculation engine. Exposes reactive signals: `kpi`, `cashFlow`, `i
 
 ---
 
-## 8. AI Chatbot / Copilot (`ai-chatbot.component.ts` — 235 lines)
+## 8. AI Chatbot / Copilot (`ai-chatbot.component.ts` — 558 lines)
 
-"CFO Virtuale" — conversational what-if scenario simulator
-- Header with online indicator
-- 3 suggested prompts (hidden after first user message): price change, hiring simulation, cost-reduction runway impact
-- Chat stream: assistant (gradient icon, bouncing-dots loading state, monospace gray bubbles) vs user (right-aligned brand bubbles); auto-scroll
-- Scenario tracker banner ("Scenario applicato" + "Ripristina" to call `planService.reset()`)
+**Multi-agent** conversational what-if simulator. Three switchable agents (`AgentId = 'elio' | 'argon' | 'xeno'`, default **Xeno**), each with its own gradient/dot/ring color and 3 i18n suggestion keys:
+- **Xeno** (violet/purple) — default; reply uses live fatturato + EBITDA deltas
+- **Elio** (amber/orange) — reply with full KPI set (fatturato, EBITDA, utile, runway)
+- **Argon** (blue/cyan) — static mock reply
+- **Agent picker** dropdown (animated `picker-panel`); selecting an agent (`selectAgent()`/`_applyAgent()`) switches theme via `--agent-ring` CSS var and posts an intro message. Parent shell tracks `currentAiAgent` and binds `@Input() agentId`.
+- Each `ChatMessage` carries its `agentId` so past bubbles keep their agent's color/name.
+- 3 suggested prompts per agent (hidden after first user message); chat stream with gradient icon + bouncing-dots loading; auto-scroll
+- Scenario tracker banner ("Scenario applicato" + "Ripristina" → `planService.reset()`)
 - Input: textarea, Enter-to-send (Shift+Enter = newline), disabled while loading
-- `sendMessage()`: simulates 2s API delay → `planService.applyAiScenario()` → reads updated KPIs → generates formatted reply with deltas (Fatturato +18%, EBITDA +15%, Utile +22%, Runway +4 mesi)
-- `useSuggestion()`, `resetScenario()`, `formatK()`
+- `sendMessage()`: 2s simulated delay → `planService.applyAiScenario()` → reads updated KPIs → agent-specific i18n reply (`chatbot.<agent>.mockReply`)
+- All replies/suggestions are ngx-translate keys (4 languages)
 
 ---
 
@@ -286,4 +331,15 @@ Multi-phase import wizard for PDF / DOC / DOCX / .bxp (proprietary format), with
 - **i18n**: ngx-translate, 4 languages, default Italian
 - **Persistence (current FE-only)**: localStorage for theme/language; saved plans currently in-memory signal (no backend yet — see [backend-architecture.md](backend-architecture.md) for planned REST API/MongoDB design)
 - **PDF Export**: currently via `window.print()` (planned to be replaced by server-side generation per backend spec)
-- **Placeholders/TODOs**: Google OAuth (`onGoogleLogin`/`onGoogleRegister`), AI chat is simulated client-side (`applyAiScenario` scales KPIs by fixed multipliers), sharing/co-work features are demo/mock data (no real backend persistence yet)
+- **Placeholders/TODOs**: Google OAuth (`onGoogleLogin`/`onGoogleRegister`), AI chat is simulated client-side (`applyAiScenario` scales KPIs by fixed multipliers; 3 agents share the same mock engine, differing only in reply copy), sharing/co-work features are demo/mock data (no real backend persistence yet)
+
+---
+
+## 13. Business Plan Creation — End-to-End Flow (summary)
+
+1. User opens **Business Plan** nav item → `<app-wizard-form/>` (§4)
+2. 6 steps collect: fiscal config, products/revenue, HR, OPEX (COGS vs OPEX split), CAPEX, financing (equity + French-amortized loans)
+3. Live preview panel + getters give real-time EBITDA + sustainability verdict before generating
+4. `generate()` → `WizardInput` → **`computeFromWizard()`** (§5): 36-month arrays → 3-year P&L with dynamic rows, **separate IRES (loss-carryforward) + IRAP (personnel-excluded)** taxes, half-rate first-year depreciation, full 36-month cash flow + runway, investor KPIs (gross margin %, EBITDA %, break-even revenue)
+5. Shell flips `hasPlan` → routes to **Dashboard** (§6, editable P&L + cash chart with break-even line) and **Report** (§7, 6 charts)
+6. User can **Save** (in-memory archive), **Share/Co-Work**, run **AI what-if** scenarios (§8), or **Export PDF**

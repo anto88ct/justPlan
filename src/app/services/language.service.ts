@@ -30,12 +30,16 @@ export class LanguageService {
     const lang = this.loadFromStorage();
     this.translate.addLangs(SUPPORTED_LANGUAGES.map(l => l.code));
     this.translate.setDefaultLang('it');
+    // update signal only once translations are actually loaded, so
+    // translate.instant() calls in computed()s don't fall back to raw keys
+    this.translate.onLangChange.subscribe(event => {
+      this.currentLang.set(event.lang as LanguageCode);
+    });
     this.translate.use(lang);
   }
 
   setLanguage(code: LanguageCode): void {
     if (code === this.currentLang()) return;
-    this.currentLang.set(code);
     this.translate.use(code);
     this.persistToStorage(code);
     // TODO: call backend API when available
