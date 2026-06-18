@@ -213,6 +213,80 @@ import { ThemeService } from '../../services/theme.service';
             [tooltip]="apexTooltip"
             [responsive]="apexResponsive"
           ></apx-chart>
+
+          <!-- Cash Flow Detail Metrics -->
+          <div class="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 grid grid-cols-2 md:grid-cols-4 gap-3">
+
+            <!-- Burn Rate -->
+            <div class="bg-zinc-50 dark:bg-zinc-800/60 rounded-xl p-3">
+              <div class="flex items-center gap-1.5 mb-1.5">
+                <svg class="w-3.5 h-3.5 text-rose-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/>
+                </svg>
+                <p class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 font-body uppercase tracking-wide">Burn Rate medio</p>
+              </div>
+              @if (cashFlowMetrics().burnRate < 0) {
+                <p class="text-sm font-bold text-rose-600 dark:text-rose-400 font-mono">{{ cashFlowMetrics().burnRate | number:'1.0-0' }} €/mese</p>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Media mesi negativi</p>
+              } @else {
+                <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400 font-mono">Sempre positivo</p>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Nessun mese in perdita</p>
+              }
+            </div>
+
+            <!-- Break-even mensile -->
+            <div class="bg-zinc-50 dark:bg-zinc-800/60 rounded-xl p-3">
+              <div class="flex items-center gap-1.5 mb-1.5">
+                <svg class="w-3.5 h-3.5 text-amber-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <p class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 font-body uppercase tracking-wide">Break-even cassa</p>
+              </div>
+              @if (cashFlowMetrics().breakEvenMonth) {
+                <p class="text-sm font-bold text-amber-600 dark:text-amber-400 font-mono">{{ cashFlowMetrics().breakEvenMonth }}</p>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Primo mese positivo</p>
+              } @else if (cashFlowMetrics().burnRate >= 0) {
+                <p class="text-sm font-bold text-emerald-600 dark:text-emerald-400 font-mono">Gen</p>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Positivo da subito</p>
+              } @else {
+                <p class="text-sm font-bold text-rose-600 dark:text-rose-400 font-mono">Non raggiunto</p>
+                <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Nell'anno 1</p>
+              }
+            </div>
+
+            <!-- Mesi positivi -->
+            <div class="bg-zinc-50 dark:bg-zinc-800/60 rounded-xl p-3">
+              <div class="flex items-center gap-1.5 mb-1.5">
+                <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                </svg>
+                <p class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 font-body uppercase tracking-wide">Mesi positivi</p>
+              </div>
+              <p class="text-sm font-bold font-mono"
+                 [ngClass]="cashFlowMetrics().posMonths >= 6 ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'">
+                {{ cashFlowMetrics().posMonths }}/12
+              </p>
+              <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Flusso mensile &gt; 0</p>
+            </div>
+
+            <!-- Saldo cumulativo anno -->
+            <div class="bg-zinc-50 dark:bg-zinc-800/60 rounded-xl p-3">
+              <div class="flex items-center gap-1.5 mb-1.5">
+                <svg class="w-3.5 h-3.5 flex-shrink-0" [ngClass]="cashFlowMetrics().cumulative >= 0 ? 'text-emerald-500' : 'text-rose-500'"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <p class="text-[10px] font-semibold text-zinc-500 dark:text-zinc-400 font-body uppercase tracking-wide">Saldo cumulativo</p>
+              </div>
+              <p class="text-sm font-bold font-mono"
+                 [ngClass]="cashFlowMetrics().cumulative >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'">
+                {{ cashFlowMetrics().cumulative >= 0 ? '+' : '' }}{{ cashFlowMetrics().cumulative | number:'1.0-0' }} €
+              </p>
+              <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Fine anno 1</p>
+            </div>
+
+          </div>
         </div>
 
         <!-- ═══ INCOME STATEMENT TABLE ═══ -->
@@ -603,6 +677,30 @@ export class DashboardCruscottoComponent {
       },
     },
   }));
+
+  // ── Cash Flow Metrics ───────────────────────────────────────────────────────
+
+  readonly cashFlowMetrics = computed(() => {
+    const cf = this.planService.cashFlow();
+    const values = cf.map(p => p.value);
+
+    const negativeValues = values.filter(v => v < 0);
+    const burnRate = negativeValues.length > 0
+      ? Math.round(negativeValues.reduce((s, v) => s + v, 0) / negativeValues.length)
+      : 0;
+
+    const breakEvenIdx = values.findIndex((v, i) => i > 0 && v >= 0 && values[i - 1] < 0);
+    const breakEvenMonth = breakEvenIdx >= 0 ? cf[breakEvenIdx].month : null;
+
+    const posMonths = values.filter(v => v >= 0).length;
+
+    const peakNegIdx = values.reduce((mi, v, i) => v < values[mi] ? i : mi, 0);
+    const peakNeg = values[peakNegIdx] < 0 ? { month: cf[peakNegIdx].month, value: values[peakNegIdx] } : null;
+
+    const cumulative = values.reduce((s, v) => s + v, 0);
+
+    return { burnRate, breakEvenMonth, posMonths, peakNeg, cumulative };
+  });
 
   // ── KPI Cards ───────────────────────────────────────────────────────────────
 

@@ -1,12 +1,13 @@
 {
   "nav": {
     "panoramica": "Resumen",
+    "chat": "Chat",
     "wizard": "Asistente",
     "dashboard": "Panel",
     "scenari": "Agentes IA",
     "report": "Informe",
     "impostazioni": "Configuración",
-    "pianiSalvati": "Mis Planes",
+    "pianiSalvati": "Mis Business Plans",
     "coWork": "Co-Work",
     "profilo": "Perfil",
     "businessPlan": "Plan de Negocio",
@@ -154,12 +155,13 @@
   },
   "views": {
     "panoramica": "Resumen",
+    "chat": "Chat",
     "wizard": "Nuevo Plan",
     "dashboard": "Plan de Negocio",
     "scenari": "Escenarios What-If",
     "report": "Informe",
     "impostazioni": "Configuración",
-    "pianiSalvati": "Mis Planes",
+    "pianiSalvati": "Mis Business Plans",
     "coWork": "Co-Work",
     "profilo": "Perfil",
     "caricamenti": "Cargas"

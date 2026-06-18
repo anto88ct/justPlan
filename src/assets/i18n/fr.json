@@ -1,12 +1,13 @@
 {
   "nav": {
     "panoramica": "Aperçu",
+    "chat": "Chat",
     "wizard": "Assistant",
     "dashboard": "Tableau de bord",
     "scenari": "Agents IA",
     "report": "Rapport",
     "impostazioni": "Paramètres",
-    "pianiSalvati": "Mes Plans",
+    "pianiSalvati": "Mes Business Plans",
     "coWork": "Co-Work",
     "profilo": "Profil",
     "businessPlan": "Plan d'affaires",
@@ -154,12 +155,13 @@
   },
   "views": {
     "panoramica": "Aperçu",
+    "chat": "Chat",
     "wizard": "Nouveau Plan",
     "dashboard": "Plan d'affaires",
     "scenari": "Scénarios What-If",
     "report": "Rapport",
     "impostazioni": "Paramètres",
-    "pianiSalvati": "Mes Plans",
+    "pianiSalvati": "Mes Business Plans",
     "coWork": "Co-Work",
     "profilo": "Profil",
     "caricamenti": "Chargements"

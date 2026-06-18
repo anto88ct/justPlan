@@ -1,4 +1,4 @@
-import { Component, signal, computed, inject, HostBinding, OnInit, OnDestroy, effect, ViewChildren, QueryList, ElementRef, NgZone } from '@angular/core';
+﻿import { Component, signal, computed, inject, HostBinding, OnInit, OnDestroy, effect, ViewChildren, QueryList, ElementRef, NgZone } from '@angular/core';
 import { ThemeService } from '../../services/theme.service';
 import { LanguageService } from '../../services/language.service';
 import { CommonModule, NgClass } from '@angular/common';
@@ -41,6 +41,20 @@ interface SettingItem {
   label: string;
   desc: string;
   enabled: boolean;
+}
+
+interface PanoramaMessage {
+  role: 'user' | 'assistant';
+  text: string;
+  agent: string;
+  ts: number;
+}
+
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: PanoramaMessage[];
+  ts: number;
 }
 
 @Component({
@@ -87,6 +101,34 @@ interface SettingItem {
     @keyframes progressLine {
       from { transform: scaleX(0); }
       to   { transform: scaleX(1); }
+    }
+
+    @keyframes pickerUp {
+      from { opacity: 0; transform: translateY(5px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .picker-up { animation: pickerUp 0.17s cubic-bezier(0.16,1,0.3,1) both; }
+
+    .panorama-input-box {
+      transition: box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .panorama-input-box:focus-within {
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+      border-color: #a5b4fc;
+    }
+    .dark .panorama-input-box:focus-within {
+      box-shadow: 0 0 0 3px rgba(99,102,241,0.18);
+      border-color: #6366f1;
+    }
+
+    .chip-btn {
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+    .chip-btn:hover { transform: translateY(-1px); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .picker-up { animation: none; }
+      .chip-btn:hover { transform: none; }
     }
 
     .view-enter    { animation: viewEnter 0.4s cubic-bezier(0.16,1,0.3,1) both; }
@@ -382,34 +424,16 @@ interface SettingItem {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
               </svg>
             </div>
-            <span class="text-base font-bold text-white tracking-tight font-display">Businext Plan</span>
+            <div class="flex flex-col leading-none">
+              <span class="text-base font-bold text-white tracking-tight font-display">Businext Plan</span>
+              <span class="text-[9px] text-zinc-500 font-body tracking-wide mt-0.5">by AirPlan</span>
+            </div>
           </div>
           <button (click)="toggleSidebar()" [title]="'sidebar.collapseTitle' | translate"
                   class="hidden lg:flex w-6 h-6 rounded-lg items-center justify-center
                          text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800 transition-all flex-shrink-0">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
-            </svg>
-          </button>
-        </div>
-      }
-
-      <!-- Project pill -->
-      @if (!sidebarCollapsed()) {
-        <div class="px-3 pb-4">
-          <button class="w-full flex items-center gap-2.5 px-3 py-2.5 bg-zinc-900 hover:bg-zinc-800/80
-                         rounded-xl transition-all duration-150 group">
-            <div class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
-                 style="background: linear-gradient(135deg, #f59e0b, #f97316);">
-              <span class="text-white text-xs font-bold">{{ projectInitial() }}</span>
-            </div>
-            <div class="flex-1 text-left min-w-0">
-              <p class="text-xs font-semibold text-zinc-200 truncate font-body">{{ projectDisplayName() }}</p>
-              <p class="text-xs text-zinc-600 font-body">{{ 'sidebar.pianoCorrente' | translate }} {{ planService.currentStartYear() }}</p>
-            </div>
-            <svg class="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors flex-shrink-0"
-                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
             </svg>
           </button>
         </div>
@@ -454,43 +478,56 @@ interface SettingItem {
         }
       </nav>
 
-      <div class="mx-3 h-px bg-zinc-800/70 mt-3 mb-3"></div>
-
-      <!-- User -->
-      <div class="px-2 pb-4">
-        <button
-          (click)="navigate({ id: 'profilo', view: 'profilo' })"
-          [matTooltip]="sidebarCollapsed() ? ('sidebar.profiloTooltip' | translate) : ''"
-          matTooltipPosition="right"
-          [ngClass]="[
-            'w-full flex items-center rounded-xl hover:bg-zinc-800/50 transition-colors py-2 px-2',
-            sidebarCollapsed() ? 'justify-center gap-0' : 'gap-3'
-          ]"
-          [class.bg-zinc-800]="currentView() === 'profilo'">
-          <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-               style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
-            <span class="text-white text-xs font-bold">F</span>
+      <!-- Project switcher (bottom) -->
+      <div class="mt-auto">
+        <div class="mx-3 h-px bg-zinc-800/70 mt-2 mb-2"></div>
+        @if (!sidebarCollapsed()) {
+          <div class="px-2 pb-3">
+            <button
+              (click)="navigate({id: 'piani-salvati', view: 'piani-salvati'})"
+              [ngClass]="[
+                'w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition-all duration-150 group',
+                currentView() === 'piani-salvati'
+                  ? 'bg-zinc-800'
+                  : 'bg-zinc-900 hover:bg-zinc-800/80'
+              ]">
+              <div class="w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0"
+                   style="background: linear-gradient(135deg, #f59e0b, #f97316);">
+                <span class="text-white text-xs font-bold">{{ projectInitial() }}</span>
+              </div>
+              <div class="flex-1 text-left min-w-0">
+                <p class="text-xs font-semibold text-zinc-200 truncate font-body">
+                  {{ planService.currentProjectName() || ('sidebar.myProject' | translate) }}
+                </p>
+                <p class="text-xs text-zinc-600 font-body">{{ 'sidebar.pianoCorrente' | translate }} {{ planService.currentStartYear() }}</p>
+              </div>
+              <svg class="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors flex-shrink-0"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+              </svg>
+            </button>
           </div>
-          @if (!sidebarCollapsed()) {
-            <div class="flex-1 min-w-0 text-left">
-              <p class="text-xs font-semibold text-zinc-300 font-body truncate">{{ 'sidebar.founder' | translate }}</p>
-              <p class="text-xs text-zinc-600 font-body truncate">{{ 'sidebar.pianostarter' | translate }}</p>
-            </div>
-            <svg class="w-3.5 h-3.5 text-zinc-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-              <path stroke-linecap="round" stroke-linejoin="round"
-                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-          }
-        </button>
+        } @else {
+          <div class="px-2 pb-3 flex justify-center">
+            <button
+              (click)="navigate({id: 'piani-salvati', view: 'piani-salvati'})"
+              [matTooltip]="planService.currentProjectName() || ('sidebar.myProject' | translate)"
+              matTooltipPosition="right"
+              class="w-8 h-8 rounded-lg flex items-center justify-center hover:opacity-90 transition-opacity"
+              style="background: linear-gradient(135deg, #f59e0b, #f97316);">
+              <span class="text-white text-xs font-bold">{{ projectInitial() }}</span>
+            </button>
+          </div>
+        }
       </div>
+
     </aside>
 
     <!-- ═══════════════════ MAIN ═══════════════════ -->
     <main class="flex-1 flex flex-col overflow-hidden bg-zinc-50 dark:bg-zinc-950 min-w-0">
 
       <!-- Topbar -->
-      <header class="h-12 bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800 flex items-center px-3 md:px-5 gap-1 md:gap-2 flex-shrink-0 shadow-sm overflow-hidden">
+      <header class="h-12 bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800 flex items-center px-3 md:px-5 gap-1 md:gap-2 flex-shrink-0 shadow-sm relative z-10">
         <button (click)="sidebarOpen.set(true)"
                 class="lg:hidden flex items-center justify-center w-8 h-8 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex-shrink-0">
           <svg class="w-4 h-4 text-zinc-600 dark:text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -550,6 +587,70 @@ interface SettingItem {
           </button>
         }
 
+        <!-- Language picker -->
+        <div class="relative flex-shrink-0">
+          <button (click)="langDropdownOpen.set(!langDropdownOpen())"
+                  class="flex items-center gap-1.5 h-8 px-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all select-none">
+            <span class="text-base leading-none">{{ languageService.getCurrentLanguage().flag }}</span>
+            <span class="text-[11px] font-semibold text-zinc-600 dark:text-zinc-300 font-body">{{ languageService.currentLang() }}</span>
+            <svg class="w-3 h-3 text-zinc-400 transition-transform duration-200"
+                 [class.rotate-180]="langDropdownOpen()"
+                 fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+            </svg>
+          </button>
+
+          @if (langDropdownOpen()) {
+            <div class="picker-up absolute top-full right-0 mt-1.5 w-36 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-xl overflow-hidden z-50">
+              @for (lang of languageService.languages; track lang.code) {
+                <button
+                  (click)="languageService.setLanguage(lang.code); langDropdownOpen.set(false)"
+                  [ngClass]="[
+                    'w-full flex items-center gap-2.5 px-3 py-2.5 text-left transition-colors',
+                    languageService.currentLang() === lang.code
+                      ? 'bg-zinc-50 dark:bg-zinc-800'
+                      : 'hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                  ]">
+                  <span class="text-base leading-none flex-shrink-0">{{ lang.flag }}</span>
+                  <span class="flex-1 text-xs font-semibold text-zinc-700 dark:text-zinc-300 font-body">{{ lang.code }}</span>
+                  @if (languageService.currentLang() === lang.code) {
+                    <svg class="w-3 h-3 text-brand-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  }
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Profile avatar with plan badge -->
+        <div class="relative flex-shrink-0">
+          <button (click)="navigate({ id: 'profilo', view: 'profilo' })"
+                  [matTooltip]="'sidebar.profiloTooltip' | translate"
+                  matTooltipPosition="below"
+                  [ngClass]="[
+                    'flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200',
+                    currentView() === 'profilo'
+                      ? 'ring-2 ring-offset-1 ring-offset-white dark:ring-offset-zinc-900'
+                      : 'hover:scale-105 hover:shadow-sm',
+                    userPlan() === 'max'  ? 'ring-violet-500'
+                    : userPlan() === 'pro' ? 'ring-amber-400'
+                    : currentView() === 'profilo' ? 'ring-brand-500' : ''
+                  ]"
+                  style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+            <span class="text-white text-xs font-bold select-none">F</span>
+          </button>
+          @if (userPlan() !== 'free') {
+            <span [ngClass]="[
+                    'absolute -bottom-1 -right-1 px-1 py-px rounded text-[7px] font-black leading-none tracking-wider text-white pointer-events-none',
+                    userPlan() === 'max' ? 'bg-violet-600' : 'bg-amber-500'
+                  ]">
+              {{ userPlan() | uppercase }}
+            </span>
+          }
+        </div>
+
         <button (click)="toggleAi()"
                 [ngClass]="[
                   'flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border transition-all duration-200 font-body flex-shrink-0',
@@ -569,224 +670,247 @@ interface SettingItem {
         <!-- ── VIEWS ── -->
         <div class="flex-1 min-w-0 overflow-hidden">
 
-          <!-- ════════════════════════════════════════════════════════
-               PANORAMICA — redesigned with tutorial + animated hero
-               ════════════════════════════════════════════════════════ -->
+          <!-- PANORAMICA: Claude-style AI landing -->
           @if (currentView() === 'panoramica') {
-            <div class="view-enter h-full overflow-y-auto scrollbar-thin">
-              <div class="max-w-3xl mx-auto px-4 py-7 space-y-5">
+            <div class="view-enter h-full flex overflow-hidden bg-zinc-50 dark:bg-zinc-950">
 
-                <!-- ─── HERO: dark split layout ─── -->
-                <div class="relative rounded-3xl overflow-hidden shadow-xl"
-                     style="background: linear-gradient(155deg, #18181b 0%, #27272a 40%, #1e1b4b 100%);">
+              <!-- ── Chat history sidebar ── -->
+              <div [ngClass]="[
+                'flex-shrink-0 flex flex-col bg-white dark:bg-zinc-900 border-r border-zinc-100 dark:border-zinc-800 transition-all duration-300 overflow-hidden',
+                chatHistoryOpen() ? 'w-52' : 'w-0'
+              ]">
+                <div class="p-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-2 min-w-[208px]">
+                  <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Cronologia</span>
+                  <button (click)="newPanoramaChat()"
+                          class="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
+                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Nuova
+                  </button>
+                </div>
+                <div class="flex-1 overflow-y-auto p-2 space-y-px min-w-[208px]">
+                  @if (chatSessions().length === 0) {
+                    <p class="text-center text-xs text-zinc-400 dark:text-zinc-600 py-8 px-3 leading-relaxed">Nessuna conversazione ancora</p>
+                  }
+                  @for (session of chatSessions(); track session.id) {
+                    <div [ngClass]="[
+                      'group flex items-start gap-1.5 w-full rounded-lg px-2.5 py-2 cursor-pointer transition-colors',
+                      activeChatId() === session.id
+                        ? 'bg-zinc-100 dark:bg-zinc-800'
+                        : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/60'
+                    ]" (click)="loadChatSession(session.id)">
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate leading-snug">{{ session.title }}</p>
+                        <p class="text-[10px] text-zinc-400 mt-0.5">{{ formatSessionDate(session.ts) }}</p>
+                      </div>
+                      <button (click)="deleteChatSession(session.id, $event)"
+                              class="opacity-0 group-hover:opacity-100 w-5 h-5 rounded flex items-center justify-center text-zinc-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all flex-shrink-0 mt-0.5">
+                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
 
-                  <!-- Dot grid texture -->
-                  <div class="absolute inset-0 pointer-events-none"
-                       style="background-image: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px); background-size: 22px 22px; opacity: 0.35;"></div>
+              <!-- ── Main area ── -->
+              <div class="flex-1 flex flex-col min-w-0 relative">
 
-                  <!-- Ambient glow blobs -->
-                  <div class="absolute top-0 right-0 w-72 h-72 pointer-events-none"
-                       style="background: radial-gradient(circle at 100% 0%, rgba(99,102,241,0.28) 0%, transparent 60%);"></div>
-                  <div class="absolute bottom-0 left-0 w-48 h-48 pointer-events-none"
-                       style="background: radial-gradient(circle at 0% 100%, rgba(139,92,246,0.14) 0%, transparent 65%);"></div>
+                <!-- Toggle history button -->
+                <button (click)="chatHistoryOpen.set(!chatHistoryOpen())"
+                        class="absolute top-3 left-3 z-10 w-7 h-7 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all">
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7"/>
+                  </svg>
+                </button>
 
-                  <!-- Decorative floating orbs -->
-                  <div class="absolute bottom-5 right-10 w-20 h-20 rounded-full pointer-events-none float-anim"
-                       style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);"></div>
-                  <div class="absolute bottom-14 right-20 w-10 h-10 rounded-full pointer-events-none"
-                       style="background: rgba(255,255,255,0.03); animation: floatAnim 2.6s ease-in-out 0.45s infinite;"></div>
-                  <div class="absolute top-8 right-32 w-6 h-6 rounded-full pointer-events-none"
-                       style="background: rgba(255,255,255,0.05); animation: floatAnim 3.2s ease-in-out 0.8s infinite;"></div>
-
-                  <!-- Content: split flex layout -->
-                  <div class="relative z-10 flex flex-col sm:flex-row">
-
-                    <!-- Left: headline + CTA -->
-                    <div class="flex-1 p-7 md:p-8">
-                      <p class="text-indigo-400 text-[10px] font-bold font-body uppercase tracking-[0.2em] mb-3">
-                        {{ 'panoramica.hero.subtitle' | translate }}
-                      </p>
-                      <h1 class="text-2xl md:text-[1.85rem] font-bold text-white font-display mb-3 leading-tight tracking-tight">
-                        {{ 'panoramica.hero.title' | translate }}
-                      </h1>
-                      <p class="text-zinc-400 text-sm font-body mb-6 leading-relaxed max-w-[300px]">
-                        {{ 'panoramica.hero.desc' | translate }}
-                      </p>
-                      <div class="flex items-center gap-3 flex-wrap">
-                        <button (click)="goToWizard()"
-                                class="inline-flex items-center gap-2 px-5 py-2.5 bg-brand-500 hover:bg-brand-400
-                                       text-white font-semibold text-sm rounded-xl transition-all duration-200 font-body
-                                       shadow-lg shadow-brand-600/30 hover:-translate-y-0.5 active:scale-[0.98]">
-                          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                @if (panoramaMessages().length === 0) {
+                  <!-- ── Landing ── -->
+                  <div class="flex-1 overflow-y-auto flex flex-col items-center justify-center px-4 py-12">
+                    <div class="mb-8 text-center" style="animation: viewEnter 0.5s cubic-bezier(0.16,1,0.3,1) both;">
+                      <div class="flex items-center justify-center gap-3 mb-2">
+                        <div class="w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm flex-shrink-0"
+                             style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                          <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/>
                           </svg>
-                          {{ 'panoramica.hero.cta' | translate }}
-                        </button>
-                        @if (hasPlan()) {
-                          <button (click)="currentView.set('dashboard')"
-                                  class="inline-flex items-center gap-2 px-4 py-2.5 hover:bg-white/10
-                                         text-zinc-300 text-sm rounded-xl border border-white/15 transition-all duration-200 font-body">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </div>
+                        <h1 class="text-[1.85rem] font-bold text-zinc-900 dark:text-zinc-100 font-display tracking-tight">
+                          {{ panoramaGreeting() }}, AirPlan
+                        </h1>
+                      </div>
+                      <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mt-1">
+                        Scegli un agente AI e fai la tua prima domanda
+                      </p>
+                    </div>
+
+                    <div class="w-full max-w-2xl" style="animation: viewEnter 0.5s 80ms cubic-bezier(0.16,1,0.3,1) both;">
+                      <div class="panorama-input-box bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-700 shadow-lg overflow-visible">
+                        <textarea
+                          [value]="panoramaInput()"
+                          (input)="panoramaInput.set($any($event.target).value)"
+                          (keydown)="onPanoramaKeydown($event)"
+                          placeholder="Incolla un documento, un'email o una domanda per iniziare"
+                          rows="3"
+                          class="w-full px-5 pt-4 pb-2 bg-transparent text-zinc-800 dark:text-zinc-200 text-sm font-body resize-none focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-500 leading-relaxed block">
+                        </textarea>
+                        <div class="px-3 pb-3 flex items-center justify-between gap-2">
+                          <div class="flex items-center gap-2">
+                            <div class="relative">
+                              <button (click)="panoramaAgentPickerOpen.set(!panoramaAgentPickerOpen())"
+                                      class="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600 transition-all text-xs font-semibold font-body text-zinc-700 dark:text-zinc-300 select-none">
+                                <span class="w-2 h-2 rounded-full flex-shrink-0 transition-colors duration-300" [style.background]="panoramaAgentDot()"></span>
+                                {{ panoramaAgentName() }}
+                                <svg class="w-3 h-3 text-zinc-400 transition-transform duration-200" [class.rotate-180]="panoramaAgentPickerOpen()" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                                </svg>
+                              </button>
+                              @if (panoramaAgentPickerOpen()) {
+                                <div class="picker-up absolute bottom-full left-0 mb-2 w-52 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-xl overflow-hidden z-30">
+                                  @for (agent of panoramaAgents; track agent.id) {
+                                    <button (click)="panoramaSelectedAgent.set(agent.id); panoramaAgentPickerOpen.set(false)"
+                                            [ngClass]="['w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors', panoramaSelectedAgent() === agent.id ? 'bg-zinc-50 dark:bg-zinc-800' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800']">
+                                      <span class="w-3 h-3 rounded-full flex-shrink-0" [style.background]="agent.dot"></span>
+                                      <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-body">{{ agent.name }}</p>
+                                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body truncate">{{ agent.role }}</p>
+                                      </div>
+                                      @if (panoramaSelectedAgent() === agent.id) {
+                                        <svg class="w-3.5 h-3.5 text-brand-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                      }
+                                    </button>
+                                  }
+                                </div>
+                              }
+                            </div>
+                          </div>
+                          <button (click)="onPanoramaSubmit()" [disabled]="!panoramaInput().trim()"
+                                  [ngClass]="['w-9 h-9 flex items-center justify-center rounded-xl transition-all duration-200 flex-shrink-0',
+                                    panoramaInput().trim()
+                                      ? 'bg-brand-600 hover:bg-brand-500 text-white shadow-sm shadow-brand-500/30 hover:scale-105 active:scale-95'
+                                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-300 dark:text-zinc-600 cursor-not-allowed']">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7"/>
                             </svg>
-                            {{ 'panoramica.hero.vediPiano' | translate }}
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="flex flex-wrap gap-2 mt-5 justify-center" style="animation: viewEnter 0.5s 160ms cubic-bezier(0.16,1,0.3,1) both;">
+                        @for (chip of panoramaSuggestions; track chip.label) {
+                          <button (click)="onPanoramaSuggestion(chip.text)"
+                                  class="chip-btn flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 rounded-full text-sm text-zinc-700 dark:text-zinc-300 font-body hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 shadow-sm whitespace-nowrap">
+                            <span class="text-base leading-none select-none">{{ chip.icon }}</span>
+                            {{ chip.label }}
                           </button>
                         }
                       </div>
                     </div>
-
-                    <!-- Right: animated KPI preview (hidden xs, shown sm+) -->
-                    <div class="hidden sm:flex flex-col gap-2 justify-center px-6 pb-7 md:pb-0 md:py-7 md:pl-0 md:pr-8 min-w-[180px]">
-                      @if (hasPlan()) {
-                        @for (kpi of liveKpis().slice(0, 3); track kpi.label; let i = $index) {
-                          <div class="animate-kpi-in bg-white/10 backdrop-blur-sm rounded-xl px-3 py-2.5 border border-white/10"
-                               [style.animation-delay]="(i * 85) + 'ms'">
-                            <p class="text-zinc-500 text-[10px] font-body mb-0.5">{{ kpi.label }}</p>
-                            <p class="text-white text-base font-bold font-mono">{{ kpi.value }}</p>
-                          </div>
-                        }
-                      } @else {
-                        <!-- Shimmer skeleton (no plan yet) -->
-                        @for (idx of [0, 1, 2]; track idx) {
-                          <div class="rounded-xl px-3 py-2.5 border border-white/8"
-                               style="background: rgba(255,255,255,0.05);"
-                               [style.animation-delay]="(idx * 100) + 'ms'">
-                            <div class="h-1.5 w-14 rounded-full mb-2 shimmer-bar"
-                                 style="background: rgba(255,255,255,0.18);"
-                                 [style.animation-delay]="(idx * 80) + 'ms'"></div>
-                            <div class="h-4 w-20 rounded-full shimmer-bar"
-                                 style="background: rgba(255,255,255,0.25);"
-                                 [style.animation-delay]="(idx * 80 + 200) + 'ms'"></div>
-                          </div>
-                        }
-                      }
-                    </div>
                   </div>
-                </div>
 
-                <!-- ─── LIVE KPIS (only if plan exists) ─── -->
-                @if (hasPlan()) {
-                  <div>
-                    <p class="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.16em] font-body mb-3">
-                      {{ 'panoramica.pianoCorrente' | translate }}
-                    </p>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                      @for (kpi of liveKpis(); track kpi.label; let i = $index) {
-                        <div class="animate-kpi-in bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-card
-                                     hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 p-4"
-                             [style.animation-delay]="(i * 55 + 40) + 'ms'">
-                          <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium font-body truncate mb-0.5">{{ kpi.label }}</p>
-                          <p class="text-lg font-bold font-mono text-zinc-900 dark:text-zinc-100 number-highlight">{{ kpi.value }}</p>
+                } @else {
+                  <!-- ── Active chat thread ── -->
+                  <div class="flex-1 overflow-y-auto px-4 md:px-12 py-8 space-y-6" id="panoramaMessages">
+                    @for (msg of panoramaMessages(); track $index) {
+                      @if (msg.role === 'user') {
+                        <div class="flex justify-end">
+                          <div class="max-w-[72%] px-4 py-3 rounded-2xl rounded-tr-sm bg-brand-600 text-white text-sm font-body leading-relaxed shadow-sm"
+                               style="animation: viewEnter 0.25s cubic-bezier(0.16,1,0.3,1) both;">
+                            {{ msg.text }}
+                          </div>
+                        </div>
+                      } @else {
+                        <div class="flex gap-3 items-start" style="animation: viewEnter 0.3s cubic-bezier(0.16,1,0.3,1) both;">
+                          <div class="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5 shadow-sm"
+                               style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                            <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/>
+                            </svg>
+                          </div>
+                          <div class="max-w-[72%]">
+                            <p class="text-[10px] font-bold text-zinc-400 dark:text-zinc-500 mb-1.5 uppercase tracking-wider">{{ msg.agent }}</p>
+                            <div class="px-4 py-3 rounded-2xl rounded-tl-sm bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 text-sm font-body text-zinc-700 dark:text-zinc-300 leading-relaxed shadow-sm">
+                              {{ msg.text }}
+                            </div>
+                          </div>
                         </div>
                       }
+                    }
+
+                    @if (aiThinking()) {
+                      <div class="flex gap-3 items-start">
+                        <div class="w-7 h-7 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                             style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                          <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/>
+                          </svg>
+                        </div>
+                        <div class="px-4 py-3.5 rounded-2xl rounded-tl-sm bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm">
+                          <div class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay:0ms"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay:150ms"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-zinc-400 animate-bounce" style="animation-delay:300ms"></span>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Chat input bar -->
+                  <div class="border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-4 py-3">
+                    <div class="max-w-3xl mx-auto">
+                      <div class="panorama-input-box bg-zinc-50 dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700">
+                        <textarea
+                          [value]="panoramaInput()"
+                          (input)="panoramaInput.set($any($event.target).value)"
+                          (keydown)="onPanoramaKeydown($event)"
+                          placeholder="Continua la conversazione..."
+                          rows="1"
+                          class="w-full px-4 pt-3 pb-1 bg-transparent text-zinc-800 dark:text-zinc-200 text-sm font-body resize-none focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-500 leading-relaxed block">
+                        </textarea>
+                        <div class="px-3 pb-2.5 flex items-center justify-between gap-2">
+                          <div class="relative">
+                            <button (click)="panoramaAgentPickerOpen.set(!panoramaAgentPickerOpen())"
+                                    class="flex items-center gap-1.5 px-2 py-1 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-500 transition-all text-[11px] font-semibold font-body text-zinc-600 dark:text-zinc-300 select-none">
+                              <span class="w-2 h-2 rounded-full flex-shrink-0" [style.background]="panoramaAgentDot()"></span>
+                              {{ panoramaAgentName() }}
+                              <svg class="w-2.5 h-2.5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                              </svg>
+                            </button>
+                            @if (panoramaAgentPickerOpen()) {
+                              <div class="picker-up absolute bottom-full left-0 mb-2 w-48 bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-xl overflow-hidden z-30">
+                                @for (agent of panoramaAgents; track agent.id) {
+                                  <button (click)="panoramaSelectedAgent.set(agent.id); panoramaAgentPickerOpen.set(false)"
+                                          [ngClass]="['w-full flex items-center gap-3 px-3 py-2 text-left transition-colors', panoramaSelectedAgent() === agent.id ? 'bg-zinc-50 dark:bg-zinc-800' : 'hover:bg-zinc-50 dark:hover:bg-zinc-800']">
+                                    <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" [style.background]="agent.dot"></span>
+                                    <div class="flex-1 min-w-0">
+                                      <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-body">{{ agent.name }}</p>
+                                      <p class="text-[10px] text-zinc-400 font-body truncate">{{ agent.role }}</p>
+                                    </div>
+                                  </button>
+                                }
+                              </div>
+                            }
+                          </div>
+                          <button (click)="onPanoramaSubmit()" [disabled]="!panoramaInput().trim() || aiThinking()"
+                                  [ngClass]="['w-8 h-8 flex items-center justify-center rounded-lg transition-all duration-200 flex-shrink-0',
+                                    panoramaInput().trim() && !aiThinking()
+                                      ? 'bg-brand-600 hover:bg-brand-500 text-white shadow-sm hover:scale-105 active:scale-95'
+                                      : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-400 cursor-not-allowed']">
+                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-7-7l7 7-7 7"/>
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 }
-
-                <!-- ─── TUTORIAL STEPS ─── -->
-                <div>
-                  <div class="flex items-baseline justify-between mb-4">
-                    <div>
-                      <p class="text-[10px] font-semibold text-brand-500 uppercase tracking-[0.18em] font-body mb-0.5">
-                        {{ 'panoramica.comeFunziona' | translate }}
-                      </p>
-                      <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-display">{{ 'panoramica.guidaRapida' | translate }}</h2>
-                    </div>
-                    @if (!hasPlan()) {
-                      <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body hidden sm:block">
-                        {{ 'panoramica.clicca' | translate }}
-                      </span>
-                    }
-                  </div>
-
-                  <!-- 2-col mobile, 4-col md -->
-                  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    @for (step of tutorialSteps(); track step.num; let i = $index) {
-                      <button
-                        class="step-card animate-kpi-in bg-white dark:bg-zinc-900 rounded-2xl border shadow-card
-                               hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200
-                               p-4 text-left cursor-pointer group relative overflow-hidden"
-                        [ngClass]="step.done ? 'border-emerald-100 dark:border-emerald-700 ring-1 ring-emerald-50 dark:ring-emerald-900/40' : 'border-zinc-100 dark:border-zinc-800'"
-                        [style.animation-delay]="(i * 70 + 120) + 'ms'"
-                        (click)="navigateToStep(step)">
-
-                        <!-- Completion badge -->
-                        @if (step.done) {
-                          <div class="absolute top-3 right-3 z-10">
-                            <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
-                              <svg class="w-3 h-3 text-emerald-600" fill="none" viewBox="0 0 24 24"
-                                   stroke="currentColor" stroke-width="3">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                              </svg>
-                            </div>
-                          </div>
-                        }
-
-                        <!-- Large muted step number as bg decoration -->
-                        <span class="absolute bottom-1 right-2 text-5xl font-bold select-none leading-none font-display"
-                              [ngClass]="step.done ? 'text-emerald-50 dark:text-emerald-900/20' : 'text-zinc-50 dark:text-zinc-800'">
-                          {{ step.num }}
-                        </span>
-
-                        <!-- Icon -->
-                        <div class="w-8 h-8 rounded-xl flex items-center justify-center mb-3 relative z-10"
-                             [ngClass]="step.iconBg">
-                          <svg class="w-4 h-4" [ngClass]="step.iconColor"
-                               fill="none" stroke="currentColor" stroke-width="1.5"
-                               viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="step.iconPath"/>
-                          </svg>
-                        </div>
-
-                        <!-- Title + description -->
-                        <p class="text-[12px] font-bold text-zinc-900 dark:text-zinc-100 font-display mb-1 leading-snug relative z-10">
-                          {{ step.title }}
-                        </p>
-                        <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body leading-relaxed relative z-10 line-clamp-2">
-                          {{ step.desc }}
-                        </p>
-
-                        <!-- Hover CTA -->
-                        <div class="flex items-center gap-1 mt-3 relative z-10">
-                          <span class="text-[10px] font-semibold font-body transition-colors"
-                                [ngClass]="step.done ? 'text-emerald-400 group-hover:text-emerald-600' : 'text-zinc-300 group-hover:text-brand-500'">
-                            {{ step.cta }}
-                          </span>
-                          <svg class="step-cta-arrow w-3 h-3 transition-colors"
-                               [ngClass]="step.done ? 'text-emerald-400 group-hover:text-emerald-600' : 'text-zinc-300 group-hover:text-brand-500'"
-                               fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                          </svg>
-                        </div>
-                      </button>
-                    }
-                  </div>
-
-                  <!-- AI tip banner -->
-                  <div class="mt-3 flex items-center gap-3 px-4 py-3 bg-brand-50 dark:bg-brand-950/40 rounded-2xl border border-brand-100 dark:border-brand-900/50 animate-fade-in"
-                       style="animation-delay: 560ms">
-                    <div class="w-8 h-8 rounded-xl bg-brand-100 dark:bg-brand-900/40 flex items-center justify-center flex-shrink-0">
-                      <svg class="w-4 h-4 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
-                      </svg>
-                    </div>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-xs font-semibold text-brand-700 dark:text-brand-300 font-body">{{ 'panoramica.tip.title' | translate }}</p>
-                      <p class="text-[11px] text-brand-600 dark:text-brand-400 font-body leading-relaxed">
-                        {{ 'panoramica.tip.desc' | translate }}
-                      </p>
-                    </div>
-                    <button (click)="toggleAi()"
-                            class="flex-shrink-0 flex items-center gap-1.5 text-[11px] font-semibold text-brand-600 dark:text-brand-400
-                                   hover:text-brand-800 dark:hover:text-brand-200 px-3 py-1.5 bg-white dark:bg-zinc-900 rounded-xl border border-brand-200 dark:border-brand-800
-                                   hover:border-brand-300 transition-all font-body whitespace-nowrap">
-                      {{ 'panoramica.tip.btn' | translate }}
-                      <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
-                      </svg>
-                    </button>
-                  </div>
-                </div>
 
               </div>
             </div>
@@ -1662,40 +1786,6 @@ interface SettingItem {
                     </div>
                   }
 
-                  <!-- SEZIONE LINGUA -->
-                  <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-card"
-                       [style.animation-delay]="(settingSections.length * 70 + 50) + 'ms'"
-                       style="animation: viewEnter 0.45s cubic-bezier(0.16,1,0.3,1) both;">
-                    <p class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-4">{{ 'settings.sections.lingua.label' | translate }}</p>
-                    <div class="grid grid-cols-2 gap-2">
-                      @for (lang of languageService.languages; track lang.code) {
-                        <button
-                          (click)="languageService.setLanguage(lang.code)"
-                          [ngClass]="[
-                            'flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all duration-200 text-left',
-                            languageService.currentLang() === lang.code
-                              ? 'border-brand-600 bg-brand-50 dark:bg-brand-600/10'
-                              : 'border-zinc-100 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
-                          ]">
-                          <span class="text-xl leading-none">{{ lang.flag }}</span>
-                          <div class="flex-1 min-w-0">
-                            <p [ngClass]="[
-                              'text-sm font-medium font-body leading-tight',
-                              languageService.currentLang() === lang.code
-                                ? 'text-brand-600 dark:text-brand-400'
-                                : 'text-zinc-700 dark:text-zinc-300'
-                            ]">{{ lang.label }}</p>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ lang.nativeLabel }}</p>
-                          </div>
-                          @if (languageService.currentLang() === lang.code) {
-                            <svg class="w-4 h-4 text-brand-600 dark:text-brand-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                            </svg>
-                          }
-                        </button>
-                      }
-                    </div>
-                  </div>
 
                   <!-- SEZIONE CONTATTI -->
                   <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 p-5 shadow-card"
@@ -2127,6 +2217,56 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   currentAiAgent        = signal<AgentId>('xeno');
   isLargeScreen         = signal(typeof window !== 'undefined' && window.innerWidth >= 1024);
   chatDesktopFullscreen = signal(false);
+  langDropdownOpen      = signal(false);
+  userPlan              = signal<'free' | 'pro' | 'max'>('free');
+
+  // ── Panoramica chat landing ─────────────────────────────────────────────────
+  panoramaInput           = signal('');
+  panoramaSelectedAgent   = signal<AgentId | 'auto'>('auto');
+  panoramaAgentPickerOpen = signal(false);
+
+  panoramaGreeting = computed(() => {
+    const h = new Date().getHours();
+    if (h >= 5  && h < 12) return 'Buon mattino';
+    if (h >= 12 && h < 18) return 'Buon pomeriggio';
+    return 'Buona sera';
+  });
+
+  panoramaAgentDot = computed(() => {
+    const dots: Record<string, string> = {
+      auto: '#6366f1', xeno: '#a78bfa', elio: '#fbbf24', argon: '#60a5fa',
+    };
+    return dots[this.panoramaSelectedAgent()] ?? '#6366f1';
+  });
+
+  panoramaAgentName = computed(() => {
+    const names: Record<string, string> = {
+      auto: 'AUTO', xeno: 'XENO', elio: 'ELIO', argon: 'ARGON',
+    };
+    return names[this.panoramaSelectedAgent()] ?? 'AUTO';
+  });
+
+  panoramaAgents: { id: AgentId | 'auto'; name: string; role: string; dot: string }[] = [
+    { id: 'auto',  name: 'AUTO',  role: 'Selezione automatica',    dot: '#6366f1' },
+    { id: 'xeno',  name: 'XENO',  role: 'Strategia & Mercato',     dot: '#a78bfa' },
+    { id: 'elio',  name: 'ELIO',  role: 'Proiezioni Finanziarie',  dot: '#fbbf24' },
+    { id: 'argon', name: 'ARGON', role: 'Analisi & Rischi',        dot: '#60a5fa' },
+  ];
+
+  panoramaSuggestions: { icon: string; label: string; text: string }[] = [
+    { icon: '📊', label: 'Scenario what-if',  text: 'Cosa succede se aumento il prezzo del 20%?' },
+    { icon: '📈', label: 'Proiezioni',        text: 'Proietta il mio fatturato per i prossimi 3 anni' },
+    { icon: '💸', label: 'Analisi costi',     text: 'Come riduco i costi operativi senza perdere qualità?' },
+    { icon: '🌍', label: 'Nuovo mercato',     text: 'Lancio in un nuovo mercato con volume +30%, proietta' },
+    { icon: '✨', label: 'Scelto da AI',      text: 'Analizza il mio business plan e suggerisci i miglioramenti principali' },
+  ];
+
+  // ── Inline chat state ───────────────────────────────────────────────────────
+  panoramaMessages = signal<PanoramaMessage[]>([]);
+  chatSessions     = signal<ChatSession[]>(this._loadChatSessions());
+  activeChatId     = signal<string | null>(null);
+  chatHistoryOpen  = signal(true);
+  aiThinking       = signal(false);
 
   // ── Share dialog ────────────────────────────────────────────────────────────
   shareDialogOpen      = signal(false);
@@ -2224,12 +2364,8 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
 
   navItems: NavItem[] = [
     {
-      id: 'panoramica', view: 'panoramica', label: 'nav.panoramica',
+      id: 'panoramica', view: 'panoramica', label: 'nav.chat',
       svgPath: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6',
-    },
-    {
-      id: 'piano', view: 'wizard', label: 'nav.businessPlan',
-      svgPath: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
     },
     {
       id: 'piani-salvati', view: 'piani-salvati', label: 'nav.pianiSalvati',
@@ -2459,7 +2595,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   readonly currentTitle = computed(() => {
     this.languageService.currentLang(); // reactive on language change
     const map: Record<View, string> = {
-      panoramica:      'views.panoramica',
+      panoramica:      'views.chat',
       wizard:          'views.wizard',
       dashboard:       'views.dashboard',
       scenari:         'views.scenari',
@@ -2593,6 +2729,109 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   openAiWithScenario(_q: string, agentId: AgentId = 'xeno'): void {
     this.currentAiAgent.set(agentId);
     this.aiOpen.set(true);
+  }
+
+  onPanoramaSubmit(): void {
+    const q = this.panoramaInput().trim();
+    if (!q || this.aiThinking()) return;
+    const sel     = this.panoramaSelectedAgent();
+    const agentId = (sel === 'auto' ? 'xeno' : sel) as AgentId;
+
+    if (this.panoramaMessages().length === 0) {
+      this.activeChatId.set(Date.now().toString());
+    }
+
+    this.panoramaMessages.update(msgs => [...msgs, { role: 'user', text: q, agent: agentId, ts: Date.now() }]);
+    this.panoramaInput.set('');
+    this.panoramaAgentPickerOpen.set(false);
+    this.aiThinking.set(true);
+    this._scrollPanoramaToBottom();
+
+    setTimeout(() => {
+      this.aiThinking.set(false);
+      this.panoramaMessages.update(msgs => [...msgs, {
+        role: 'assistant',
+        text: `Analisi in corso con ${agentId.toUpperCase()}. Collega il tuo piano finanziario per ricevere risposte personalizzate basate sui dati reali del tuo progetto.`,
+        agent: agentId,
+        ts: Date.now(),
+      }]);
+      this._saveChatSession();
+      this._scrollPanoramaToBottom();
+    }, 1400);
+  }
+
+  onPanoramaKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.onPanoramaSubmit();
+    }
+  }
+
+  onPanoramaSuggestion(text: string): void {
+    this.panoramaInput.set(text);
+  }
+
+  newPanoramaChat(): void {
+    this.panoramaMessages.set([]);
+    this.activeChatId.set(null);
+    this.aiThinking.set(false);
+  }
+
+  loadChatSession(id: string): void {
+    const session = this.chatSessions().find(s => s.id === id);
+    if (!session) return;
+    this.panoramaMessages.set(session.messages);
+    this.activeChatId.set(id);
+    setTimeout(() => this._scrollPanoramaToBottom(), 50);
+  }
+
+  deleteChatSession(id: string, event: Event): void {
+    event.stopPropagation();
+    this.chatSessions.update(s => s.filter(x => x.id !== id));
+    this._persistChatSessions();
+    if (this.activeChatId() === id) this.newPanoramaChat();
+  }
+
+  formatSessionDate(ts: number): string {
+    const d    = new Date(ts);
+    const diff = Date.now() - ts;
+    if (diff < 86_400_000)  return d.toLocaleTimeString('it', { hour: '2-digit', minute: '2-digit' });
+    if (diff < 604_800_000) return d.toLocaleDateString('it', { weekday: 'short' });
+    return d.toLocaleDateString('it', { day: '2-digit', month: 'short' });
+  }
+
+  private _saveChatSession(): void {
+    const id   = this.activeChatId();
+    const msgs = this.panoramaMessages();
+    if (!id || msgs.length === 0) return;
+    const first = msgs[0].text;
+    const title = first.length > 42 ? first.slice(0, 42) + '…' : first;
+    const session: ChatSession = { id, title, messages: msgs, ts: Date.now() };
+    this.chatSessions.update(sessions => {
+      const idx = sessions.findIndex(s => s.id === id);
+      if (idx >= 0) { const updated = [...sessions]; updated[idx] = session; return updated; }
+      return [session, ...sessions];
+    });
+    this._persistChatSessions();
+  }
+
+  private _persistChatSessions(): void {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('panorama_chat_sessions', JSON.stringify(this.chatSessions()));
+    }
+  }
+
+  private _loadChatSessions(): ChatSession[] {
+    if (typeof localStorage === 'undefined') return [];
+    try { return JSON.parse(localStorage.getItem('panorama_chat_sessions') ?? '[]'); }
+    catch { return []; }
+  }
+
+  private _scrollPanoramaToBottom(): void {
+    setTimeout(() => {
+      const el = document.getElementById('panoramaMessages');
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 30);
   }
 
   exportPdf(): void {

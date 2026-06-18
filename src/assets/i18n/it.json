@@ -1,12 +1,13 @@
 {
   "nav": {
     "panoramica": "Panoramica",
+    "chat": "Chat",
     "wizard": "Wizard",
     "dashboard": "Dashboard",
     "scenari": "Agenti AI",
     "report": "Report",
     "impostazioni": "Impostazioni",
-    "pianiSalvati": "I Miei Piani",
+    "pianiSalvati": "I Miei Business Plan",
     "coWork": "Co-Work",
     "profilo": "Profilo",
     "businessPlan": "Business Plan",
@@ -92,7 +93,7 @@
   },
   "pianiSalvati": {
     "archivio": "Archivio",
-    "title": "I Miei Piani",
+    "title": "I Miei Business Plan",
     "count": "piani salvati",
     "nuovoPiano": "Nuovo Piano",
     "nessunPiano": "Nessun piano salvato",
@@ -154,12 +155,13 @@
   },
   "views": {
     "panoramica": "Panoramica",
+    "chat": "Chat",
     "wizard": "Nuovo Piano",
     "dashboard": "Business Plan",
     "scenari": "Scenari What-If",
     "report": "Report",
     "impostazioni": "Impostazioni",
-    "pianiSalvati": "I Miei Piani",
+    "pianiSalvati": "I Miei Business Plan",
     "coWork": "Co-Work",
     "profilo": "Profilo",
     "caricamenti": "Caricamenti"

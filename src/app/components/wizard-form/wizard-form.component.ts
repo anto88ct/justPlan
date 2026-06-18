@@ -377,8 +377,247 @@ interface LoanItem {
       color: #f87171;
     }
     :host-context(.dark) .remove-btn:hover { background: rgba(239,68,68,0.22); }
+
+    /* ── Phase animations ───────────────────────────────────────────────── */
+    @keyframes phaseUp {
+      from { opacity: 0; transform: translateY(28px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes phaseSlideIn {
+      from { opacity: 0; transform: translateX(36px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes phaseSlideBack {
+      from { opacity: 0; transform: translateX(-36px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes typeCardFloat {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-5px); }
+    }
+    .phase-up       { animation: phaseUp      0.48s cubic-bezier(0.16,1,0.3,1) both; }
+    .phase-slide    { animation: phaseSlideIn  0.40s cubic-bezier(0.16,1,0.3,1) both; }
+    .phase-back     { animation: phaseSlideBack 0.40s cubic-bezier(0.16,1,0.3,1) both; }
+
+    .type-card {
+      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1),
+                  box-shadow 0.25s cubic-bezier(0.16,1,0.3,1),
+                  border-color 0.18s ease,
+                  background 0.18s ease;
+    }
+    .type-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px -8px rgba(0,0,0,0.14); }
+
+    .phase-icon {
+      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .type-card:hover .phase-icon { transform: scale(1.15); }
+
+    @media (prefers-reduced-motion: reduce) {
+      .phase-up, .phase-slide, .phase-back { animation: none; opacity: 1; transform: none; }
+      .type-card:hover { transform: none; box-shadow: none; }
+      .type-card:hover .phase-icon { transform: none; }
+    }
   `],
   template: `
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         PHASE 1 — Tipo di realtà
+         ═══════════════════════════════════════════════════════════════════════ -->
+    @if (wizardPhase() === 'type') {
+      <div class="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-white dark:bg-zinc-950 overflow-y-auto phase-up">
+
+        <!-- Badge -->
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-50 dark:bg-brand-950/40
+                    border border-brand-100 dark:border-brand-800/50 mb-8"
+             style="animation: phaseUp 0.4s 60ms cubic-bezier(0.16,1,0.3,1) both;">
+          <div class="w-1.5 h-1.5 rounded-full bg-brand-500"></div>
+          <span class="text-xs font-semibold text-brand-700 dark:text-brand-400 font-body">Nuovo Business Plan</span>
+        </div>
+
+        <!-- Heading -->
+        <div class="text-center mb-10 max-w-sm"
+             style="animation: phaseUp 0.45s 120ms cubic-bezier(0.16,1,0.3,1) both;">
+          <h2 class="text-[1.65rem] font-bold text-zinc-900 dark:text-zinc-100 font-display leading-tight mb-2 text-balance">
+            Che tipo di realtà<br>stai pianificando?
+          </h2>
+          <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body leading-relaxed">
+            Scegli il contesto giusto per personalizzare le proiezioni.
+          </p>
+        </div>
+
+        <!-- Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-lg"
+             style="animation: phaseUp 0.5s 200ms cubic-bezier(0.16,1,0.3,1) both;">
+
+          <!-- Startup -->
+          <button type="button" (click)="selectType('startup')"
+                  class="type-card group relative flex flex-col items-center text-center gap-4 p-7
+                         bg-white dark:bg-zinc-900 rounded-2xl border-2 border-zinc-200 dark:border-zinc-700
+                         hover:border-brand-400 dark:hover:border-brand-500 cursor-pointer">
+            <!-- Glow bg on hover -->
+            <div class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                 style="background: radial-gradient(ellipse at 50% 0%, rgba(99,102,241,0.08) 0%, transparent 70%);"></div>
+
+            <!-- Icon -->
+            <div class="phase-icon w-16 h-16 rounded-2xl flex items-center justify-center
+                        bg-brand-50 dark:bg-brand-950/40 border border-brand-100 dark:border-brand-800/50 z-10">
+              <svg class="w-8 h-8 text-brand-600 dark:text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              </svg>
+            </div>
+
+            <!-- Text -->
+            <div class="z-10">
+              <p class="text-lg font-bold text-zinc-900 dark:text-zinc-100 font-display mb-1">Startup</p>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400 font-body leading-relaxed">
+                Nuova impresa, nessun storico contabile. Parte da zero.
+              </p>
+            </div>
+
+            <!-- Arrow -->
+            <div class="z-10 flex items-center gap-1 text-xs font-semibold text-brand-600 dark:text-brand-400
+                        opacity-0 group-hover:opacity-100 transition-all duration-200 -mt-1">
+              Scegli
+              <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </button>
+
+          <!-- Azienda -->
+          <button type="button" (click)="selectType('azienda')"
+                  class="type-card group relative flex flex-col items-center text-center gap-4 p-7
+                         bg-white dark:bg-zinc-900 rounded-2xl border-2 border-zinc-200 dark:border-zinc-700
+                         hover:border-emerald-400 dark:hover:border-emerald-500 cursor-pointer">
+            <div class="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                 style="background: radial-gradient(ellipse at 50% 0%, rgba(16,185,129,0.07) 0%, transparent 70%);"></div>
+
+            <div class="phase-icon w-16 h-16 rounded-2xl flex items-center justify-center
+                        bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-800/50 z-10">
+              <svg class="w-8 h-8 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+            </div>
+
+            <div class="z-10">
+              <p class="text-lg font-bold text-zinc-900 dark:text-zinc-100 font-display mb-1">Azienda</p>
+              <p class="text-xs text-zinc-500 dark:text-zinc-400 font-body leading-relaxed">
+                Impresa esistente con storico contabile e saldi iniziali.
+              </p>
+            </div>
+
+            <div class="z-10 flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400
+                        opacity-0 group-hover:opacity-100 transition-all duration-200 -mt-1">
+              Scegli
+              <svg class="w-3.5 h-3.5 transition-transform duration-200 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </div>
+          </button>
+
+        </div>
+      </div>
+    }
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         PHASE 2 — Nome Business Plan
+         ═══════════════════════════════════════════════════════════════════════ -->
+    @if (wizardPhase() === 'name') {
+      <div class="flex-1 flex flex-col bg-white dark:bg-zinc-950 overflow-y-auto">
+
+        <!-- Top bar: back + type badge -->
+        <div class="flex items-center justify-between px-6 pt-5 pb-0 flex-shrink-0 phase-back">
+          <button type="button" (click)="wizardPhase.set('type')"
+                  class="flex items-center gap-1.5 text-sm font-medium text-zinc-500 dark:text-zinc-400
+                         hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors font-body">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Indietro
+          </button>
+
+          <!-- Type badge -->
+          <div [ngClass]="[
+            'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold font-body border',
+            config.companyType === 'startup'
+              ? 'bg-brand-50 dark:bg-brand-950/40 text-brand-700 dark:text-brand-400 border-brand-100 dark:border-brand-800/50'
+              : 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/50'
+          ]">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              @if (config.companyType === 'startup') {
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+              } @else {
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              }
+            </svg>
+            {{ config.companyType === 'startup' ? 'Startup' : 'Azienda' }}
+          </div>
+        </div>
+
+        <!-- Centered card -->
+        <div class="flex-1 flex items-center justify-center px-6 py-8">
+          <div class="w-full max-w-md phase-slide">
+
+            <!-- Heading -->
+            <div class="mb-7">
+              <h2 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display mb-1.5">Come si chiama?</h2>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body">Dai un nome al tuo Business Plan e descrivila brevemente.</p>
+            </div>
+
+            <!-- Name input -->
+            <div class="mb-4">
+              <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-2 font-body uppercase tracking-wide">
+                Nome Business Plan <span class="text-rose-400">*</span>
+              </label>
+              <input type="text" [(ngModel)]="config.projectName" name="projectName"
+                     placeholder="{{ config.companyType === 'startup' ? 'es. MyStartup SaaS 2025' : 'es. Rossi & Figli Piano 2025' }}"
+                     class="inp text-base"
+                     (keydown.enter)="startStepper()"/>
+              @if (!config.projectName.trim()) {
+                <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-body mt-1.5">Campo obbligatorio per procedere</p>
+              }
+            </div>
+
+            <!-- Description -->
+            <div class="mb-7">
+              <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-2 font-body uppercase tracking-wide">
+                Descrizione azienda
+                <span class="normal-case text-zinc-400 font-normal ml-1">(opzionale)</span>
+              </label>
+              <textarea [(ngModel)]="config.companyDescription" name="companyDescription"
+                        rows="3"
+                        placeholder="Cosa fa, a chi si rivolge, qual è il modello di revenue..."
+                        class="inp resize-none leading-relaxed text-sm"></textarea>
+              <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-body mt-1.5">Usata dall'AI per contestualizzare le proiezioni.</p>
+            </div>
+
+            <!-- CTA -->
+            <button type="button" (click)="startStepper()"
+                    [disabled]="!config.projectName.trim()"
+                    [ngClass]="[
+                      'w-full flex items-center justify-center gap-2.5 py-3.5 rounded-xl text-sm font-bold font-body transition-all duration-200',
+                      config.projectName.trim()
+                        ? 'text-white hover:-translate-y-0.5 shadow-lg'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed'
+                    ]"
+                    [style]="config.projectName.trim() ? 'background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 6px 20px rgba(79,70,229,0.35);' : ''">
+              Inizia il Piano
+              <svg class="w-4 h-4 transition-transform duration-200" [class.translate-x-1]="config.projectName.trim()"
+                   fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
+
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         PHASE 3 — Stepper
+         ═══════════════════════════════════════════════════════════════════════ -->
+    @if (wizardPhase() === 'stepper') {
+
     <!-- ═══ STEPPER ══════════════════════════════════════════════════════════ -->
     <div class="flex-shrink-0 px-4 md:px-8 pt-4 md:pt-6 pb-0 bg-white dark:bg-zinc-950">
       <div class="relative flex items-center justify-between mb-1">
@@ -427,6 +666,31 @@ interface LoanItem {
         <!-- ── Step 1: Setup ─────────────────────────────────────────────── -->
         @if (currentStep() === 1) {
           <div [class]="stepClass()">
+            <!-- Summary pill: shows name + type selected in pre-wizard phases -->
+            <div class="flex items-center gap-2 mb-6 p-3 bg-zinc-50 dark:bg-zinc-900 rounded-xl border border-zinc-100 dark:border-zinc-800">
+              <div [ngClass]="[
+                     'w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0',
+                     config.companyType === 'startup' ? 'bg-brand-100 dark:bg-brand-900/50' : 'bg-emerald-100 dark:bg-emerald-900/50'
+                   ]">
+                <svg class="w-3.5 h-3.5" [ngClass]="config.companyType === 'startup' ? 'text-brand-600' : 'text-emerald-600'"
+                     fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  @if (config.companyType === 'startup') {
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  } @else {
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                  }
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-display truncate">{{ config.projectName }}</p>
+                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 font-body">{{ config.companyType === 'startup' ? 'Startup' : 'Azienda' }}</p>
+              </div>
+              <button type="button" (click)="wizardPhase.set('name')"
+                      class="text-[11px] text-brand-600 dark:text-brand-400 font-semibold font-body hover:underline flex-shrink-0">
+                Modifica
+              </button>
+            </div>
+
             <div class="mb-7">
               <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-brand-50 text-brand-700 text-xs font-semibold rounded-full font-body mb-3">
                 <span class="w-1.5 h-1.5 rounded-full bg-brand-500"></span> Passo 1 di 6 · Setup
@@ -436,12 +700,6 @@ interface LoanItem {
             </div>
 
             <div class="space-y-4">
-              <!-- Nome Progetto -->
-              <div>
-                <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5 font-body uppercase tracking-wide">Nome Progetto</label>
-                <input type="text" [(ngModel)]="config.projectName" name="projectName"
-                       placeholder="es. MyStartup SaaS" class="inp"/>
-              </div>
 
               <!-- Anno Inizio -->
               <div>
@@ -499,21 +757,7 @@ interface LoanItem {
                 </div>
               </div>
 
-              <!-- Toggle Nuova Startup -->
-              <div class="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800">
-                <div>
-                  <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body">Sei una nuova Startup?</p>
-                  <p class="text-xs text-zinc-500 dark:text-zinc-400 font-body mt-0.5">Disattiva per inserire saldi storici dello Stato Patrimoniale</p>
-                </div>
-                <button (click)="config.isNewStartup = !config.isNewStartup"
-                        class="relative w-12 h-6 rounded-full transition-colors duration-200 flex-shrink-0 ml-4"
-                        [ngClass]="config.isNewStartup ? 'bg-brand-500' : 'bg-zinc-300'">
-                  <span class="absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200"
-                        [ngClass]="config.isNewStartup ? 'left-6' : 'left-0.5'"></span>
-                </button>
-              </div>
-
-              <!-- Storico (non-startup) -->
+              <!-- Storico (non-startup / azienda) -->
               @if (!config.isNewStartup) {
                 <div class="bg-amber-50 rounded-2xl border border-amber-100 p-4 space-y-3">
                   <p class="text-xs font-bold text-amber-700 font-body uppercase tracking-wide flex items-center gap-1.5">
@@ -1582,6 +1826,8 @@ interface LoanItem {
       }
     </div>
 
+    } <!-- end @if stepper -->
+
     <!-- Desktop tooltip (fixed, viewport-aware, escapes overflow container) -->
     @if (showDeskTip()) {
       <div class="desk-tip"
@@ -1609,6 +1855,20 @@ export class WizardFormComponent {
   Math = Math;
 
   private readonly planService = inject(BusinessPlanService);
+
+  // ─── Pre-wizard phase ─────────────────────────────────────────────────────
+  wizardPhase = signal<'type' | 'name' | 'stepper'>('type');
+
+  selectType(type: 'startup' | 'azienda'): void {
+    this.config.companyType = type;
+    this.config.isNewStartup = type === 'startup';
+    this.wizardPhase.set('name');
+  }
+
+  startStepper(): void {
+    if (!this.config.projectName.trim()) return;
+    this.wizardPhase.set('stepper');
+  }
 
   // ─── Navigation ──────────────────────────────────────────────────────────
   currentStep = signal(1);
@@ -1690,15 +1950,17 @@ export class WizardFormComponent {
 
   // ─── Step 1: Global Config ────────────────────────────────────────────────
   config = {
-    projectName:     '',
-    startYear:       new Date().getFullYear(),
-    iresRate:        24,
-    irapRate:        4,
-    badDebtPct:      0.1,
-    isNewStartup:    true,
-    initialCash:     0,
-    residualCredits: 0,
-    residualDebts:   0,
+    projectName:        '',
+    companyType:        'startup' as 'startup' | 'azienda',
+    companyDescription: '',
+    startYear:          new Date().getFullYear(),
+    iresRate:           24,
+    irapRate:           4,
+    badDebtPct:         0.1,
+    isNewStartup:       true,
+    initialCash:        0,
+    residualCredits:    0,
+    residualDebts:      0,
   };
 
   // ─── Step 2: Products ─────────────────────────────────────────────────────
