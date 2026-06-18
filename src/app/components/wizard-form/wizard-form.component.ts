@@ -377,46 +377,6 @@ interface LoanItem {
       color: #f87171;
     }
     :host-context(.dark) .remove-btn:hover { background: rgba(239,68,68,0.22); }
-
-    /* ── Phase animations ───────────────────────────────────────────────── */
-    @keyframes phaseUp {
-      from { opacity: 0; transform: translateY(28px) scale(0.97); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    @keyframes phaseSlideIn {
-      from { opacity: 0; transform: translateX(36px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes phaseSlideBack {
-      from { opacity: 0; transform: translateX(-36px); }
-      to   { opacity: 1; transform: translateX(0); }
-    }
-    @keyframes typeCardFloat {
-      0%, 100% { transform: translateY(0); }
-      50%      { transform: translateY(-5px); }
-    }
-    .phase-up       { animation: phaseUp      0.48s cubic-bezier(0.16,1,0.3,1) both; }
-    .phase-slide    { animation: phaseSlideIn  0.40s cubic-bezier(0.16,1,0.3,1) both; }
-    .phase-back     { animation: phaseSlideBack 0.40s cubic-bezier(0.16,1,0.3,1) both; }
-
-    .type-card {
-      transition: transform 0.25s cubic-bezier(0.16,1,0.3,1),
-                  box-shadow 0.25s cubic-bezier(0.16,1,0.3,1),
-                  border-color 0.18s ease,
-                  background 0.18s ease;
-    }
-    .type-card:hover { transform: translateY(-6px); box-shadow: 0 16px 40px -8px rgba(0,0,0,0.14); }
-
-    .phase-icon {
-      transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    .type-card:hover .phase-icon { transform: scale(1.15); }
-
-    @media (prefers-reduced-motion: reduce) {
-      .phase-up, .phase-slide, .phase-back { animation: none; opacity: 1; transform: none; }
-      .type-card:hover { transform: none; box-shadow: none; }
-      .type-card:hover .phase-icon { transform: none; }
-    }
   `],
   template: `
 
