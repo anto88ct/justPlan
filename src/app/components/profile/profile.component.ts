@@ -125,6 +125,20 @@ import { Router } from '@angular/router';
           </div>
         </div>
 
+        <!-- Piano attivo -->
+        <div class="pe-2 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-700 shadow-card px-6 py-5 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <span class="inline-flex px-2.5 py-1 rounded-lg bg-violet-600 text-white text-xs font-black tracking-wider font-body">MAX</span>
+            <div>
+              <p class="text-sm font-semibold text-zinc-800 dark:text-zinc-200 font-body">Piano attivo</p>
+              <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">Rinnovo il 19 lug 2026</p>
+            </div>
+          </div>
+          <button class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 font-body transition-colors flex-shrink-0">
+            Gestisci piano
+          </button>
+        </div>
+
         <!-- Personal info -->
         <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-700 shadow-card p-6 pe-3">
           <p class="text-xs font-semibold text-zinc-400 dark:text-zinc-500 uppercase tracking-widest font-body mb-5">
@@ -342,6 +356,7 @@ export class ProfileComponent {
   confirmNewPassword = '';
 
   readonly initial = computed(() => (this.name() || 'F').charAt(0).toUpperCase());
+
 
   private readonly contributionDays = this.generateFakeContributions();
 

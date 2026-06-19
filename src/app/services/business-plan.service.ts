@@ -24,13 +24,31 @@ export interface IncomeRow {
   isCost?: boolean;
 }
 
-export interface SavedPlan {
+export interface PlanVersionContributor {
+  name: string;
+  initials: string;
+  avatarColor: string;
+  lastEditedAt: Date;
+}
+
+export interface PlanVersion {
   id: string;
   name: string;
+  color: string;
+  status: 'bozza' | 'definitivo';
   savedAt: Date;
   kpi: KpiData;
   incomeStatement: IncomeRow[];
   cashFlow: CashFlowPoint[];
+  contributors?: PlanVersionContributor[];
+}
+
+export interface SavedPlan {
+  id: string;
+  name: string;
+  createdAt: Date;
+  isCowork?: boolean;
+  versions: PlanVersion[];
 }
 
 // ── Wizard input interfaces ──────────────────────────────────────────────────
@@ -191,74 +209,168 @@ export class BusinessPlanService {
     return { fatturato: '+18%', ebitda: '+15%', utile: '+22%', runway: '+4 mesi' };
   });
 
+  readonly currentPlanId = signal<string | null>(null);
+
   readonly savedPlans = signal<SavedPlan[]>([
     {
       id: 'plan-001',
       name: 'TechHub Pro',
-      savedAt: new Date('2025-01-15'),
-      kpi: { fatturatoTotale: 892000, ebitda: 267000, utileNetto: 198000, cashRunway: 22 },
-      cashFlow: [
-        { month: 'Gen', value: 12000 }, { month: 'Feb', value: 28000 }, { month: 'Mar', value: 45000 },
-        { month: 'Apr', value: 52000 }, { month: 'Mag', value: 68000 }, { month: 'Giu', value: 75000 },
-        { month: 'Lug', value: 82000 }, { month: 'Ago', value: 88000 }, { month: 'Set', value: 95000 },
-        { month: 'Ott', value: 102000 }, { month: 'Nov', value: 112000 }, { month: 'Dic', value: 125000 },
-      ],
-      incomeStatement: [
-        { label: 'Ricavi Totali',     anno1:  892000, anno2: 1350000, anno3: 2100000, isHighlight: true },
-        { label: 'Costo del Venduto', anno1: -312000, anno2: -405000, anno3: -525000, isCost: true },
-        { label: 'Gross Profit',      anno1:  580000, anno2:  945000, anno3: 1575000, isHighlight: true },
-        { label: 'Marketing & Sales', anno1:  -89200, anno2: -135000, anno3: -189000, isCost: true },
-        { label: 'Personale',         anno1: -180000, anno2: -270000, anno3: -360000, isCost: true },
-        { label: 'G&A',               anno1:  -43800, anno2:  -65000, anno3:  -82000, isCost: true },
-        { label: 'EBITDA',            anno1:  267000, anno2:  475000, anno3:  944000, isHighlight: true },
-        { label: 'Ammortamenti',      anno1:  -35000, anno2:  -42000, anno3:  -55000, isCost: true },
-        { label: 'Utile Netto',       anno1:  198000, anno2:  375000, anno3:  793000, isHighlight: true },
+      createdAt: new Date('2025-01-10'),
+      isCowork: true,
+      versions: [
+        {
+          id: 'v-001-1',
+          name: 'Base Ottimistica',
+          color: '#6366f1',
+          status: 'definitivo',
+          savedAt: new Date('2025-01-15'),
+          kpi: { fatturatoTotale: 892000, ebitda: 267000, utileNetto: 198000, cashRunway: 22 },
+          cashFlow: [
+            { month: 'Gen', value: 12000 }, { month: 'Feb', value: 28000 }, { month: 'Mar', value: 45000 },
+            { month: 'Apr', value: 52000 }, { month: 'Mag', value: 68000 }, { month: 'Giu', value: 75000 },
+            { month: 'Lug', value: 82000 }, { month: 'Ago', value: 88000 }, { month: 'Set', value: 95000 },
+            { month: 'Ott', value: 102000 }, { month: 'Nov', value: 112000 }, { month: 'Dic', value: 125000 },
+          ],
+          incomeStatement: [
+            { label: 'Ricavi Totali',     anno1:  892000, anno2: 1350000, anno3: 2100000, isHighlight: true },
+            { label: 'Costo del Venduto', anno1: -312000, anno2: -405000, anno3: -525000, isCost: true },
+            { label: 'Gross Profit',      anno1:  580000, anno2:  945000, anno3: 1575000, isHighlight: true },
+            { label: 'Marketing & Sales', anno1:  -89200, anno2: -135000, anno3: -189000, isCost: true },
+            { label: 'Personale',         anno1: -180000, anno2: -270000, anno3: -360000, isCost: true },
+            { label: 'G&A',               anno1:  -43800, anno2:  -65000, anno3:  -82000, isCost: true },
+            { label: 'EBITDA',            anno1:  267000, anno2:  475000, anno3:  944000, isHighlight: true },
+            { label: 'Ammortamenti',      anno1:  -35000, anno2:  -42000, anno3:  -55000, isCost: true },
+            { label: 'Utile Netto',       anno1:  198000, anno2:  375000, anno3:  793000, isHighlight: true },
+          ],
+          contributors: [
+            { name: 'Marco Bianchi', initials: 'MB', avatarColor: '#6366f1', lastEditedAt: new Date('2025-01-15') },
+            { name: 'Sara Neri', initials: 'SN', avatarColor: '#f59e0b', lastEditedAt: new Date('2025-01-14') },
+          ],
+        },
+        {
+          id: 'v-001-2',
+          name: 'Scenario Prudente',
+          color: '#10b981',
+          status: 'definitivo',
+          savedAt: new Date('2025-02-01'),
+          kpi: { fatturatoTotale: 720000, ebitda: 180000, utileNetto: 130000, cashRunway: 18 },
+          cashFlow: [
+            { month: 'Gen', value: 5000 }, { month: 'Feb', value: 15000 }, { month: 'Mar', value: 30000 },
+            { month: 'Apr', value: 38000 }, { month: 'Mag', value: 52000 }, { month: 'Giu', value: 60000 },
+            { month: 'Lug', value: 65000 }, { month: 'Ago', value: 72000 }, { month: 'Set', value: 78000 },
+            { month: 'Ott', value: 85000 }, { month: 'Nov', value: 92000 }, { month: 'Dic', value: 100000 },
+          ],
+          incomeStatement: [
+            { label: 'Ricavi Totali',     anno1:  720000, anno2: 1080000, anno3: 1680000, isHighlight: true },
+            { label: 'Costo del Venduto', anno1: -252000, anno2: -324000, anno3: -420000, isCost: true },
+            { label: 'Gross Profit',      anno1:  468000, anno2:  756000, anno3: 1260000, isHighlight: true },
+            { label: 'Marketing & Sales', anno1:  -72000, anno2: -108000, anno3: -151200, isCost: true },
+            { label: 'Personale',         anno1: -180000, anno2: -270000, anno3: -360000, isCost: true },
+            { label: 'G&A',               anno1:  -36000, anno2:  -54000, anno3:  -70000, isCost: true },
+            { label: 'EBITDA',            anno1:  180000, anno2:  324000, anno3:  678800, isHighlight: true },
+            { label: 'Ammortamenti',      anno1:  -28000, anno2:  -35000, anno3:  -44000, isCost: true },
+            { label: 'Utile Netto',       anno1:  130000, anno2:  252000, anno3:  564000, isHighlight: true },
+          ],
+          contributors: [
+            { name: 'Marco Bianchi', initials: 'MB', avatarColor: '#6366f1', lastEditedAt: new Date('2025-02-01') },
+          ],
+        },
+        {
+          id: 'v-001-3',
+          name: 'Draft Revisione Q2',
+          color: '#f59e0b',
+          status: 'bozza',
+          savedAt: new Date('2025-03-05'),
+          kpi: { fatturatoTotale: 950000, ebitda: 290000, utileNetto: 210000, cashRunway: 24 },
+          cashFlow: [
+            { month: 'Gen', value: 18000 }, { month: 'Feb', value: 35000 }, { month: 'Mar', value: 55000 },
+            { month: 'Apr', value: 65000 }, { month: 'Mag', value: 80000 }, { month: 'Giu', value: 88000 },
+            { month: 'Lug', value: 95000 }, { month: 'Ago', value: 102000 }, { month: 'Set', value: 110000 },
+            { month: 'Ott', value: 118000 }, { month: 'Nov', value: 128000 }, { month: 'Dic', value: 140000 },
+          ],
+          incomeStatement: [
+            { label: 'Ricavi Totali',     anno1:  950000, anno2: 1450000, anno3: 2250000, isHighlight: true },
+            { label: 'Costo del Venduto', anno1: -332500, anno2: -435000, anno3: -562500, isCost: true },
+            { label: 'Gross Profit',      anno1:  617500, anno2: 1015000, anno3: 1687500, isHighlight: true },
+            { label: 'Marketing & Sales', anno1:  -95000, anno2: -145000, anno3: -202500, isCost: true },
+            { label: 'Personale',         anno1: -192000, anno2: -288000, anno3: -384000, isCost: true },
+            { label: 'G&A',               anno1:  -40500, anno2:  -68000, anno3:  -88000, isCost: true },
+            { label: 'EBITDA',            anno1:  290000, anno2:  514000, anno3: 1013000, isHighlight: true },
+            { label: 'Ammortamenti',      anno1:  -38000, anno2:  -46000, anno3:  -60000, isCost: true },
+            { label: 'Utile Netto',       anno1:  210000, anno2:  408000, anno3:  848000, isHighlight: true },
+          ],
+          contributors: [
+            { name: 'Marco Bianchi', initials: 'MB', avatarColor: '#6366f1', lastEditedAt: new Date('2025-03-05') },
+            { name: 'Sara Neri', initials: 'SN', avatarColor: '#f59e0b', lastEditedAt: new Date('2025-03-04') },
+            { name: 'Luca Verdi', initials: 'LV', avatarColor: '#10b981', lastEditedAt: new Date('2025-03-03') },
+          ],
+        },
       ],
     },
     {
       id: 'plan-002',
       name: 'FoodieApp',
-      savedAt: new Date('2025-02-28'),
-      kpi: { fatturatoTotale: 320000, ebitda: 45000, utileNetto: 22000, cashRunway: 9 },
-      cashFlow: [
-        { month: 'Gen', value: -22000 }, { month: 'Feb', value: -15000 }, { month: 'Mar', value: -5000 },
-        { month: 'Apr', value: 8000 },  { month: 'Mag', value: 15000 },  { month: 'Giu', value: 22000 },
-        { month: 'Lug', value: 18000 }, { month: 'Ago', value: 25000 },  { month: 'Set', value: 32000 },
-        { month: 'Ott', value: 38000 }, { month: 'Nov', value: 45000 },  { month: 'Dic', value: 52000 },
-      ],
-      incomeStatement: [
-        { label: 'Ricavi Totali',     anno1:  320000, anno2:  580000, anno3:  980000, isHighlight: true },
-        { label: 'Costo del Venduto', anno1: -128000, anno2: -208000, anno3: -343000, isCost: true },
-        { label: 'Gross Profit',      anno1:  192000, anno2:  372000, anno3:  637000, isHighlight: true },
-        { label: 'Marketing & Sales', anno1:  -64000, anno2: -116000, anno3: -196000, isCost: true },
-        { label: 'Personale',         anno1:  -72000, anno2: -108000, anno3: -162000, isCost: true },
-        { label: 'G&A',               anno1:  -11000, anno2:  -20000, anno3:  -32000, isCost: true },
-        { label: 'EBITDA',            anno1:   45000, anno2:  128000, anno3:  247000, isHighlight: true },
-        { label: 'Ammortamenti',      anno1:  -12000, anno2:  -15000, anno3:  -18000, isCost: true },
-        { label: 'Utile Netto',       anno1:   22000, anno2:  100000, anno3:  208000, isHighlight: true },
+      createdAt: new Date('2025-02-25'),
+      isCowork: false,
+      versions: [
+        {
+          id: 'v-002-1',
+          name: 'Versione Iniziale',
+          color: '#f97316',
+          status: 'definitivo',
+          savedAt: new Date('2025-02-28'),
+          kpi: { fatturatoTotale: 320000, ebitda: 45000, utileNetto: 22000, cashRunway: 9 },
+          cashFlow: [
+            { month: 'Gen', value: -22000 }, { month: 'Feb', value: -15000 }, { month: 'Mar', value: -5000 },
+            { month: 'Apr', value: 8000 },  { month: 'Mag', value: 15000 },  { month: 'Giu', value: 22000 },
+            { month: 'Lug', value: 18000 }, { month: 'Ago', value: 25000 },  { month: 'Set', value: 32000 },
+            { month: 'Ott', value: 38000 }, { month: 'Nov', value: 45000 },  { month: 'Dic', value: 52000 },
+          ],
+          incomeStatement: [
+            { label: 'Ricavi Totali',     anno1:  320000, anno2:  580000, anno3:  980000, isHighlight: true },
+            { label: 'Costo del Venduto', anno1: -128000, anno2: -208000, anno3: -343000, isCost: true },
+            { label: 'Gross Profit',      anno1:  192000, anno2:  372000, anno3:  637000, isHighlight: true },
+            { label: 'Marketing & Sales', anno1:  -64000, anno2: -116000, anno3: -196000, isCost: true },
+            { label: 'Personale',         anno1:  -72000, anno2: -108000, anno3: -162000, isCost: true },
+            { label: 'G&A',               anno1:  -11000, anno2:  -20000, anno3:  -32000, isCost: true },
+            { label: 'EBITDA',            anno1:   45000, anno2:  128000, anno3:  247000, isHighlight: true },
+            { label: 'Ammortamenti',      anno1:  -12000, anno2:  -15000, anno3:  -18000, isCost: true },
+            { label: 'Utile Netto',       anno1:   22000, anno2:  100000, anno3:  208000, isHighlight: true },
+          ],
+        },
       ],
     },
     {
       id: 'plan-003',
       name: 'EcoStore',
-      savedAt: new Date('2025-03-10'),
-      kpi: { fatturatoTotale: 156000, ebitda: -28000, utileNetto: -42000, cashRunway: 6 },
-      cashFlow: [
-        { month: 'Gen', value: -35000 }, { month: 'Feb', value: -28000 }, { month: 'Mar', value: -18000 },
-        { month: 'Apr', value: -8000 },  { month: 'Mag', value: 2000 },   { month: 'Giu', value: 8000 },
-        { month: 'Lug', value: 5000 },   { month: 'Ago', value: 12000 },  { month: 'Set', value: 18000 },
-        { month: 'Ott', value: 22000 },  { month: 'Nov', value: 28000 },  { month: 'Dic', value: 35000 },
-      ],
-      incomeStatement: [
-        { label: 'Ricavi Totali',     anno1:  156000, anno2:  312000, anno3:  624000, isHighlight: true },
-        { label: 'Costo del Venduto', anno1:  -93600, anno2: -156000, anno3: -280800, isCost: true },
-        { label: 'Gross Profit',      anno1:   62400, anno2:  156000, anno3:  343200, isHighlight: true },
-        { label: 'Marketing & Sales', anno1:  -46800, anno2:  -62400, anno3:  -93600, isCost: true },
-        { label: 'Personale',         anno1:  -36000, anno2:  -72000, anno3: -108000, isCost: true },
-        { label: 'G&A',               anno1:   -7600, anno2:  -12000, anno3:  -16000, isCost: true },
-        { label: 'EBITDA',            anno1:  -28000, anno2:    9600, anno3:  125600, isHighlight: true },
-        { label: 'Ammortamenti',      anno1:   -8000, anno2:  -10000, anno3:  -12000, isCost: true },
-        { label: 'Utile Netto',       anno1:  -42000, anno2:    -400, anno3:  113600, isHighlight: true },
+      createdAt: new Date('2025-03-08'),
+      isCowork: false,
+      versions: [
+        {
+          id: 'v-003-1',
+          name: 'Piano di Lancio',
+          color: '#8b5cf6',
+          status: 'definitivo',
+          savedAt: new Date('2025-03-10'),
+          kpi: { fatturatoTotale: 156000, ebitda: -28000, utileNetto: -42000, cashRunway: 6 },
+          cashFlow: [
+            { month: 'Gen', value: -35000 }, { month: 'Feb', value: -28000 }, { month: 'Mar', value: -18000 },
+            { month: 'Apr', value: -8000 },  { month: 'Mag', value: 2000 },   { month: 'Giu', value: 8000 },
+            { month: 'Lug', value: 5000 },   { month: 'Ago', value: 12000 },  { month: 'Set', value: 18000 },
+            { month: 'Ott', value: 22000 },  { month: 'Nov', value: 28000 },  { month: 'Dic', value: 35000 },
+          ],
+          incomeStatement: [
+            { label: 'Ricavi Totali',     anno1:  156000, anno2:  312000, anno3:  624000, isHighlight: true },
+            { label: 'Costo del Venduto', anno1:  -93600, anno2: -156000, anno3: -280800, isCost: true },
+            { label: 'Gross Profit',      anno1:   62400, anno2:  156000, anno3:  343200, isHighlight: true },
+            { label: 'Marketing & Sales', anno1:  -46800, anno2:  -62400, anno3:  -93600, isCost: true },
+            { label: 'Personale',         anno1:  -36000, anno2:  -72000, anno3: -108000, isCost: true },
+            { label: 'G&A',               anno1:   -7600, anno2:  -12000, anno3:  -16000, isCost: true },
+            { label: 'EBITDA',            anno1:  -28000, anno2:    9600, anno3:  125600, isHighlight: true },
+            { label: 'Ammortamenti',      anno1:   -8000, anno2:  -10000, anno3:  -12000, isCost: true },
+            { label: 'Utile Netto',       anno1:  -42000, anno2:    -400, anno3:  113600, isHighlight: true },
+          ],
+        },
       ],
     },
   ]);
@@ -620,30 +732,138 @@ export class BusinessPlanService {
     this.isAiUpdated.set(false);
   }
 
-  // ── Existing helpers ─────────────────────────────────────────────────────
+  // ── Plan / version helpers ───────────────────────────────────────────────
+
+  private _versionColors = ['#6366f1', '#10b981', '#f59e0b', '#f97316', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16'];
+  private _nextVersionColor(planId: string): string {
+    const plan = this.savedPlans().find(p => p.id === planId);
+    const used = plan?.versions.map(v => v.color) ?? [];
+    return this._versionColors.find(c => !used.includes(c)) ?? this._versionColors[0];
+  }
+
+  createDraftPlan(name: string): string {
+    const planId = `plan-${Date.now()}`;
+    const versionId = `v-${Date.now()}`;
+    const newPlan: SavedPlan = {
+      id: planId,
+      name,
+      createdAt: new Date(),
+      isCowork: false,
+      versions: [{
+        id: versionId,
+        name: 'Bozza',
+        color: '#6366f1',
+        status: 'bozza',
+        savedAt: new Date(),
+        kpi: { ...this.kpi() },
+        cashFlow: this.cashFlow().map(p => ({ ...p })),
+        incomeStatement: this.incomeStatement().map(r => ({ ...r })),
+      }],
+    };
+    this.savedPlans.update(plans => [newPlan, ...plans]);
+    this.currentPlanId.set(planId);
+    return planId;
+  }
 
   savePlan(name?: string): void {
     const planName = name || this.currentProjectName() || `Business Plan ${new Date().toLocaleDateString('it-IT')}`;
-    const newPlan: SavedPlan = {
-      id: `plan-${Date.now()}`,
-      name: planName,
+    const existing = this.currentPlanId();
+    if (existing) {
+      this.autoSaveDraft(existing);
+      return;
+    }
+    this.createDraftPlan(planName);
+  }
+
+  autoSaveDraft(planId: string): void {
+    this.savedPlans.update(plans => plans.map(p => {
+      if (p.id !== planId) return p;
+      const draftIdx = p.versions.findIndex(v => v.status === 'bozza');
+      const updatedVersion: PlanVersion = {
+        id: draftIdx >= 0 ? p.versions[draftIdx].id : `v-${Date.now()}`,
+        name: draftIdx >= 0 ? p.versions[draftIdx].name : 'Bozza',
+        color: draftIdx >= 0 ? p.versions[draftIdx].color : '#6366f1',
+        status: 'bozza',
+        savedAt: new Date(),
+        kpi: { ...this.kpi() },
+        cashFlow: this.cashFlow().map(pt => ({ ...pt })),
+        incomeStatement: this.incomeStatement().map(r => ({ ...r })),
+        contributors: draftIdx >= 0 ? p.versions[draftIdx].contributors : undefined,
+      };
+      const versions = draftIdx >= 0
+        ? p.versions.map((v, i) => i === draftIdx ? updatedVersion : v)
+        : [...p.versions, updatedVersion];
+      return { ...p, versions };
+    }));
+  }
+
+  saveRevision(versionName?: string): void {
+    const planId = this.currentPlanId();
+    if (!planId) {
+      const newId = this.createDraftPlan(this.currentProjectName() || 'Business Plan');
+      this._finalizeRevision(newId, versionName);
+      return;
+    }
+    this._finalizeRevision(planId, versionName);
+  }
+
+  private _finalizeRevision(planId: string, versionName?: string): void {
+    const color = this._nextVersionColor(planId);
+    const plan = this.savedPlans().find(p => p.id === planId);
+    const revNum = (plan?.versions.filter(v => v.status === 'definitivo').length ?? 0) + 1;
+    const newVersion: PlanVersion = {
+      id: `v-${Date.now()}`,
+      name: versionName ?? `Revisione ${revNum}`,
+      color,
+      status: 'definitivo',
       savedAt: new Date(),
       kpi: { ...this.kpi() },
       cashFlow: this.cashFlow().map(p => ({ ...p })),
       incomeStatement: this.incomeStatement().map(r => ({ ...r })),
     };
-    this.savedPlans.update(plans => [newPlan, ...plans]);
+    this.savedPlans.update(plans => plans.map(p =>
+      p.id === planId ? { ...p, versions: [...p.versions, newVersion] } : p
+    ));
+  }
+
+  loadVersion(version: PlanVersion, planId: string): void {
+    this.kpi.set({ ...version.kpi });
+    this.cashFlow.set(version.cashFlow.map(p => ({ ...p })));
+    this.incomeStatement.set(version.incomeStatement.map(r => ({ ...r })));
+    this.isAiUpdated.set(false);
+    this.currentPlanId.set(planId);
   }
 
   loadPlan(plan: SavedPlan): void {
-    this.kpi.set({ ...plan.kpi });
-    this.cashFlow.set(plan.cashFlow.map(p => ({ ...p })));
-    this.incomeStatement.set(plan.incomeStatement.map(r => ({ ...r })));
-    this.isAiUpdated.set(false);
+    const latest = plan.versions[plan.versions.length - 1];
+    if (latest) this.loadVersion(latest, plan.id);
   }
 
   deletePlan(id: string): void {
     this.savedPlans.update(plans => plans.filter(p => p.id !== id));
+    if (this.currentPlanId() === id) this.currentPlanId.set(null);
+  }
+
+  deleteVersion(planId: string, versionId: string): void {
+    this.savedPlans.update(plans => plans.map(p => {
+      if (p.id !== planId) return p;
+      const versions = p.versions.filter(v => v.id !== versionId);
+      return { ...p, versions };
+    }));
+  }
+
+  updateVersionName(planId: string, versionId: string, name: string): void {
+    this.savedPlans.update(plans => plans.map(p => {
+      if (p.id !== planId) return p;
+      return { ...p, versions: p.versions.map(v => v.id === versionId ? { ...v, name } : v) };
+    }));
+  }
+
+  updateVersionColor(planId: string, versionId: string, color: string): void {
+    this.savedPlans.update(plans => plans.map(p => {
+      if (p.id !== planId) return p;
+      return { ...p, versions: p.versions.map(v => v.id === versionId ? { ...v, color } : v) };
+    }));
   }
 
   applyAiScenario(): void {

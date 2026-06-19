@@ -10,7 +10,7 @@ import { AiChatbotComponent, AgentId } from '../ai-chatbot/ai-chatbot.component'
 import { ReportComponent } from '../report/report.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { UploadBusinessPlanComponent } from '../upload-business-plan/upload-business-plan.component';
-import { BusinessPlanService, SavedPlan } from '../../services/business-plan.service';
+import { BusinessPlanService, SavedPlan, PlanVersion } from '../../services/business-plan.service';
 
 type View = 'panoramica' | 'wizard' | 'dashboard' | 'scenari' | 'report' | 'impostazioni' | 'piani-salvati' | 'profilo' | 'caricamenti' | 'co-work';
 
@@ -563,7 +563,7 @@ interface ChatSession {
                     'flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border transition-all duration-300 font-body flex-shrink-0',
                     justSaved()
                       ? 'bg-emerald-500 text-white border-emerald-500'
-                      : 'bg-brand-600 text-white border-brand-600 hover:bg-brand-500'
+                      : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
                   ]">
             @if (justSaved()) {
               <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
@@ -575,6 +575,25 @@ interface ChatSession {
                 <path stroke-linecap="round" stroke-linejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/>
               </svg>
               <span class="hidden sm:inline">{{ 'topbar.salva' | translate }}</span>
+            }
+          </button>
+          <button (click)="onSaveRevision()"
+                  [ngClass]="[
+                    'flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border transition-all duration-300 font-body flex-shrink-0',
+                    justSavedRevision()
+                      ? 'bg-emerald-500 text-white border-emerald-500'
+                      : 'bg-brand-600 text-white border-brand-600 hover:bg-brand-500'
+                  ]">
+            @if (justSavedRevision()) {
+              <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+              </svg>
+              <span class="hidden sm:inline">Revisione salvata</span>
+            } @else {
+              <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/>
+              </svg>
+              <span class="hidden sm:inline">Salva revisione</span>
             }
           </button>
           <button (click)="openShareDialog()"
@@ -624,33 +643,6 @@ interface ChatSession {
           }
         </div>
 
-        <!-- Profile avatar with plan badge -->
-        <div class="relative flex-shrink-0">
-          <button (click)="navigate({ id: 'profilo', view: 'profilo' })"
-                  [matTooltip]="'sidebar.profiloTooltip' | translate"
-                  matTooltipPosition="below"
-                  [ngClass]="[
-                    'flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200',
-                    currentView() === 'profilo'
-                      ? 'ring-2 ring-offset-1 ring-offset-white dark:ring-offset-zinc-900'
-                      : 'hover:scale-105 hover:shadow-sm',
-                    userPlan() === 'max'  ? 'ring-violet-500'
-                    : userPlan() === 'pro' ? 'ring-amber-400'
-                    : currentView() === 'profilo' ? 'ring-brand-500' : ''
-                  ]"
-                  style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
-            <span class="text-white text-xs font-bold select-none">F</span>
-          </button>
-          @if (userPlan() !== 'free') {
-            <span [ngClass]="[
-                    'absolute -bottom-1 -right-1 px-1 py-px rounded text-[7px] font-black leading-none tracking-wider text-white pointer-events-none',
-                    userPlan() === 'max' ? 'bg-violet-600' : 'bg-amber-500'
-                  ]">
-              {{ userPlan() | uppercase }}
-            </span>
-          }
-        </div>
-
         <button (click)="toggleAi()"
                 [ngClass]="[
                   'flex items-center gap-1.5 text-xs font-semibold px-2 sm:px-3 py-1.5 rounded-lg border transition-all duration-200 font-body flex-shrink-0',
@@ -662,6 +654,29 @@ interface ChatSession {
           </svg>
           <span class="hidden sm:inline">{{ 'topbar.aiCopilot' | translate }}</span>
         </button>
+
+        <!-- Profile avatar with plan badge — far right -->
+        <div class="relative flex-shrink-0">
+          <button (click)="navigate({ id: 'profilo', view: 'profilo' })"
+                  [matTooltip]="'sidebar.profiloTooltip' | translate"
+                  matTooltipPosition="below"
+                  [ngClass]="[
+                    'flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200 ring-2 ring-offset-1 ring-offset-white dark:ring-offset-zinc-900',
+                    currentView() === 'profilo' ? 'opacity-90' : 'hover:scale-105 hover:shadow-sm',
+                    userPlan() === 'max'  ? 'ring-violet-500'
+                    : userPlan() === 'pro' ? 'ring-amber-400'
+                    : 'ring-brand-500'
+                  ]"
+                  style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+            <span class="text-white text-xs font-bold select-none">F</span>
+          </button>
+          <span [ngClass]="[
+                  'absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-1.5 py-px rounded text-[7px] font-black leading-none tracking-wider text-white pointer-events-none whitespace-nowrap',
+                  userPlan() === 'max' ? 'bg-violet-600' : userPlan() === 'pro' ? 'bg-amber-500' : 'bg-zinc-500'
+                ]">
+            {{ userPlan() | uppercase }}
+          </span>
+        </div>
       </header>
 
       <!-- View + AI split -->
@@ -672,12 +687,20 @@ interface ChatSession {
 
           <!-- PANORAMICA: Claude-style AI landing -->
           @if (currentView() === 'panoramica') {
-            <div class="view-enter h-full flex overflow-hidden bg-zinc-50 dark:bg-zinc-950">
+            <div class="view-enter h-full flex overflow-hidden bg-zinc-50 dark:bg-zinc-950 relative">
+
+              <!-- Mobile backdrop for chat history -->
+              @if (chatHistoryOpen()) {
+                <div class="absolute inset-0 bg-black/40 z-10 lg:hidden"
+                     (click)="chatHistoryOpen.set(false)"></div>
+              }
 
               <!-- ── Chat history sidebar ── -->
               <div [ngClass]="[
-                'flex-shrink-0 flex flex-col bg-white dark:bg-zinc-900 border-r border-zinc-100 dark:border-zinc-800 transition-all duration-300 overflow-hidden',
-                chatHistoryOpen() ? 'w-52' : 'w-0'
+                'flex flex-col bg-white dark:bg-zinc-900 border-r border-zinc-100 dark:border-zinc-800 transition-all duration-300 overflow-hidden',
+                chatHistoryOpen()
+                  ? 'absolute inset-y-0 left-0 z-20 w-52 shadow-xl lg:relative lg:inset-auto lg:z-auto lg:shadow-none lg:flex-shrink-0'
+                  : 'w-0 lg:flex-shrink-0'
               ]">
                 <div class="p-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between gap-2 min-w-[208px]">
                   <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Cronologia</span>
@@ -1220,126 +1243,293 @@ interface ChatSession {
 
           <!-- PIANI SALVATI -->
           @if (currentView() === 'piani-salvati') {
-            <div class="view-enter h-full overflow-y-auto scrollbar-thin p-8">
-              <div class="max-w-4xl mx-auto">
-                <div class="flex items-start justify-between mb-7">
-                  <div>
-                    <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">{{ 'pianiSalvati.archivio' | translate }}</p>
-                    <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display">{{ 'pianiSalvati.title' | translate }}</h1>
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mt-1">{{ planService.savedPlans().length }} {{ 'pianiSalvati.count' | translate }}</p>
-                  </div>
-                  <button (click)="goToWizard()"
-                          class="flex items-center gap-2 px-4 py-2.5 bg-brand-600 hover:bg-brand-500
-                                 text-white text-sm font-semibold rounded-xl transition-all duration-200 font-body
-                                 hover:-translate-y-0.5 shadow-md shadow-brand-500/25">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                    </svg>
-                    {{ 'pianiSalvati.nuovoPiano' | translate }}
-                  </button>
-                </div>
-                @if (planService.savedPlans().length === 0) {
-                  <div class="text-center py-20">
-                    <div class="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4 float-anim">
-                      <svg class="w-7 h-7 text-zinc-400 dark:text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12l1-12"/>
-                      </svg>
+            <div class="view-enter h-full flex overflow-hidden">
+
+              <!-- ── Plan list ── -->
+              <div [ngClass]="[
+                'flex flex-col transition-all duration-300 ease-in-out overflow-y-auto scrollbar-thin',
+                selectedPlanId() ? 'w-0 lg:w-80 lg:flex-shrink-0 overflow-hidden' : 'flex-1'
+              ]">
+                <div class="p-6 lg:p-8 min-w-[18rem]">
+                  <div class="flex items-start justify-between mb-7">
+                    <div>
+                      <p class="text-xs font-semibold text-brand-600 uppercase tracking-widest font-body mb-1">{{ 'pianiSalvati.archivio' | translate }}</p>
+                      <h1 class="text-2xl font-bold text-zinc-900 dark:text-zinc-100 font-display">{{ 'pianiSalvati.title' | translate }}</h1>
+                      <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mt-1">{{ planService.savedPlans().length }} {{ 'pianiSalvati.count' | translate }}</p>
                     </div>
-                    <p class="text-sm font-semibold text-zinc-600 dark:text-zinc-400 font-display mb-1">{{ 'pianiSalvati.nessunPiano' | translate }}</p>
-                    <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.nessunPianoDesc' | translate }}</p>
+                    <button (click)="goToWizard()"
+                            class="flex items-center gap-2 px-4 py-2.5 bg-brand-600 hover:bg-brand-500
+                                   text-white text-sm font-semibold rounded-xl transition-all duration-200 font-body
+                                   hover:-translate-y-0.5 shadow-md shadow-brand-500/25 flex-shrink-0">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                      </svg>
+                      {{ 'pianiSalvati.nuovoPiano' | translate }}
+                    </button>
                   </div>
-                } @else {
-                  <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
-                    @for (plan of planService.savedPlans(); track plan.id; let i = $index) {
-                      <div [ngClass]="[
-                              'bg-white dark:bg-zinc-900 rounded-2xl border shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 overflow-hidden',
-                              i === 0 ? 'border-violet-200 dark:border-violet-800/50' : 'border-zinc-100 dark:border-zinc-800'
-                           ]"
-                           [style.animation-delay]="(i * 60) + 'ms'"
-                           style="animation: viewEnter 0.4s cubic-bezier(0.16,1,0.3,1) both;">
-                        <div class="px-5 pt-5 pb-4 border-b border-zinc-50 dark:border-zinc-800">
-                          <!-- Shared badge + collaborator avatars (demo on first plan) -->
-                          @if (i === 0) {
-                            <div class="flex items-center justify-between mb-3">
-                              <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-violet-50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-800/50">
-                                <svg class="w-3 h-3 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+
+                  @if (planService.savedPlans().length === 0) {
+                    <div class="text-center py-20">
+                      <div class="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4 float-anim">
+                        <svg class="w-7 h-7 text-zinc-400 dark:text-zinc-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8l1 12h12l1-12"/>
+                        </svg>
+                      </div>
+                      <p class="text-sm font-semibold text-zinc-600 dark:text-zinc-400 font-display mb-1">{{ 'pianiSalvati.nessunPiano' | translate }}</p>
+                      <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.nessunPianoDesc' | translate }}</p>
+                    </div>
+                  } @else {
+                    <div [ngClass]="selectedPlanId() ? 'space-y-3' : 'grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4'">
+                      @for (plan of planService.savedPlans(); track plan.id; let i = $index) {
+                        <div (click)="selectedPlanId.set(plan.id)"
+                             [ngClass]="[
+                               'cursor-pointer bg-white dark:bg-zinc-900 rounded-2xl border shadow-card hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200 overflow-hidden',
+                               selectedPlanId() === plan.id
+                                 ? 'border-brand-300 dark:border-brand-700 ring-2 ring-brand-100 dark:ring-brand-900/30'
+                                 : plan.isCowork ? 'border-violet-200 dark:border-violet-800/50' : 'border-zinc-100 dark:border-zinc-800'
+                             ]"
+                             [style.animation-delay]="(i * 60) + 'ms'"
+                             style="animation: viewEnter 0.4s cubic-bezier(0.16,1,0.3,1) both;">
+
+                          <div class="px-5 pt-4 pb-3 border-b border-zinc-50 dark:border-zinc-800">
+                            <!-- Cowork badge -->
+                            @if (plan.isCowork) {
+                              <div class="flex items-center justify-between mb-2">
+                                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-violet-50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-800/50">
+                                  <svg class="w-3 h-3 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                                  </svg>
+                                  <span class="text-[10px] font-semibold text-violet-700 dark:text-violet-400 font-body">Co-work</span>
+                                </div>
+                              </div>
+                            }
+                            <div class="flex items-start justify-between gap-3">
+                              <div class="min-w-0">
+                                <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-display truncate">{{ plan.name }}</p>
+                                <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">
+                                  {{ plan.versions.length }} versioni · {{ formatDate(plan.createdAt) }}
+                                </p>
+                              </div>
+                              <button (click)="$event.stopPropagation(); planService.deletePlan(plan.id)"
+                                      class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0
+                                             text-zinc-300 dark:text-zinc-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
-                                <span class="text-[10px] font-semibold text-violet-700 dark:text-violet-400 font-body">{{ 'pianiSalvati.condiviso' | translate }}</span>
-                              </div>
-                              <!-- Overlapping avatar stack -->
-                              <div class="flex items-center -space-x-2">
-                                @for (collab of demoCollaborators; track collab.initials) {
-                                  <div class="w-6 h-6 rounded-full border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white text-[9px] font-bold flex-shrink-0"
-                                       [style.background]="collab.color"
-                                       [title]="collab.name + ' (' + collab.role + ')'">{{ collab.initials }}</div>
-                                }
-                                <!-- Active indicator -->
-                                <div class="ml-2 w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" title="Online"></div>
-                              </div>
+                              </button>
                             </div>
+                          </div>
+
+                          <!-- Version color dots -->
+                          <div class="px-5 py-3 flex items-center gap-2">
+                            @for (v of plan.versions; track v.id) {
+                              <div class="w-2.5 h-2.5 rounded-full flex-shrink-0 ring-1 ring-white dark:ring-zinc-900"
+                                   [style.background]="v.color"
+                                   [title]="v.name + ' (' + v.status + ')'"></div>
+                            }
+                            <span class="text-xs text-zinc-400 dark:text-zinc-500 font-body ml-1">
+                              {{ countVersionsByStatus(plan, 'definitivo') }} definitive,
+                              {{ countVersionsByStatus(plan, 'bozza') }} bozze
+                            </span>
+                          </div>
+
+                          <div class="px-5 pb-4">
+                            <div class="text-xs text-brand-600 dark:text-brand-400 font-semibold font-body flex items-center gap-1">
+                              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+                              </svg>
+                              Vedi versioni
+                            </div>
+                          </div>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+
+              <!-- ── Versions panel ── -->
+              @if (selectedPlan()) {
+                <div class="flex-1 flex flex-col border-l border-zinc-100 dark:border-zinc-800 overflow-hidden bg-zinc-50 dark:bg-zinc-950"
+                     style="animation: slideFromRight 0.3s cubic-bezier(0.16,1,0.3,1) both;">
+
+                  <!-- Panel header -->
+                  <div class="flex items-center justify-between px-6 py-4 bg-white dark:bg-zinc-900 border-b border-zinc-100 dark:border-zinc-800 flex-shrink-0">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <button (click)="selectedPlanId.set(null); colorPickerVersionId.set(null)"
+                              class="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors lg:hidden flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                      </button>
+                      <div class="min-w-0">
+                        <h2 class="text-base font-bold text-zinc-900 dark:text-zinc-100 font-display truncate">{{ selectedPlan()!.name }}</h2>
+                        <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5 flex items-center gap-1.5">
+                          {{ selectedPlan()!.versions.length }} versioni
+                          @if (selectedPlan()!.isCowork) {
+                            <span class="inline-flex items-center gap-1 px-1.5 py-px bg-violet-50 dark:bg-violet-950/40 border border-violet-100 dark:border-violet-800/50 rounded-full">
+                              <svg class="w-2.5 h-2.5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                              </svg>
+                              <span class="text-[9px] font-semibold text-violet-700 dark:text-violet-400 font-body">Co-work</span>
+                            </span>
                           }
-                          <div class="flex items-start justify-between gap-3">
-                            <div class="min-w-0">
-                              <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-display truncate">{{ plan.name }}</p>
-                              <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body mt-0.5">{{ formatDate(plan.savedAt) }}</p>
+                        </p>
+                      </div>
+                    </div>
+                    <button (click)="selectedPlanId.set(null); colorPickerVersionId.set(null)"
+                            class="hidden lg:flex w-8 h-8 items-center justify-center rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex-shrink-0">
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+
+                  <!-- Version list -->
+                  <div class="flex-1 overflow-y-auto scrollbar-thin p-6 space-y-3">
+                    @for (version of selectedPlan()!.versions; track version.id; let vi = $index) {
+                      <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-card overflow-visible"
+                           [style.animation-delay]="(vi * 50) + 'ms'"
+                           style="animation: viewEnter 0.35s cubic-bezier(0.16,1,0.3,1) both;">
+
+                        <!-- Color accent bar -->
+                        <div class="h-1 rounded-t-2xl" [style.background]="version.color"></div>
+
+                        <div class="px-5 pt-4 pb-3">
+                          <div class="flex items-start gap-3">
+
+                            <!-- Color swatch + picker -->
+                            <div class="relative flex-shrink-0">
+                              <button (click)="$event.stopPropagation(); colorPickerVersionId.set(colorPickerVersionId() === version.id ? null : version.id)"
+                                      class="w-8 h-8 rounded-lg border-2 border-white dark:border-zinc-800 shadow-sm hover:scale-110 transition-transform"
+                                      [style.background]="version.color"
+                                      title="Cambia colore"></button>
+
+                              @if (colorPickerVersionId() === version.id) {
+                                <div class="absolute top-10 left-0 z-50 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-700 shadow-2xl p-4 w-52"
+                                     (click)="$event.stopPropagation()"
+                                     style="animation: pickerUp 0.17s cubic-bezier(0.16,1,0.3,1) both;">
+                                  <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider font-body mb-3">Colore versione</p>
+                                  <div class="grid grid-cols-5 gap-2">
+                                    @for (color of versionColors; track color) {
+                                      <button (click)="selectVersionColor(selectedPlan()!.id, version.id, color)"
+                                              class="w-8 h-8 rounded-xl transition-all hover:scale-110 hover:shadow-md ring-offset-2 dark:ring-offset-zinc-900"
+                                              [class.ring-2]="version.color === color"
+                                              [style.background]="color"
+                                              [style.ring-color]="color"></button>
+                                    }
+                                  </div>
+                                </div>
+                              }
                             </div>
-                            <button (click)="planService.deletePlan(plan.id)"
-                                    class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0
-                                           text-zinc-300 dark:text-zinc-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all">
-                              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+
+                            <!-- Name + meta -->
+                            <div class="flex-1 min-w-0">
+                              <!-- Editable name -->
+                              @if (editingVersionId() === version.id) {
+                                <input
+                                  type="text"
+                                  class="w-full text-sm font-bold font-display text-zinc-900 dark:text-zinc-100 bg-transparent border-b-2 border-brand-400 focus:outline-none pb-0.5 mb-0.5"
+                                  [value]="editingVersionName()"
+                                  (input)="editingVersionName.set($any($event.target).value)"
+                                  (blur)="commitVersionName(selectedPlan()!.id, version.id)"
+                                  (keydown.enter)="commitVersionName(selectedPlan()!.id, version.id)"
+                                  (keydown.escape)="editingVersionId.set(null)"
+                                  autofocus/>
+                              } @else {
+                                <button (click)="startEditVersionName(version)"
+                                        class="text-sm font-bold font-display text-zinc-900 dark:text-zinc-100 hover:text-brand-600 dark:hover:text-brand-400 transition-colors text-left truncate max-w-full group flex items-center gap-1">
+                                  {{ version.name }}
+                                  <svg class="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                  </svg>
+                                </button>
+                              }
+                              <div class="flex items-center gap-2 mt-0.5">
+                                <!-- Status badge -->
+                                <span [ngClass]="[
+                                  'inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold font-body',
+                                  version.status === 'definitivo'
+                                    ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
+                                    : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
+                                ]">
+                                  <div [ngClass]="['w-1.5 h-1.5 rounded-full', version.status === 'definitivo' ? 'bg-emerald-500' : 'bg-amber-400']"></div>
+                                  {{ version.status === 'definitivo' ? 'Definitivo' : 'Bozza' }}
+                                </span>
+                                <span class="text-[11px] text-zinc-400 dark:text-zinc-500 font-body">{{ formatDate(version.savedAt) }}</span>
+                              </div>
+                            </div>
+
+                            <!-- Delete version -->
+                            <button (click)="planService.deleteVersion(selectedPlan()!.id, version.id)"
+                                    class="w-7 h-7 flex items-center justify-center rounded-lg text-zinc-300 dark:text-zinc-600 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/30 transition-all flex-shrink-0">
+                              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
                               </svg>
                             </button>
                           </div>
-                        </div>
-                        <div class="px-5 py-4 grid grid-cols-2 gap-3">
-                          <div>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.fatturatoY1' | translate }}</p>
-                            <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">{{ formatK(plan.kpi.fatturatoTotale) }}</p>
+
+                          <!-- KPI summary row -->
+                          <div class="mt-3 grid grid-cols-3 gap-2 pb-3 border-b border-zinc-50 dark:border-zinc-800">
+                            <div>
+                              <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body">Fatturato Y1</p>
+                              <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">{{ formatK(version.kpi.fatturatoTotale) }}</p>
+                            </div>
+                            <div>
+                              <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body">EBITDA Y1</p>
+                              <p [ngClass]="['text-xs font-bold font-mono mt-0.5', version.kpi.ebitda >= 0 ? 'text-emerald-600' : 'text-rose-500']">
+                                {{ formatK(version.kpi.ebitda) }}
+                              </p>
+                            </div>
+                            <div>
+                              <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body">Cash Runway</p>
+                              <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">{{ version.kpi.cashRunway }} mesi</p>
+                            </div>
                           </div>
-                          <div>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.ebitdaY1' | translate }}</p>
-                            <p [ngClass]="['text-sm font-bold font-mono mt-0.5', plan.kpi.ebitda >= 0 ? 'text-emerald-600' : 'text-rose-500']">
-                              {{ formatK(plan.kpi.ebitda) }}
-                            </p>
+
+                          <!-- Cowork: contributors per version -->
+                          @if (selectedPlan()!.isCowork && version.contributors && version.contributors.length > 0) {
+                            <div class="mt-3 pb-3 border-b border-zinc-50 dark:border-zinc-800">
+                              <p class="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider font-body mb-2">Chi ha operato</p>
+                              <div class="space-y-1.5">
+                                @for (contributor of version.contributors; track contributor.name) {
+                                  <div class="flex items-center gap-2">
+                                    <div class="w-5 h-5 rounded-full flex items-center justify-center text-white text-[8px] font-bold flex-shrink-0"
+                                         [style.background]="contributor.avatarColor">{{ contributor.initials }}</div>
+                                    <span class="text-xs text-zinc-600 dark:text-zinc-400 font-body flex-1 truncate">{{ contributor.name }}</span>
+                                    <span class="text-[10px] text-zinc-400 dark:text-zinc-500 font-body flex-shrink-0">{{ formatDate(contributor.lastEditedAt) }}</span>
+                                  </div>
+                                }
+                              </div>
+                            </div>
+                          }
+
+                          <!-- Actions -->
+                          <div class="mt-3 flex items-center gap-2">
+                            <button (click)="loadVersionAndNavigate(version, selectedPlan()!.id)"
+                                    class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-950 dark:bg-zinc-800 hover:bg-zinc-800 dark:hover:bg-zinc-700
+                                           text-white text-xs font-semibold rounded-xl transition-all duration-150 font-body">
+                              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                              </svg>
+                              Carica
+                            </button>
+                            <button (click)="sendVersionToAi(version, selectedPlan()!.id)"
+                                    class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-brand-600 hover:bg-brand-500
+                                           text-white text-xs font-semibold rounded-xl transition-all duration-150 font-body shadow-sm shadow-brand-500/20">
+                              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+                              </svg>
+                              Chiedi all'AI
+                            </button>
                           </div>
-                          <div>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.utileNetto' | translate }}</p>
-                            <p [ngClass]="['text-sm font-bold font-mono mt-0.5', plan.kpi.utileNetto >= 0 ? 'text-zinc-800 dark:text-zinc-200' : 'text-rose-500']">
-                              {{ formatK(plan.kpi.utileNetto) }}
-                            </p>
-                          </div>
-                          <div>
-                            <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">{{ 'pianiSalvati.cashRunway' | translate }}</p>
-                            <p class="text-sm font-bold text-zinc-800 dark:text-zinc-200 font-mono mt-0.5">{{ plan.kpi.cashRunway }} {{ 'pianiSalvati.mesi' | translate }}</p>
-                          </div>
-                        </div>
-                        <div class="px-5 pb-4">
-                          <div [ngClass]="[
-                            'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold font-body',
-                            plan.kpi.ebitda >= 0 ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
-                          ]">
-                            <div [ngClass]="['w-1.5 h-1.5 rounded-full', plan.kpi.ebitda >= 0 ? 'bg-emerald-500' : 'bg-amber-500']"></div>
-                            {{ plan.kpi.ebitda >= 0 ? ('pianiSalvati.sostenibile' | translate) : ('pianiSalvati.rivedere' | translate) }}
-                          </div>
-                        </div>
-                        <div class="px-5 pb-5">
-                          <button (click)="loadAndNavigate(plan)"
-                                  class="w-full flex items-center justify-center gap-2 px-4 py-2.5
-                                         bg-zinc-950 dark:bg-zinc-800 hover:bg-zinc-800 dark:hover:bg-zinc-700 text-white text-xs font-semibold
-                                         rounded-xl transition-all duration-200 font-body">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
-                            </svg>
-                            {{ 'pianiSalvati.caricaPiano' | translate }}
-                          </button>
                         </div>
                       </div>
                     }
                   </div>
-                }
-              </div>
+                </div>
+              }
+
             </div>
           }
 
@@ -2212,13 +2402,31 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   aiOpen           = signal(false);
   hasPlan          = signal(false);
   justSaved        = signal(false);
+  justSavedRevision = signal(false);
+
+  // ── Piani salvati: versioni ──────────────────────────────────────────────
+  selectedPlanId      = signal<string | null>(null);
+  editingVersionId    = signal<string | null>(null);
+  editingVersionName  = signal('');
+  colorPickerVersionId = signal<string | null>(null);
+
+  readonly selectedPlan = computed(() => {
+    const id = this.selectedPlanId();
+    return id ? this.planService.savedPlans().find(p => p.id === id) ?? null : null;
+  });
+
+  readonly versionColors = [
+    '#6366f1', '#10b981', '#f59e0b', '#f97316',
+    '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16',
+    '#ef4444', '#14b8a6',
+  ];
 
   chatWidth             = signal(480);
   currentAiAgent        = signal<AgentId>('xeno');
   isLargeScreen         = signal(typeof window !== 'undefined' && window.innerWidth >= 1024);
   chatDesktopFullscreen = signal(false);
   langDropdownOpen      = signal(false);
-  userPlan              = signal<'free' | 'pro' | 'max'>('free');
+  userPlan              = signal<'free' | 'pro' | 'max'>('max');
 
   // ── Panoramica chat landing ─────────────────────────────────────────────────
   panoramaInput           = signal('');
@@ -2627,15 +2835,57 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   }
 
   onSavePlan(): void {
-    this.planService.savePlan();
+    const planId = this.planService.currentPlanId();
+    if (planId) {
+      this.planService.autoSaveDraft(planId);
+    } else {
+      this.planService.savePlan();
+    }
     this.justSaved.set(true);
     setTimeout(() => this.justSaved.set(false), 2200);
+  }
+
+  onSaveRevision(): void {
+    this.planService.saveRevision();
+    this.justSavedRevision.set(true);
+    setTimeout(() => this.justSavedRevision.set(false), 2200);
   }
 
   loadAndNavigate(plan: SavedPlan): void {
     this.planService.loadPlan(plan);
     this.hasPlan.set(true);
     this.currentView.set('dashboard');
+  }
+
+  loadVersionAndNavigate(version: PlanVersion, planId: string): void {
+    this.planService.loadVersion(version, planId);
+    this.hasPlan.set(true);
+    this.currentView.set('dashboard');
+  }
+
+  startEditVersionName(version: PlanVersion): void {
+    this.editingVersionId.set(version.id);
+    this.editingVersionName.set(version.name);
+  }
+
+  commitVersionName(planId: string, versionId: string): void {
+    const name = this.editingVersionName().trim();
+    if (name) this.planService.updateVersionName(planId, versionId, name);
+    this.editingVersionId.set(null);
+  }
+
+  selectVersionColor(planId: string, versionId: string, color: string): void {
+    this.planService.updateVersionColor(planId, versionId, color);
+    this.colorPickerVersionId.set(null);
+  }
+
+  sendVersionToAi(version: PlanVersion, planId: string): void {
+    this.loadVersionAndNavigate(version, planId);
+    this.aiOpen.set(true);
+  }
+
+  countVersionsByStatus(plan: SavedPlan, status: 'bozza' | 'definitivo'): number {
+    return plan.versions.filter(v => v.status === status).length;
   }
 
   formatK(value: number): string {
@@ -2666,6 +2916,13 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
 
   onPlanGenerated(): void {
     this.hasPlan.set(true);
+    // Auto-create a draft plan entry if none active
+    if (!this.planService.currentPlanId()) {
+      const name = this.planService.currentProjectName() || 'Business Plan';
+      this.planService.createDraftPlan(name);
+    } else {
+      this.planService.autoSaveDraft(this.planService.currentPlanId()!);
+    }
     this.currentView.set('dashboard');
     if (this.isLargeScreen()) {
       this.aiOpen.set(true);
