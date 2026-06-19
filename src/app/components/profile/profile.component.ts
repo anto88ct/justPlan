@@ -150,7 +150,7 @@ import { Router } from '@angular/router';
               <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">Nome completo</label>
               <input type="text" [ngModel]="name()" (ngModelChange)="name.set($event)"
                      placeholder="Mario Rossi" autocomplete="name"
-                     class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                     class="profile-input w-full px-4 py-2.5 rounded-xl text-base font-body text-zinc-900 dark:text-zinc-100
                             border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
                             placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
             </div>
@@ -159,7 +159,7 @@ import { Router } from '@angular/router';
               <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">Email</label>
               <input type="email" [ngModel]="email()" (ngModelChange)="email.set($event)"
                      placeholder="mario@startup.it" autocomplete="email"
-                     class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                     class="profile-input w-full px-4 py-2.5 rounded-xl text-base font-body text-zinc-900 dark:text-zinc-100
                             border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
                             placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
             </div>
@@ -172,7 +172,7 @@ import { Router } from '@angular/router';
                 </label>
                 <input type="text" [ngModel]="company()" (ngModelChange)="company.set($event)"
                        placeholder="La tua startup"
-                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                       class="profile-input w-full px-4 py-2.5 rounded-xl text-base font-body text-zinc-900 dark:text-zinc-100
                               border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
                               placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
               </div>
@@ -183,7 +183,7 @@ import { Router } from '@angular/router';
                 </label>
                 <input type="text" [ngModel]="role()" (ngModelChange)="role.set($event)"
                        placeholder="CEO / Founder"
-                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                       class="profile-input w-full px-4 py-2.5 rounded-xl text-base font-body text-zinc-900 dark:text-zinc-100
                               border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
                               placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
               </div>
@@ -260,7 +260,7 @@ import { Router } from '@angular/router';
                 <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">Password attuale</label>
                 <input type="password" [(ngModel)]="currentPassword" name="currentPw"
                        placeholder="••••••••"
-                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                       class="profile-input w-full px-4 py-2.5 rounded-xl text-base font-body text-zinc-900 dark:text-zinc-100
                               border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
                               placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
               </div>
@@ -268,7 +268,7 @@ import { Router } from '@angular/router';
                 <label class="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5">Nuova password</label>
                 <input [type]="showNewPw() ? 'text' : 'password'" [(ngModel)]="newPassword" name="newPw"
                        placeholder="Min. 8 caratteri"
-                       class="profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100
+                       class="profile-input w-full px-4 py-2.5 rounded-xl text-base font-body text-zinc-900 dark:text-zinc-100
                               border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-800
                               placeholder:text-zinc-400 dark:placeholder:text-zinc-500"/>
               </div>
@@ -277,7 +277,7 @@ import { Router } from '@angular/router';
                 <input [type]="showNewPw() ? 'text' : 'password'" [(ngModel)]="confirmNewPassword" name="confirmNewPw"
                        placeholder="Ripeti la password"
                        [ngClass]="[
-                         'profile-input w-full px-4 py-2.5 rounded-xl text-sm font-body text-zinc-900 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500',
+                         'profile-input w-full px-4 py-2.5 rounded-xl text-base font-body text-zinc-900 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-800 placeholder:text-zinc-400 dark:placeholder:text-zinc-500',
                          confirmNewPassword && newPassword !== confirmNewPassword
                            ? 'border-rose-400'
                            : 'border border-zinc-200 dark:border-zinc-600'

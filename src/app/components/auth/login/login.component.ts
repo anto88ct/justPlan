@@ -282,7 +282,7 @@ import { Router, RouterLink } from '@angular/router';
                 placeholder="nome@azienda.com"
                 autocomplete="email"
                 required
-                class="field-input w-full px-4 py-3 rounded-xl text-sm font-body text-white placeholder-zinc-600
+                class="field-input w-full px-4 py-3 rounded-xl text-base font-body text-white placeholder-zinc-600
                        border border-zinc-800 bg-zinc-900"
               />
             </div>
@@ -300,7 +300,7 @@ import { Router, RouterLink } from '@angular/router';
                   placeholder="••••••••"
                   autocomplete="current-password"
                   required
-                  class="field-input w-full px-4 py-3 pr-11 rounded-xl text-sm font-body text-white placeholder-zinc-600
+                  class="field-input w-full px-4 py-3 pr-11 rounded-xl text-base font-body text-white placeholder-zinc-600
                          border border-zinc-800 bg-zinc-900"
                 />
                 <button type="button"

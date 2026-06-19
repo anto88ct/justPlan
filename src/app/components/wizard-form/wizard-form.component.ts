@@ -104,7 +104,7 @@ interface LoanItem {
     input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
 
     .inp {
-      width: 100%; padding: 10px 12px; font-size: 14px; color: #18181b;
+      width: 100%; padding: 10px 12px; font-size: 16px; color: #18181b;
       background: #fafafa; border: 1.5px solid #e4e4e7; border-radius: 10px;
       outline: none; transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
       font-family: 'Outfit', sans-serif;
@@ -547,7 +547,7 @@ interface LoanItem {
               <textarea [(ngModel)]="config.companyDescription" name="companyDescription"
                         rows="3"
                         placeholder="Cosa fa, a chi si rivolge, qual è il modello di revenue..."
-                        class="inp resize-none leading-relaxed text-sm"></textarea>
+                        class="inp resize-none leading-relaxed"></textarea>
               <p class="text-[11px] text-zinc-400 dark:text-zinc-500 font-body mt-1.5">Usata dall'AI per contestualizzare le proiezioni.</p>
             </div>
 
@@ -710,7 +710,7 @@ interface LoanItem {
                 <div class="flex items-center gap-3">
                   <div class="relative" style="width: 160px;">
                     <input type="number" [(ngModel)]="config.badDebtPct" name="badDebtPct"
-                           min="0" max="10" step="0.1" class="inp inp-suffix font-mono text-sm"/>
+                           min="0" max="10" step="0.1" class="inp inp-suffix font-mono"/>
                     <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                   </div>
                   <p class="text-xs text-zinc-400 dark:text-zinc-500 font-body">Default: 0.1% — fondo su crediti inesigibili</p>
@@ -731,21 +731,21 @@ interface LoanItem {
                       <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Cassa Iniziale</label>
                       <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
-                        <input type="number" [(ngModel)]="config.initialCash" name="initialCash" min="0" class="inp inp-prefix font-mono text-sm"/>
+                        <input type="number" [(ngModel)]="config.initialCash" name="initialCash" min="0" class="inp inp-prefix font-mono"/>
                       </div>
                     </div>
                     <div>
                       <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Crediti Residui</label>
                       <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
-                        <input type="number" [(ngModel)]="config.residualCredits" name="residualCredits" min="0" class="inp inp-prefix font-mono text-sm"/>
+                        <input type="number" [(ngModel)]="config.residualCredits" name="residualCredits" min="0" class="inp inp-prefix font-mono"/>
                       </div>
                     </div>
                     <div>
                       <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Debiti Residui</label>
                       <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
-                        <input type="number" [(ngModel)]="config.residualDebts" name="residualDebts" min="0" class="inp inp-prefix font-mono text-sm"/>
+                        <input type="number" [(ngModel)]="config.residualDebts" name="residualDebts" min="0" class="inp inp-prefix font-mono"/>
                       </div>
                     </div>
                   </div>
@@ -965,27 +965,27 @@ interface LoanItem {
                   <div>
                     <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">% INPS (datore)</label>
                     <div class="relative">
-                      <input type="number" [(ngModel)]="hrParams.inpsPct" name="inpsPct" min="0" max="50" step="0.1" class="inp inp-suffix font-mono text-sm"/>
+                      <input type="number" [(ngModel)]="hrParams.inpsPct" name="inpsPct" min="0" max="50" step="0.1" class="inp inp-suffix font-mono"/>
                       <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                     </div>
                   </div>
                   <div>
                     <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">% INAIL</label>
                     <div class="relative">
-                      <input type="number" [(ngModel)]="hrParams.inailPct" name="inailPct" min="0" max="5" step="0.1" class="inp inp-suffix font-mono text-sm"/>
+                      <input type="number" [(ngModel)]="hrParams.inailPct" name="inailPct" min="0" max="5" step="0.1" class="inp inp-suffix font-mono"/>
                       <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                     </div>
                   </div>
                   <div>
                     <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">% TFR</label>
                     <div class="relative">
-                      <input type="number" [(ngModel)]="hrParams.tfrPct" name="tfrPct" min="0" max="10" step="0.01" class="inp inp-suffix font-mono text-sm"/>
+                      <input type="number" [(ngModel)]="hrParams.tfrPct" name="tfrPct" min="0" max="10" step="0.01" class="inp inp-suffix font-mono"/>
                       <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                     </div>
                   </div>
                   <div>
                     <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Numero Mensilità</label>
-                    <select [(ngModel)]="hrParams.salaryMonths" name="salaryMonths" class="inp text-sm">
+                    <select [(ngModel)]="hrParams.salaryMonths" name="salaryMonths" class="inp">
                       <option [value]="12">12 mensilità</option>
                       <option [value]="13">13ª mensilità</option>
                       <option [value]="14">14ª mensilità</option>
@@ -1022,7 +1022,7 @@ interface LoanItem {
                         <div class="relative">
                           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                           <input type="number" [(ngModel)]="employees[ei].ral" [name]="'eRal_' + e.id"
-                                 min="0" step="500" class="inp inp-prefix font-mono text-sm"/>
+                                 min="0" step="500" class="inp inp-prefix font-mono"/>
                         </div>
                       </div>
                       <div>
@@ -1032,7 +1032,7 @@ interface LoanItem {
                                   (click)="employees[ei].fte = +(Math.max(0.1, employees[ei].fte - 0.5)).toFixed(1)"
                                   class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-all font-mono flex-shrink-0">−</button>
                           <input type="number" [(ngModel)]="employees[ei].fte" [name]="'eFte_' + e.id"
-                                 min="0.1" max="5" step="0.5" class="inp text-center font-mono font-bold text-sm"/>
+                                 min="0.1" max="5" step="0.5" class="inp text-center font-mono font-bold"/>
                           <button type="button"
                                   (click)="employees[ei].fte = +(Math.min(5, employees[ei].fte + 0.5)).toFixed(1)"
                                   class="w-8 h-8 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition-all font-mono flex-shrink-0">+</button>
@@ -1043,13 +1043,13 @@ interface LoanItem {
                     <div>
                       <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Data di Ingresso</label>
                       <div class="grid grid-cols-2 gap-2">
-                        <select [(ngModel)]="employees[ei].startMonth" [name]="'eMonth_' + e.id" class="inp text-sm">
+                        <select [(ngModel)]="employees[ei].startMonth" [name]="'eMonth_' + e.id" class="inp">
                           @for (m of months; track m; let mi = $index) {
                             <option [value]="mi + 1">{{ m }}</option>
                           }
                         </select>
                         <input type="number" [(ngModel)]="employees[ei].startYear" [name]="'eYear_' + e.id"
-                               min="2024" max="2040" class="inp font-mono text-sm"/>
+                               min="2024" max="2040" class="inp font-mono"/>
                       </div>
                     </div>
 
@@ -1182,7 +1182,7 @@ interface LoanItem {
                     <div class="grid grid-cols-2 gap-3">
                       <div>
                         <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Aliquota IVA<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info IVA">?</button><span class="tt-box">Percentuale IVA applicata a questo costo. 22% per la maggior parte di beni/servizi, 10% o 4% per categorie agevolate, 0% se esente.</span></span></label>
-                        <select [(ngModel)]="variableCosts[ci].vatRate" [name]="'vcVat_' + c.id" class="inp text-sm">
+                        <select [(ngModel)]="variableCosts[ci].vatRate" [name]="'vcVat_' + c.id" class="inp">
                           <option [value]="0">0% — Esente</option>
                           <option [value]="4">4% — Ridotta</option>
                           <option [value]="10">10% — Ridotta</option>
@@ -1191,7 +1191,7 @@ interface LoanItem {
                       </div>
                       <div>
                         <label class="flex items-center gap-1.5 text-xs font-semibold text-zinc-500 mb-1 font-body">Dilazione Fornitori<span class="tt-wrap"><button type="button" tabindex="0" class="help-btn" aria-label="Info Dilazione Fornitori">?</button><span class="tt-box">Giorni medi prima di pagare il fornitore dopo la ricezione della merce/servizio. Una dilazione più lunga migliora il capitale circolante (working capital).</span></span></label>
-                        <select [(ngModel)]="variableCosts[ci].paymentDelay" [name]="'vcDel_' + c.id" class="inp text-sm">
+                        <select [(ngModel)]="variableCosts[ci].paymentDelay" [name]="'vcDel_' + c.id" class="inp">
                           <option [value]="0">Immediato (0 gg)</option>
                           <option [value]="30">30 giorni</option>
                           <option [value]="60">60 giorni</option>
@@ -1255,7 +1255,7 @@ interface LoanItem {
                       </div>
                       <div>
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Categoria</label>
-                        <select [(ngModel)]="fixedCosts[fi].category" [name]="'fcCat_' + c.id" class="inp text-sm">
+                        <select [(ngModel)]="fixedCosts[fi].category" [name]="'fcCat_' + c.id" class="inp">
                           @for (cat of fixedCostCategories; track cat.value) {
                             <option [value]="cat.value">{{ cat.label }}</option>
                           }
@@ -1269,12 +1269,12 @@ interface LoanItem {
                         <div class="relative">
                           <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                           <input type="number" [(ngModel)]="fixedCosts[fi].monthlyBudget" [name]="'fcBudget_' + c.id"
-                                 min="0" class="inp inp-prefix font-mono text-sm"/>
+                                 min="0" class="inp inp-prefix font-mono"/>
                         </div>
                       </div>
                       <div>
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">IVA</label>
-                        <select [(ngModel)]="fixedCosts[fi].vatRate" [name]="'fcVat_' + c.id" class="inp text-sm">
+                        <select [(ngModel)]="fixedCosts[fi].vatRate" [name]="'fcVat_' + c.id" class="inp">
                           <option [value]="0">0%</option>
                           <option [value]="4">4%</option>
                           <option [value]="10">10%</option>
@@ -1283,7 +1283,7 @@ interface LoanItem {
                       </div>
                       <div>
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Dilazione</label>
-                        <select [(ngModel)]="fixedCosts[fi].paymentDelay" [name]="'fcDel_' + c.id" class="inp text-sm">
+                        <select [(ngModel)]="fixedCosts[fi].paymentDelay" [name]="'fcDel_' + c.id" class="inp">
                           <option [value]="0">0 gg</option>
                           <option [value]="30">30 gg</option>
                           <option [value]="60">60 gg</option>
@@ -1349,7 +1349,7 @@ interface LoanItem {
                   <div class="grid grid-cols-2 gap-3 mb-3">
                     <div>
                       <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Categoria</label>
-                      <select [(ngModel)]="investments[ii].category" [name]="'invCat_' + inv.id" class="inp text-sm">
+                      <select [(ngModel)]="investments[ii].category" [name]="'invCat_' + inv.id" class="inp">
                         @for (cat of capexCategories; track cat.value) {
                           <option [value]="cat.value">{{ cat.label }}</option>
                         }
@@ -1373,12 +1373,12 @@ interface LoanItem {
                       <div class="relative">
                         <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs pointer-events-none font-mono">€</span>
                         <input type="number" [(ngModel)]="investments[ii].cost" [name]="'invCost_' + inv.id"
-                               min="0" class="inp inp-prefix font-mono font-semibold text-sm"/>
+                               min="0" class="inp inp-prefix font-mono font-semibold"/>
                       </div>
                     </div>
                     <div>
                       <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Mese Acquisto</label>
-                      <select [(ngModel)]="investments[ii].purchaseMonth" [name]="'invMonth_' + inv.id" class="inp text-sm">
+                      <select [(ngModel)]="investments[ii].purchaseMonth" [name]="'invMonth_' + inv.id" class="inp">
                         @for (m of months; track m; let mi = $index) {
                           <option [value]="mi + 1">{{ m }}</option>
                         }
@@ -1387,7 +1387,7 @@ interface LoanItem {
                     <div>
                       <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Anno</label>
                       <input type="number" [(ngModel)]="investments[ii].purchaseYear" [name]="'invYear_' + inv.id"
-                             min="2024" max="2040" class="inp font-mono text-sm"/>
+                             min="2024" max="2040" class="inp font-mono"/>
                     </div>
                   </div>
 
@@ -1472,7 +1472,7 @@ interface LoanItem {
                       </div>
                       <div>
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Mese</label>
-                        <select [(ngModel)]="equityInjections[eqi].month" [name]="'eqMonth_' + eq.id" class="inp text-sm">
+                        <select [(ngModel)]="equityInjections[eqi].month" [name]="'eqMonth_' + eq.id" class="inp">
                           @for (m of months; track m; let mi = $index) {
                             <option [value]="mi + 1">{{ m }}</option>
                           }
@@ -1481,7 +1481,7 @@ interface LoanItem {
                       <div>
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Anno</label>
                         <input type="number" [(ngModel)]="equityInjections[eqi].year" [name]="'eqYear_' + eq.id"
-                               min="2024" max="2040" class="inp font-mono text-sm"/>
+                               min="2024" max="2040" class="inp font-mono"/>
                       </div>
                     </div>
                     <div class="flex justify-end mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800">
@@ -1538,7 +1538,7 @@ interface LoanItem {
                       </div>
                       <div>
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Mese Stipula</label>
-                        <select [(ngModel)]="loans[li].month" [name]="'lnMonth_' + loan.id" class="inp text-sm">
+                        <select [(ngModel)]="loans[li].month" [name]="'lnMonth_' + loan.id" class="inp">
                           @for (m of months; track m; let mi = $index) {
                             <option [value]="mi + 1">{{ m }}</option>
                           }
@@ -1547,7 +1547,7 @@ interface LoanItem {
                       <div>
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Anno</label>
                         <input type="number" [(ngModel)]="loans[li].year" [name]="'lnYear_' + loan.id"
-                               min="2024" max="2040" class="inp font-mono text-sm"/>
+                               min="2024" max="2040" class="inp font-mono"/>
                       </div>
                     </div>
 
@@ -1556,32 +1556,32 @@ interface LoanItem {
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Tasso Annuo</label>
                         <div class="relative">
                           <input type="number" [(ngModel)]="loans[li].interestRate" [name]="'lnRate_' + loan.id"
-                                 min="0" max="30" step="0.1" class="inp inp-suffix font-mono text-sm"/>
+                                 min="0" max="30" step="0.1" class="inp inp-suffix font-mono"/>
                           <span class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 text-xs font-mono pointer-events-none">%</span>
                         </div>
                       </div>
                       <div>
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Durata (mesi)</label>
                         <input type="number" [(ngModel)]="loans[li].durationMonths" [name]="'lnDur_' + loan.id"
-                               min="1" max="360" class="inp font-mono text-sm"/>
+                               min="1" max="360" class="inp font-mono"/>
                       </div>
                       <div>
                         <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Pre-amm. (mesi)</label>
                         <input type="number" [(ngModel)]="loans[li].preAmortizationMonths" [name]="'lnPre_' + loan.id"
-                               min="0" class="inp font-mono text-sm"/>
+                               min="0" class="inp font-mono"/>
                       </div>
                     </div>
 
                     <div class="mb-3">
                       <label class="block text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1 font-body">Prima Rata</label>
                       <div class="grid grid-cols-2 gap-2">
-                        <select [(ngModel)]="loans[li].firstPaymentMonth" [name]="'lnFpMonth_' + loan.id" class="inp text-sm">
+                        <select [(ngModel)]="loans[li].firstPaymentMonth" [name]="'lnFpMonth_' + loan.id" class="inp">
                           @for (m of months; track m; let mi = $index) {
                             <option [value]="mi + 1">{{ m }}</option>
                           }
                         </select>
                         <input type="number" [(ngModel)]="loans[li].firstPaymentYear" [name]="'lnFpYear_' + loan.id"
-                               min="2024" max="2040" class="inp font-mono text-sm"/>
+                               min="2024" max="2040" class="inp font-mono"/>
                       </div>
                     </div>
 

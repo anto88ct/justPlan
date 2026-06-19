@@ -378,7 +378,7 @@ import { ThemeService } from '../../services/theme.service';
                       (click)="startEdit(row.label, 'anno1')">
                       @if (isEditing(row.label, 'anno1')) {
                         <input type="number" [value]="row.anno1" autofocus
-                               class="w-full text-right bg-transparent font-mono text-sm py-3 px-3 outline-none border-b-2 border-brand-400"
+                               class="w-full text-right bg-transparent font-mono text-base py-3 px-3 outline-none border-b-2 border-brand-400"
                                (blur)="commitEdit($event, row.label, 'anno1')"
                                (keydown.enter)="blurTarget($event)"
                                (keydown.escape)="cancelEdit()"/>
@@ -397,7 +397,7 @@ import { ThemeService } from '../../services/theme.service';
                       (click)="startEdit(row.label, 'anno2')">
                       @if (isEditing(row.label, 'anno2')) {
                         <input type="number" [value]="row.anno2" autofocus
-                               class="w-full text-right bg-transparent font-mono text-sm py-3 px-3 outline-none border-b-2 border-brand-400"
+                               class="w-full text-right bg-transparent font-mono text-base py-3 px-3 outline-none border-b-2 border-brand-400"
                                (blur)="commitEdit($event, row.label, 'anno2')"
                                (keydown.enter)="blurTarget($event)"
                                (keydown.escape)="cancelEdit()"/>
@@ -416,7 +416,7 @@ import { ThemeService } from '../../services/theme.service';
                       (click)="startEdit(row.label, 'anno3')">
                       @if (isEditing(row.label, 'anno3')) {
                         <input type="number" [value]="row.anno3" autofocus
-                               class="w-full text-right bg-transparent font-mono text-sm py-3 px-3 outline-none border-b-2 border-brand-400"
+                               class="w-full text-right bg-transparent font-mono text-base py-3 px-3 outline-none border-b-2 border-brand-400"
                                (blur)="commitEdit($event, row.label, 'anno3')"
                                (keydown.enter)="blurTarget($event)"
                                (keydown.escape)="cancelEdit()"/>

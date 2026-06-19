@@ -190,7 +190,7 @@ import { Router, RouterLink } from '@angular/router';
               </label>
               <input type="text" [(ngModel)]="name" name="name"
                      placeholder="Mario Rossi" autocomplete="name" required
-                     class="field-input w-full px-4 py-3 rounded-xl text-sm font-body text-white placeholder-zinc-600
+                     class="field-input w-full px-4 py-3 rounded-xl text-base font-body text-white placeholder-zinc-600
                             border border-zinc-800 bg-zinc-900" />
             </div>
 
@@ -201,7 +201,7 @@ import { Router, RouterLink } from '@angular/router';
               </label>
               <input type="text" [(ngModel)]="companyName" name="companyName"
                      placeholder="La tua startup"
-                     class="field-input w-full px-4 py-3 rounded-xl text-sm font-body text-white placeholder-zinc-600
+                     class="field-input w-full px-4 py-3 rounded-xl text-base font-body text-white placeholder-zinc-600
                             border border-zinc-800 bg-zinc-900" />
             </div>
 
@@ -212,7 +212,7 @@ import { Router, RouterLink } from '@angular/router';
               </label>
               <input type="email" [(ngModel)]="email" name="email"
                      placeholder="mario@startup.it" autocomplete="email" required
-                     class="field-input w-full px-4 py-3 rounded-xl text-sm font-body text-white placeholder-zinc-600
+                     class="field-input w-full px-4 py-3 rounded-xl text-base font-body text-white placeholder-zinc-600
                             border border-zinc-800 bg-zinc-900" />
             </div>
 
@@ -226,7 +226,7 @@ import { Router, RouterLink } from '@angular/router';
                        [(ngModel)]="password" name="password"
                        placeholder="Min. 8 caratteri" autocomplete="new-password" required
                        (input)="calcStrength()"
-                       class="field-input w-full px-4 py-3 pr-11 rounded-xl text-sm font-body text-white placeholder-zinc-600
+                       class="field-input w-full px-4 py-3 pr-11 rounded-xl text-base font-body text-white placeholder-zinc-600
                               border border-zinc-800 bg-zinc-900" />
                 <button type="button" (click)="togglePassword()"
                         class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-600 hover:text-zinc-300 transition-colors p-1">
@@ -266,7 +266,7 @@ import { Router, RouterLink } from '@angular/router';
               <input [type]="showPassword() ? 'text' : 'password'"
                      [(ngModel)]="confirmPassword" name="confirmPassword"
                      placeholder="Ripeti la password" autocomplete="new-password" required
-                     class="field-input w-full px-4 py-3 rounded-xl text-sm font-body placeholder-zinc-600
+                     class="field-input w-full px-4 py-3 rounded-xl text-base font-body placeholder-zinc-600
                             border bg-zinc-900"
                      [class.text-white]="!confirmPassword || password === confirmPassword"
                      [class.text-rose-400]="confirmPassword && password !== confirmPassword"

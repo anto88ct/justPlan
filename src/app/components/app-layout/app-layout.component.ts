@@ -777,7 +777,7 @@ interface ChatSession {
                           (keydown)="onPanoramaKeydown($event)"
                           placeholder="Incolla un documento, un'email o una domanda per iniziare"
                           rows="3"
-                          class="w-full px-5 pt-4 pb-2 bg-transparent text-zinc-800 dark:text-zinc-200 text-sm font-body resize-none focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-500 leading-relaxed block">
+                          class="w-full px-5 pt-4 pb-2 bg-transparent text-zinc-800 dark:text-zinc-200 text-base font-body resize-none focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-500 leading-relaxed block">
                         </textarea>
                         <div class="px-3 pb-3 flex items-center justify-between gap-2">
                           <div class="flex items-center gap-2">
@@ -893,7 +893,7 @@ interface ChatSession {
                           (keydown)="onPanoramaKeydown($event)"
                           placeholder="Continua la conversazione..."
                           rows="1"
-                          class="w-full px-4 pt-3 pb-1 bg-transparent text-zinc-800 dark:text-zinc-200 text-sm font-body resize-none focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-500 leading-relaxed block">
+                          class="w-full px-4 pt-3 pb-1 bg-transparent text-zinc-800 dark:text-zinc-200 text-base font-body resize-none focus:outline-none placeholder-zinc-400 dark:placeholder-zinc-500 leading-relaxed block">
                         </textarea>
                         <div class="px-3 pb-2.5 flex items-center justify-between gap-2">
                           <div class="relative">
@@ -1429,7 +1429,7 @@ interface ChatSession {
                               @if (editingVersionId() === version.id) {
                                 <input
                                   type="text"
-                                  class="w-full text-sm font-bold font-display text-zinc-900 dark:text-zinc-100 bg-transparent border-b-2 border-brand-400 focus:outline-none pb-0.5 mb-0.5"
+                                  class="w-full text-base font-bold font-display text-zinc-900 dark:text-zinc-100 bg-transparent border-b-2 border-brand-400 focus:outline-none pb-0.5 mb-0.5"
                                   [value]="editingVersionName()"
                                   (input)="editingVersionName.set($any($event.target).value)"
                                   (blur)="commitVersionName(selectedPlan()!.id, version.id)"
@@ -1760,7 +1760,7 @@ interface ChatSession {
                              [value]="coworkEmailInput()"
                              (input)="coworkEmailInput.set($any($event.target).value)"
                              (keydown.enter)="addCoworkMember()"
-                             class="flex-1 min-w-0 px-3 py-2 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 transition-all"/>
+                             class="flex-1 min-w-0 px-3 py-2 text-base bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 transition-all"/>
                       <div class="flex gap-0.5 p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg flex-shrink-0">
                         <button (click)="coworkRoleInput.set('reader')"
                                 [matTooltip]="'cowork.tooltipReader' | translate" matTooltipPosition="below"
@@ -2016,14 +2016,14 @@ interface ChatSession {
                             <input type="text" [placeholder]="'settings.sections.contatti.form.nomePlaceholder' | translate"
                                    [value]="contactName()"
                                    (input)="contactName.set($any($event.target).value)"
-                                   class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
+                                   class="w-full px-3 py-2.5 text-base bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
                           </div>
                           <div>
                             <label class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5 block">{{ 'settings.sections.contatti.form.email' | translate }}</label>
                             <input type="email" placeholder="nome@azienda.com"
                                    [value]="contactEmail()"
                                    (input)="contactEmail.set($any($event.target).value)"
-                                   class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
+                                   class="w-full px-3 py-2.5 text-base bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
                           </div>
                         </div>
                         <div>
@@ -2031,14 +2031,14 @@ interface ChatSession {
                           <input type="text" [placeholder]="'settings.sections.contatti.form.oggettoPlaceholder' | translate"
                                  [value]="contactSubject()"
                                  (input)="contactSubject.set($any($event.target).value)"
-                                 class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
+                                 class="w-full px-3 py-2.5 text-base bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
                         </div>
                         <div>
                           <label class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-1.5 block">{{ 'settings.sections.contatti.form.messaggio' | translate }}</label>
                           <textarea rows="4" [placeholder]="'settings.sections.contatti.form.messaggioPlaceholder' | translate"
                                     [value]="contactMessage()"
                                     (input)="contactMessage.set($any($event.target).value)"
-                                    class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all resize-none"></textarea>
+                                    class="w-full px-3 py-2.5 text-base bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all resize-none"></textarea>
                         </div>
                         <button type="submit"
                                 [disabled]="!contactEmail().trim() || !contactMessage().trim()"
@@ -2296,7 +2296,7 @@ interface ChatSession {
                   <p class="text-xs font-semibold text-zinc-600 dark:text-zinc-400 font-body mb-2">{{ 'share.linkGenerato' | translate }}</p>
                   <div class="flex gap-2">
                     <input type="text" [value]="shareLink()" readonly
-                           class="flex-1 px-3 py-2 text-xs bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-mono text-zinc-600 dark:text-zinc-400 focus:outline-none truncate"/>
+                           class="flex-1 px-3 py-2 text-base bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-mono text-zinc-600 dark:text-zinc-400 focus:outline-none truncate"/>
                     <button (click)="copyLink()"
                             [ngClass]="linkCopied() ? 'bg-emerald-500 text-white border-emerald-500' : 'bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:border-brand-300'"
                             class="flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-semibold font-body transition-all duration-200 flex-shrink-0">
@@ -2334,7 +2334,7 @@ interface ChatSession {
                 <input type="email" placeholder="nome@azienda.com"
                        [value]="shareEmailInput()"
                        (input)="shareEmailInput.set($any($event.target).value)"
-                       class="w-full px-3 py-2.5 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
+                       class="w-full px-3 py-2.5 text-base bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl font-body text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-600 focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-100 dark:focus:ring-brand-900/30 transition-all"/>
               </div>
               <!-- Permission selector -->
               <div>

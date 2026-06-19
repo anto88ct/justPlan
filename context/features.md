@@ -53,29 +53,39 @@ All lazy-loaded standalone components.
 
 ---
 
-## 3. App Shell (`app-layout.component.ts` — 2695 lines)
+## 3. App Shell (`app-layout.component.ts` — 3191 lines)
 
-Central orchestrator: navigation, view switching (signal-based, not routed), AI copilot panel, sharing, collaboration, settings.
+Central orchestrator: navigation, view switching (signal-based, not routed), AI copilot panel, plan versioning UI, sharing, collaboration, settings. `View` type = `'panoramica' | 'wizard' | 'dashboard' | 'scenari' | 'report' | 'impostazioni' | 'piani-salvati' | 'profilo' | 'caricamenti' | 'co-work'`.
 
 ### 3.1 Sidebar Navigation
 - Collapsible (224px ↔ 56px) on desktop; mobile drawer overlay
-- Nav items: Panoramica, Business Plan, Piani Salvati, Co-Work, Caricamenti, Scenari, Report, Impostazioni
+- Nav items (7): **Chat** (`panoramica`), **Piani Salvati**, **Co-Work**, **Caricamenti**, **Scenari** (Agenti AI), **Report**, **Impostazioni**
+- **No** "Business Plan" or "Profilo" nav entries: Wizard/Dashboard reached contextually (`navigate`/`onPlanGenerated`); Profile reached via the top-bar avatar pill
 - Active indicator (gradient bar + brand color), bottom user-profile pill
 
-### 3.2 Panoramica (Overview/Home)
-- Hero split panel: CTA buttons ("Crea piano" / "Vedi piano"), live KPI preview cards (or shimmer skeleton if no plan)
-- Live KPI grid: Fatturato Y1, EBITDA Y1, Utile Netto, Cash Runway
-- 4-card tutorial/onboarding grid (Create Plan → View Dashboard → Run AI Scenarios → Export Reports), each clickable, shows completion badges
-- AI tip banner promoting Copilot
+### 3.2 Panoramica — Chat Landing (Claude/ChatGPT-style)
+- **No longer a KPI hero/tutorial page** — now the conversational entry point
+- Time-based greeting (`panoramaGreeting`: Buon mattino/pomeriggio/sera, "AirPlan")
+- **Agent picker** dropdown (`panoramaAgents`): **AUTO** (auto-select), **XENO** (Strategia & Mercato), **ELIO** (Proiezioni Finanziarie), **ARGON** (Analisi & Rischi) — colored dot + role label; selection drives reply agent (AUTO → xeno)
+- 5 **suggestion chips** (`panoramaSuggestions`): scenario what-if, proiezioni, analisi costi, nuovo mercato, "Scelto da AI"
+- Textarea input, Enter-to-send (Shift+Enter newline), disabled send while empty/thinking
+- **Active chat thread**: user/assistant bubbles (assistant tagged with agent name + gradient star icon), bouncing-dots thinking state, auto-scroll. Replies are static mock (1.4 s delay) prompting to connect the plan
+- **Chat history sidebar** (collapsible, mobile backdrop): `chatSessions` persisted to `localStorage['panorama_chat_sessions']`; "Nuova" (`newPanoramaChat`), load (`loadChatSession`), delete (`deleteChatSession`), relative date labels (`formatSessionDate`). Title auto-derived from first message (≤42 chars)
 
 ### 3.3 Dashboard (when `hasPlan()`)
 - Hosts `<app-dashboard-cruscotto/>`
-- Top bar actions: Edit (→ wizard), Export PDF, Save Plan, Share, AI Copilot toggle
+- Top bar actions: Modifica (→ wizard), Export PDF, **Salva** (`onSavePlan` → autosave draft / create draft), **Salva revisione** (`onSaveRevision` → finalize a `definitivo` version), Condividi, AI Copilot toggle
 
-### 3.4 Piani Salvati (Saved Plans archive)
-- Cards: name, save date, shared badge + collaborator avatars, 4 KPI mini-tiles, sustainability indicator (green/amber by EBITDA sign)
-- Actions: "Load & Open" (`loadAndNavigate`), Delete
-- Responsive grid (1/2/3 cols); empty state messaging
+### 3.4 Piani Salvati — Saved Plans archive + **versioning** (master-detail)
+- **Plan list** (left, collapses to 320px rail when a plan is selected): cards show plan name, **Co-work badge** (violet, if `isCowork`), version count + created date, **version color dots** (one per version, hover = name/status), "N definitive, M bozze" tally, "Vedi versioni" affordance. "Nuovo Piano" (`goToWizard`), delete plan, empty state. Tracks `selectedPlanId`.
+- **Versions panel** (right, slides in): per-version card with
+  - color accent bar + **color swatch picker** (10 presets, `selectVersionColor`)
+  - inline **rename** (`startEditVersionName`/`commitVersionName`)
+  - **status badge** Definitivo (emerald) / Bozza (amber) + saved date
+  - delete version (`deleteVersion`)
+  - KPI summary tiles (Fatturato Y1 / EBITDA Y1 / Cash Runway)
+  - **Cowork contributors** ("Chi ha operato": avatar/initials/name/last-edited) when `isCowork`
+  - actions: **Carica** (`loadVersionAndNavigate` → Dashboard), **Chiedi all'AI** (`sendVersionToAi` → load + open copilot)
 
 ### 3.5 Co-Work (Team Collaboration)
 - **Animated SVG orbital network**: owner "sun" avatar center, members distributed across 3 orbit rings, status dots (green=joined, orange=pending), animated rotating speech-bubble messages, mouse-follow tooltip with member info
@@ -97,28 +107,40 @@ Central orchestrator: navigation, view switching (signal-based, not routed), AI 
 - **Contatti** form: name/email/subject/message → `contactSent` confirmation state
 - **FAQ** accordion (`openFaqIndex` single-open)
 
-### 3.8 Top Bar
-- Breadcrumb "Businext Plan > [View]"
-- Context buttons (dashboard: Edit/Export PDF/Save/Share/AI; other views: AI toggle only)
+### 3.8 Scenari — "Agenti AI" gallery
+- Header (`agenti.title`/`agenti.desc`) + 3-card grid, one per agent, each with a **bespoke animated SVG stage** (RAF/CSS):
+  - **ELIO** (amber) — orbital "sun" with planets on perspective ellipses
+  - **ARGON** (blue/cyan) — radar with rotating scan beam, dashed rings, pulsing anomaly nodes
+  - **XENO** (violet) — nested rotating hexagons + orbiting particles + core glow
+- Each card: role tag, name, description, italic example prompt, CTA → `openAiWithScenario(example, agentId)` (opens copilot pre-set to that agent)
+- "No plan" amber warning with "→ wizard" link when `!hasPlan()`
 
-### 3.9 AI Copilot Panel
+### 3.9 Top Bar
+- Breadcrumb "Businext Plan > [`currentTitle()`]"
+- Dashboard context buttons: Modifica, Export PDF, Salva, **Salva revisione**, Condividi (other views: none)
+- **Language picker** dropdown (flag + code, 4 langs) — moved here (also still in Settings)
+- AI Copilot toggle (`toggleAi`)
+- **Profile avatar pill** (far right): click → Profilo; ring color + badge reflect `userPlan` (`free`/`pro`/`max` — default **max**: violet ring + "MAX" badge)
+
+### 3.10 AI Copilot Panel
 - Desktop: docked right, resizable (240–640px drag handle), fullscreen toggle, Ctrl+K shortcut
 - Mobile: full-screen overlay
 - Hosts `<app-ai-chatbot/>` with `[agentId]="currentAiAgent()"`; **multi-agent** — switching agent in chat syncs the shell's `currentAiAgent` signal (Elio/Argon/Xeno, see §8)
 
-### 3.10 Key Computed/Methods
-- `hasPlan()`, `liveKpis()`, `tutorialSteps()`, `projectDisplayName()`, `isActive()`, `orbitalNodes()`
-- `navigate()`, `goToWizard()`, `navigateToStep()`, `loadAndNavigate()`
-- `onSavePlan()` (shows "Saved" badge 2.2s), `exportPdf()` (switches to report view + `window.print()`), `onPlanGenerated()`
-- `toggleSidebar()`, `toggleAi()`, `toggleSettingItem()`, `onResizeStart()` (chat panel resize)
+### 3.11 Key Computed/Methods
+- `hasPlan()`, `projectDisplayName()`/`projectInitial()`, `currentTitle()`, `isActive()`, `orbitalNodes()`, `selectedPlan()` (`liveKpis()`/`tutorialSteps()`/`navigateToStep()` still defined but no longer rendered after the Panoramica→chat rewrite — legacy)
+- Navigation: `navigate()`, `goToWizard()`, `navigateToStep()`, `loadAndNavigate()`, `loadVersionAndNavigate()`
+- Plans/versions: `onSavePlan()` (autosave draft + "Saved" badge 2.2 s), `onSaveRevision()` ("Revisione salvata" badge), `startEditVersionName()`/`commitVersionName()`, `selectVersionColor()`, `sendVersionToAi()`, `countVersionsByStatus()`
+- Panorama chat: `onPanoramaSubmit()`, `onPanoramaKeydown()`, `onPanoramaSuggestion()`, `newPanoramaChat()`, `loadChatSession()`, `deleteChatSession()`, `_saveChatSession()`/`_persistChatSessions()`/`_loadChatSessions()`
+- `exportPdf()` (switches to report view + `window.print()`), `onPlanGenerated()` (sets `hasPlan`, creates/saves draft, opens AI on desktop), `toggleSidebar()`, `toggleAi()`, `toggleSettingItem()`, `onResizeStart()` (chat panel resize)
 
-### 3.11 Responsive & Theming
+### 3.12 Responsive & Theming
 - Breakpoints: mobile <1024px (drawer + fullscreen AI), tablet 1024–1440px, desktop >1440px (full layout incl. wizard live-preview panel)
 - Full dark-mode support via Tailwind `dark:` classes + `themeService.dark()`
 
 ---
 
-## 4. Business Plan Creation — Wizard (`wizard-form.component.ts` — 2017 lines, 6 steps)
+## 4. Business Plan Creation — Wizard (`wizard-form.component.ts` — 2239 lines, 6 steps)
 
 > **The core feature.** A 6-step guided flow that turns structured Italian-fiscal input into a full 36-month, 3-year financial projection. Emits `planGenerated()` on completion; the parent shell flips `hasPlan` and routes to the Dashboard.
 
@@ -184,9 +206,9 @@ Two sub-sections:
 
 ---
 
-## 5. Financial Engine (`business-plan.service.ts` — 686 lines)
+## 5. Financial Engine + Plan Versioning (`business-plan.service.ts` — 906 lines)
 
-Core state + calculation engine. Reactive signals: `kpi`, `cashFlow`, `incomeStatement`, `isAiUpdated`, `currentProjectName`, `currentStartYear`, `savedPlans`, plus computed `kpiDelta`.
+Core state + calculation engine. Reactive signals: `kpi`, `cashFlow`, `incomeStatement`, `isAiUpdated`, `currentProjectName`, `currentStartYear`, `savedPlans`, `currentPlanId`, plus computed `kpiDelta`.
 
 ### `KpiData` (extended)
 `fatturatoTotale`, `ebitda`, `utileNetto`, `cashRunway`, plus investor metrics **`grossMarginPct`**, **`ebitdaPct`**, **`breakevenRevenue`**.
@@ -223,16 +245,23 @@ Opening cash = 0 (new startup) or `initialCash + residualCredits − residualDeb
 - `ebitdaPct` = EBITDA₁ / Rev₁
 - `breakevenRevenue` = `fixedBase₁ / contribMargin`, where `contribMargin = (Rev₁ − variableCosts₁)/Rev₁` and `fixedBase₁` = personnel + marketing + G&A + ammortamenti + oneri finanziari
 
+### Plan / Version data model & methods
+A `SavedPlan` is `{ id, name, createdAt, isCowork?, versions[] }`; each **`PlanVersion`** = `{ id, name, color, status: 'bozza'|'definitivo', savedAt, kpi, incomeStatement, cashFlow, contributors? }` (`PlanVersionContributor` = name/initials/avatarColor/lastEditedAt). `savedPlans` seeded with 3 demo plans — **TechHub Pro** (cowork, 3 versions w/ contributors), **FoodieApp**, **EcoStore** (1 version each).
+- `createDraftPlan(name)` — new plan with one `bozza` version snapshot; sets `currentPlanId`
+- `savePlan(name?)` / `autoSaveDraft(planId)` — upsert the plan's single `bozza` version from current state
+- `saveRevision(name?)` / `_finalizeRevision()` — append a new **`definitivo`** version ("Revisione N"), auto-assigned next free color (`_nextVersionColor`, 8-color cycle)
+- `loadVersion(version, planId)` / `loadPlan(plan)` (loads latest version)
+- `deletePlan()`, `deleteVersion()`, `updateVersionName()`, `updateVersionColor()`
+
 ### Other methods
-- `updateCell()` / `recompute()` — inline P&L edit; `recompute` now handles the dynamic OPEX Variabili / Svalutazione Crediti rows when present
+- `updateCell()` / `recompute()` — inline P&L edit; `recompute` handles the dynamic OPEX Variabili / Svalutazione Crediti rows when present
 - `syncKpiFromStatement()`
-- `savePlan()`, `loadPlan()`, `deletePlan()` — in-memory `savedPlans` signal (seeded with 3 demo plans: TechHub Pro, FoodieApp, EcoStore)
-- `applyAiScenario()` — simulated: ×1.18 revenue/cash, ×1.15 EBITDA, ×1.22 net, ×1.3 runway; negatives scaled by 1/m; recomputes calc rows
+- `applyAiScenario()` — simulated: ×1.18 revenue/cash, ×1.15 EBITDA, ×1.22 net, ×1.3 runway; income-statement rows scaled ×m if ≥0 else ×1/m; recomputes calc rows
 - `reset()` — restores `_computedBase` snapshot (post-generate baseline) or static demo fallback (~€485K Y1, €97K EBITDA, 14-mo runway)
 
 ---
 
-## 6. Dashboard (`dashboard-cruscotto.component.ts` — 772 lines)
+## 6. Dashboard (`dashboard-cruscotto.component.ts` — 870 lines)
 
 - **4 KPI cards**: Fatturato Totale, EBITDA, Utile Netto, Cash Runway — color-coded, animated, optional AI-delta badges
 - **Cash flow area chart** (ApexCharts): 12-month Y1 cumulative, gradient fill, switches to green when AI-updated, break-even dashed line
@@ -261,10 +290,11 @@ Opening cash = 0 (new startup) or `initialCash + residualCredits − residualDeb
 
 ## 8. AI Chatbot / Copilot (`ai-chatbot.component.ts` — 558 lines)
 
-**Multi-agent** conversational what-if simulator. Three switchable agents (`AgentId = 'elio' | 'argon' | 'xeno'`, default **Xeno**), each with its own gradient/dot/ring color and 3 i18n suggestion keys:
-- **Xeno** (violet/purple) — default; reply uses live fatturato + EBITDA deltas
-- **Elio** (amber/orange) — reply with full KPI set (fatturato, EBITDA, utile, runway)
-- **Argon** (blue/cyan) — static mock reply
+**Multi-agent** conversational what-if simulator. Three switchable agents (`AgentId = 'elio' | 'argon' | 'xeno'`, default **Xeno**), each with its own gradient/dot/ring color, role label, and 3 i18n suggestion keys:
+- **Xeno** (violet/purple) — *Strategia & Mercato*; default; reply uses live fatturato + EBITDA deltas
+- **Elio** (amber/orange) — *Proiezioni Finanziarie*; reply with full KPI set (fatturato, EBITDA, utile, runway)
+- **Argon** (blue/cyan) — *Analisi & Rischi*; static mock reply
+- (An extra **AUTO** option exists only in the Panoramica chat picker, §3.2 — it routes to Xeno.)
 - **Agent picker** dropdown (animated `picker-panel`); selecting an agent (`selectAgent()`/`_applyAgent()`) switches theme via `--agent-ring` CSS var and posts an intro message. Parent shell tracks `currentAiAgent` and binds `@Input() agentId`.
 - Each `ChatMessage` carries its `agentId` so past bubbles keep their agent's color/name.
 - 3 suggested prompts per agent (hidden after first user message); chat stream with gradient icon + bouncing-dots loading; auto-scroll
@@ -294,10 +324,12 @@ Multi-phase import wizard for PDF / DOC / DOCX / .bxp (proprietary format), with
 
 ---
 
-## 10. Profile (`profile.component.ts` — 298 lines)
+## 10. Profile (`profile.component.ts` — 420 lines)
 
 - **Avatar**: gradient placeholder with initials, photo upload (FileReader → DataURL), hover camera overlay
+- **Piano attivo card**: plan badge ("MAX"), renewal date ("Rinnovo il 19 lug 2026"), "Gestisci piano" button
 - **Personal info form**: Nome completo, Email, Nome azienda (optional), Ruolo (optional)
+- **Activity / contribution graph**: GitHub-style 53-week × 7-day heatmap (5 intensity levels), seeded deterministic fake data (`generateFakeContributions`), `totalContributions` count, per-day tooltips, "Meno/Più" legend
 - **Password change** (collapsible section): current/new/confirm fields, mismatch validation, "Mostra password" visibility toggle
 - **Logout** card → routes to `/login`
 - **Save**: `save()` shows success animation (2.4s, emerald "Salvato!" with bounce)
@@ -329,17 +361,17 @@ Multi-phase import wizard for PDF / DOC / DOCX / .bxp (proprietary format), with
 - **Styling**: TailwindCSS 3.4 with extensive dark-mode (`dark:`) support and custom keyframe animations (staggered entrances, pulse, pop, slide)
 - **Charts**: ApexCharts via `ng-apexcharts` (Dashboard: 1 chart, Report: 6 charts)
 - **i18n**: ngx-translate, 4 languages, default Italian
-- **Persistence (current FE-only)**: localStorage for theme/language; saved plans currently in-memory signal (no backend yet — see [backend-architecture.md](backend-architecture.md) for planned REST API/MongoDB design)
+- **Persistence (current FE-only)**: localStorage for theme/language + **Panoramica chat history** (`panorama_chat_sessions`); saved plans + versions currently in-memory signal (no backend yet — see [backend-architecture.md](backend-architecture.md) for planned REST API/MongoDB design)
 - **PDF Export**: currently via `window.print()` (planned to be replaced by server-side generation per backend spec)
-- **Placeholders/TODOs**: Google OAuth (`onGoogleLogin`/`onGoogleRegister`), AI chat is simulated client-side (`applyAiScenario` scales KPIs by fixed multipliers; 3 agents share the same mock engine, differing only in reply copy), sharing/co-work features are demo/mock data (no real backend persistence yet)
+- **Placeholders/TODOs**: Google OAuth (`onGoogleLogin`/`onGoogleRegister`), AI chat is simulated client-side (Panoramica chat = static mock replies; copilot `applyAiScenario` scales KPIs by fixed multipliers; agents share the same mock engine, differing only in reply copy/role), `userPlan` hardcoded `max`, profile activity graph is seeded fake data, sharing/co-work features + cowork contributors are demo/mock data (no real backend persistence yet)
 
 ---
 
 ## 13. Business Plan Creation — End-to-End Flow (summary)
 
-1. User opens **Business Plan** nav item → `<app-wizard-form/>` (§4)
+1. User starts a plan via **Chat/Panoramica** CTA or **Piani Salvati → Nuovo Piano** → `<app-wizard-form/>` (§4)
 2. 6 steps collect: fiscal config, products/revenue, HR, OPEX (COGS vs OPEX split), CAPEX, financing (equity + French-amortized loans)
 3. Live preview panel + getters give real-time EBITDA + sustainability verdict before generating
 4. `generate()` → `WizardInput` → **`computeFromWizard()`** (§5): 36-month arrays → 3-year P&L with dynamic rows, **separate IRES (loss-carryforward) + IRAP (personnel-excluded)** taxes, half-rate first-year depreciation, full 36-month cash flow + runway, investor KPIs (gross margin %, EBITDA %, break-even revenue)
-5. Shell flips `hasPlan` → routes to **Dashboard** (§6, editable P&L + cash chart with break-even line) and **Report** (§7, 6 charts)
-6. User can **Save** (in-memory archive), **Share/Co-Work**, run **AI what-if** scenarios (§8), or **Export PDF**
+5. Shell flips `hasPlan`, auto-creates a **draft plan** → routes to **Dashboard** (§6, editable P&L + cash chart with break-even line); **Report** (§7, 6 charts) also available
+6. User can **Salva** (autosave draft) / **Salva revisione** (append a `definitivo` version), manage versions in **Piani Salvati** (§3.4), **Share/Co-Work**, run **AI what-if** scenarios (§8 copilot / §3.8 Agenti AI), or **Export PDF**

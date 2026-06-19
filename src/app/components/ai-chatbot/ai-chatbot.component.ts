@@ -334,7 +334,7 @@ const AGENTS: AgentDef[] = [
             [placeholder]="'chatbot.' + activeAgent().id + '.placeholder' | translate"
             [disabled]="isLoading()"
             rows="3"
-            class="w-full bg-transparent resize-none text-sm
+            class="w-full bg-transparent resize-none text-base
                    px-3.5 pt-3 pb-10
                    focus:outline-none
                    text-zinc-800 dark:text-zinc-100
