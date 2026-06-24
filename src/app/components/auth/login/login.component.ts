@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { OnboardingService } from '../../../services/onboarding.service';
 
 @Component({
   selector: 'app-login',
@@ -375,6 +376,7 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class LoginComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
+  private readonly onboardingService = inject(OnboardingService);
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
   email = '';
@@ -472,13 +474,16 @@ export class LoginComponent implements OnInit, OnDestroy {
     // TODO: chiamata API di autenticazione → replace setTimeout con HTTP call
     setTimeout(() => {
       this.loading.set(false);
-      this.router.navigate(['/app']);
+      // TEMP: always show the onboarding gate after login, regardless of past completion.
+      // TODO: revert to `this.onboardingService.isComplete() ? '/app' : '/onboarding'` once stable.
+      this.router.navigate(['/onboarding']);
     }, 1000);
   }
 
   onGoogleLogin(): void {
     console.log('Login con Google avviato');
     // TODO: integrare Google OAuth provider
-    this.router.navigate(['/app']);
+    // TEMP: always show the onboarding gate after login, regardless of past completion.
+    this.router.navigate(['/onboarding']);
   }
 }

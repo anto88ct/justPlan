@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { OnboardingService } from '../../../services/onboarding.service';
 
 @Component({
   selector: 'app-register',
@@ -312,6 +313,7 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class RegisterComponent {
   private readonly router = inject(Router);
+  private readonly onboardingService = inject(OnboardingService);
 
   name = '';
   email = '';
@@ -371,13 +373,13 @@ export class RegisterComponent {
     // TODO: chiamata API di registrazione → replace setTimeout con HTTP call
     setTimeout(() => {
       this.loading.set(false);
-      this.router.navigate(['/app']);
+      this.router.navigate([this.onboardingService.isComplete() ? '/app' : '/onboarding']);
     }, 1000);
   }
 
   onGoogleRegister(): void {
     console.log('Registrazione con Google avviata');
     // TODO: integrare Google OAuth provider
-    this.router.navigate(['/app']);
+    this.router.navigate([this.onboardingService.isComplete() ? '/app' : '/onboarding']);
   }
 }

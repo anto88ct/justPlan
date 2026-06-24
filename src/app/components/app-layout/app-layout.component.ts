@@ -11,8 +11,9 @@ import { ReportComponent } from '../report/report.component';
 import { ProfileComponent } from '../profile/profile.component';
 import { UploadBusinessPlanComponent } from '../upload-business-plan/upload-business-plan.component';
 import { BusinessPlanService, SavedPlan, PlanVersion } from '../../services/business-plan.service';
+import { AziendeComponent } from '../aziende/aziende.component';
 
-type View = 'panoramica' | 'wizard' | 'dashboard' | 'scenari' | 'report' | 'impostazioni' | 'piani-salvati' | 'profilo' | 'caricamenti' | 'co-work';
+type View = 'panoramica' | 'wizard' | 'dashboard' | 'scenari' | 'report' | 'impostazioni' | 'piani-salvati' | 'profilo' | 'caricamenti' | 'co-work' | 'aziende';
 
 interface CoworkMember {
   id: string;
@@ -61,7 +62,7 @@ interface ChatSession {
   selector: 'app-layout',
   standalone: true,
   host: { class: 'flex h-full w-full overflow-hidden' },
-  imports: [CommonModule, NgClass, MatTooltipModule, TranslatePipe, WizardFormComponent, DashboardCruscottoComponent, AiChatbotComponent, ReportComponent, ProfileComponent, UploadBusinessPlanComponent],
+  imports: [CommonModule, NgClass, MatTooltipModule, TranslatePipe, WizardFormComponent, DashboardCruscottoComponent, AiChatbotComponent, ReportComponent, ProfileComponent, UploadBusinessPlanComponent, AziendeComponent],
   styles: [`
     :host { display: flex; height: 100%; width: 100%; overflow: hidden; }
 
@@ -93,6 +94,17 @@ interface ChatSession {
     @keyframes floatAnim {
       0%, 100% { transform: translateY(0); }
       50%      { transform: translateY(-6px); }
+    }
+    .panorama-greeting-word {
+      display: inline-block;
+      opacity: 1;
+      transition: opacity 300ms ease;
+    }
+    .panorama-greeting-word.fading {
+      opacity: 0;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .panorama-greeting-word { transition: none; }
     }
     @keyframes shimmerPulse {
       0%, 100% { opacity: 0.25; }
@@ -760,8 +772,9 @@ interface ChatSession {
                             <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"/>
                           </svg>
                         </div>
-                        <h1 class="text-[1.85rem] font-bold text-zinc-900 dark:text-zinc-100 font-display tracking-tight">
-                          {{ panoramaGreeting() }}, AirPlan
+                        <h1 class="text-xl sm:text-[1.85rem] font-bold text-zinc-900 dark:text-zinc-100 font-display tracking-tight flex items-baseline gap-1.5 flex-wrap justify-center">
+                          <span class="panorama-greeting-word" [class.fading]="panoramaGreetingFading()">{{ panoramaGreeting() }}</span>
+                          <span>, AirPlan</span>
                         </h1>
                       </div>
                       <p class="text-sm text-zinc-500 dark:text-zinc-400 font-body mt-1">
@@ -950,6 +963,13 @@ interface ChatSession {
           @if (currentView() === 'dashboard') {
             <div class="view-enter flex flex-col h-full overflow-hidden">
               <app-dashboard-cruscotto/>
+            </div>
+          }
+
+          <!-- LE MIE AZIENDE -->
+          @if (currentView() === 'aziende') {
+            <div class="view-enter flex flex-col h-full overflow-hidden">
+              <app-aziende/>
             </div>
           }
 
@@ -2433,12 +2453,28 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   panoramaSelectedAgent   = signal<AgentId | 'auto'>('auto');
   panoramaAgentPickerOpen = signal(false);
 
-  panoramaGreeting = computed(() => {
+  private _greetingPeriod = (): 'morning' | 'afternoon' | 'evening' => {
     const h = new Date().getHours();
-    if (h >= 5  && h < 12) return 'Buon mattino';
-    if (h >= 12 && h < 18) return 'Buon pomeriggio';
-    return 'Buona sera';
+    if (h >= 5  && h < 12) return 'morning';
+    if (h >= 12 && h < 18) return 'afternoon';
+    return 'evening';
+  };
+
+  panoramaGreetingWords = computed(() => {
+    this.languageService.currentLang(); // reactive on language change
+    const words = this.translate.instant(`panorama.greeting.${this._greetingPeriod()}`);
+    return Array.isArray(words) ? words : [words];
   });
+
+  panoramaGreetingIndex = signal(0);
+  panoramaGreetingFading = signal(false);
+
+  panoramaGreeting = computed(() => {
+    const words = this.panoramaGreetingWords();
+    return words[this.panoramaGreetingIndex() % words.length];
+  });
+
+  private _greetingIntervalId = 0;
 
   panoramaAgentDot = computed(() => {
     const dots: Record<string, string> = {
@@ -2473,7 +2509,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
   panoramaMessages = signal<PanoramaMessage[]>([]);
   chatSessions     = signal<ChatSession[]>(this._loadChatSessions());
   activeChatId     = signal<string | null>(null);
-  chatHistoryOpen  = signal(true);
+  chatHistoryOpen  = signal(false);
   aiThinking       = signal(false);
 
   // ── Share dialog ────────────────────────────────────────────────────────────
@@ -2588,6 +2624,10 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       svgPath: 'M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5',
     },
     {
+      id: 'aziende', view: 'aziende', label: 'nav.leMieAziende',
+      svgPath: 'M3 21h18M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16M9 9h1m4 0h1m-5 4h1m4 0h1m-5 4h1m4 0h1',
+    },
+    {
       id: 'scenari', view: 'scenari', label: 'nav.scenariLabel',
       svgPath: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z',
     },
@@ -2665,10 +2705,24 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       .flatMap(s => s.items)
       .find(i => i.key === 'dark');
     if (darkItem) darkItem.enabled = this.themeService.dark();
+
+    this._zone.runOutsideAngular(() => {
+      this._greetingIntervalId = window.setInterval(() => {
+        this._zone.run(() => {
+          this.panoramaGreetingFading.set(true);
+          setTimeout(() => {
+            const words = this.panoramaGreetingWords();
+            this.panoramaGreetingIndex.set((this.panoramaGreetingIndex() + 1) % words.length);
+            this.panoramaGreetingFading.set(false);
+          }, 300);
+        });
+      }, 30000);
+    });
   }
 
   ngOnDestroy(): void {
     if (this._rafId) cancelAnimationFrame(this._rafId);
+    if (this._greetingIntervalId) clearInterval(this._greetingIntervalId);
   }
 
   constructor() {
@@ -2813,6 +2867,7 @@ export class AppLayoutComponent implements OnInit, OnDestroy {
       'co-work':       'views.coWork',
       profilo:         'views.profilo',
       caricamenti:     'views.caricamenti',
+      aziende:         'views.aziende',
     };
     return map[this.currentView()];
   });

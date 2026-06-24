@@ -29,7 +29,21 @@
       "Bash(node test-dark-settings.js)",
       "Bash(cat)",
       "Read(//tmp/**)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(node *)",
+      "Skill(run)",
+      "Bash(chromium-cli --help)",
+      "Bash(npx -y playwright --version)",
+      "Bash(npx playwright *)",
+      "Bash(curl -s http://localhost:4300/assets/i18n/it.json)",
+      "Bash(rm -f .tmp-verify.mjs .tmp-debug.mjs)",
+      "Bash(rm -rf .tmp-shots)",
+      "Bash(npm uninstall *)",
+      "Bash(taskkill *)",
+      "Bash(timeout 60 bash -c 'until curl -sf http://localhost:4300/onboarding >/dev/null 2>&1; do sleep 1; done')",
+      "Bash(rm -f .tmp-verify2.mjs)",
+      "Bash(rm -rf .tmp-shots2)",
+      "Bash(netstat -ano)"
     ]
   }
 }

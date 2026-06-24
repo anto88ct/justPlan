@@ -1,4 +1,11 @@
 {
+  "panorama": {
+    "greeting": {
+      "morning": ["Buongiorno", "Buon inizio", "Ben arrivato", "Pronto a iniziare?"],
+      "afternoon": ["Buon pomeriggio", "Bentornato", "Ciao", "Pronto a continuare?"],
+      "evening": ["Buonasera", "Bentornato", "Ciao", "Ancora al lavoro?"]
+    }
+  },
   "nav": {
     "panoramica": "Panoramica",
     "chat": "Chat",
@@ -13,6 +20,7 @@
     "businessPlan": "Business Plan",
     "caricamenti": "Caricamenti",
     "scenariLabel": "Agenti",
+    "leMieAziende": "Le mie aziende",
     "menu": "Menu"
   },
   "sidebar": {
@@ -164,7 +172,8 @@
     "pianiSalvati": "I Miei Business Plan",
     "coWork": "Co-Work",
     "profilo": "Profilo",
-    "caricamenti": "Caricamenti"
+    "caricamenti": "Caricamenti",
+    "aziende": "Le mie aziende"
   },
   "settings": {
     "subtitle": "Config",
@@ -312,6 +321,166 @@
       "s2": "Cosa significa EBITDA?",
       "s3": "Come funziona il cash runway?",
       "mockReply": "Ho aggiornato il Business Plan di esempio. Ecco i valori correnti:\n\n• Fatturato → €{{fatturato}}\n• EBITDA → €{{ebitda}}\n\nChiedimi la definizione di qualsiasi termine che trovi nel piano."
+    }
+  },
+  "onboarding": {
+    "azienda": {
+      "back": "Indietro",
+      "next": "Continua",
+      "close": "Chiudi",
+      "submit": "Crea azienda",
+      "submitted": "Azienda creata",
+      "stepProgress": "Passo {{current}} di {{total}}",
+      "gate": {
+        "eyebrow": "Per iniziare",
+        "title": "Hai già un'azienda?",
+        "subtitle": "Usiamo queste informazioni per impostare il piano finanziario giusto per te.",
+        "hasLabel": "Ho già un'azienda",
+        "hasDesc": "Raccontaci qualcosa in più per personalizzare il tuo piano.",
+        "noneLabel": "Non ho ancora un'azienda",
+        "noneDesc": "Nessun problema, potrai aggiungerla quando vuoi."
+      },
+      "steps": {
+        "basics": {
+          "label": "Azienda",
+          "eyebrow": "La tua azienda",
+          "title": "Parlaci della tua azienda",
+          "subtitle": "Bastano un paio di informazioni: puoi modificarle in qualsiasi momento.",
+          "nomeLabel": "Nome azienda",
+          "nomePlaceholder": "Es. TechFlow Srl",
+          "descrizioneLabel": "Descrizione",
+          "descrizioneOptional": "(opzionale)",
+          "descrizionePlaceholder": "In poche righe: cosa fa la tua azienda e a chi si rivolge."
+        },
+        "profile": {
+          "label": "Profilo",
+          "eyebrow": "Il tuo profilo",
+          "title": "Che tipo di realtà è?",
+          "subtitle": "Ci aiuta a calibrare le agevolazioni fiscali corrette.",
+          "startupQuestion": "È una startup?",
+          "innovativaQuestion": "È una startup innovativa?",
+          "innovativaHint": "Iscritta alla sezione speciale del Registro Imprese.",
+          "yes": "Sì",
+          "no": "No"
+        },
+        "sector": {
+          "label": "Settore",
+          "eyebrow": "Il tuo settore",
+          "title": "In che settore operi?",
+          "subtitle": "Ci aiuta a personalizzare le proiezioni del tuo piano.",
+          "settoreLabel": "Settore"
+        },
+        "status": {
+          "label": "Costituzione",
+          "eyebrow": "Stato giuridico",
+          "title": "La tua azienda è già costituita?",
+          "subtitle": "Ci aiuta a capire se partire da zero o da uno storico esistente.",
+          "question": "Stato di costituzione",
+          "costituitaLabel": "È già costituita",
+          "costituitaDesc": "Ha già una forma giuridica attiva (es. SRL, SAS, ditta individuale).",
+          "nonCostituitaLabel": "Non è costituita",
+          "nonCostituitaDesc": "È ancora un progetto: partiremo da zero con il piano finanziario."
+        },
+        "upload": {
+          "label": "Storico",
+          "eyebrow": "Storico finanziario",
+          "title": "Carica il tuo storico finanziario",
+          "subtitle": "Se hai un bilancio o un business plan esistente, caricalo: lo useremo per personalizzare le proiezioni.",
+          "fileLabel": "Documento storico",
+          "fileOptional": "(opzionale)",
+          "dropTitle": "Trascina un file qui o clicca per selezionarlo",
+          "dropHint": "PDF o DOCX, max 10MB",
+          "remove": "Rimuovi file",
+          "errorType": "Formato non supportato: carica un file PDF o DOCX.",
+          "errorSize": "File troppo grande: il limite è 10MB."
+        },
+        "team": {
+          "label": "Team",
+          "eyebrow": "Il tuo team",
+          "title": "Parlaci del tuo team",
+          "subtitle": "Facoltativo: ci aiuta a contestualizzare i costi del personale nel piano.",
+          "youngQuestion": "Il team ha un'età media giovanile?",
+          "youngHint": "Indicativamente under 35 anni.",
+          "countLabel": "Numero di dipendenti",
+          "countOptional": "(opzionale)",
+          "rolePlaceholder": "Ruolo",
+          "nomePlaceholder": "Nome",
+          "cognomePlaceholder": "Cognome",
+          "remove": "Rimuovi dipendente"
+        },
+        "location": {
+          "label": "Sedi",
+          "eyebrow": "Geolocalizzazione",
+          "title": "Dove si trova la tua azienda?",
+          "subtitle": "Facoltativo: puoi aggiungere più sedi se operi in diversi paesi.",
+          "countryLabel": "Paese della sede",
+          "countryOptional": "(opzionale)",
+          "countryPlaceholder": "Seleziona un paese",
+          "addLabel": "Aggiungi",
+          "remove": "Rimuovi sede"
+        },
+        "businessModel": {
+          "label": "Modello",
+          "eyebrow": "Ultimo passo",
+          "title": "Qual è il tuo modello di business?",
+          "subtitle": "Facoltativo: ci aiuta a calibrare ricavi e margini nelle proiezioni.",
+          "modelLabel": "Modello di business",
+          "modelOptional": "(opzionale)"
+        }
+      },
+      "settore": {
+        "tech": "Tecnologia & Software",
+        "retail": "Retail & E-commerce",
+        "food": "Food & Beverage",
+        "manifatturiero": "Manifatturiero & Industria",
+        "servizi": "Servizi Professionali",
+        "sanita": "Sanità & Benessere",
+        "edilizia": "Edilizia & Immobiliare",
+        "turismo": "Turismo & Hospitality",
+        "altro": "Altro"
+      },
+      "businessModel": {
+        "b2b": "Business to Business",
+        "b2c": "Business to Consumer",
+        "b2b2c": "Business to Business to Consumer",
+        "marketplace": "Marketplace / Piattaforma",
+        "saas": "SaaS & Abbonamento",
+        "ecommerce": "E-commerce",
+        "freemium": "Freemium",
+        "licensing": "Licensing / Royalty",
+        "franchising": "Franchising"
+      },
+      "countries": {
+        "it": "Italia",
+        "fr": "Francia",
+        "de": "Germania",
+        "es": "Spagna",
+        "pt": "Portogallo",
+        "gb": "Regno Unito",
+        "ch": "Svizzera",
+        "at": "Austria",
+        "nl": "Paesi Bassi",
+        "be": "Belgio",
+        "ie": "Irlanda",
+        "pl": "Polonia",
+        "se": "Svezia",
+        "us": "Stati Uniti",
+        "ca": "Canada",
+        "br": "Brasile",
+        "ae": "Emirati Arabi Uniti",
+        "cn": "Cina",
+        "jp": "Giappone",
+        "au": "Australia"
+      }
+    }
+  },
+  "aziende": {
+    "backToList": "Le mie aziende",
+    "detail": {
+      "eyebrow": "Modifica azienda",
+      "save": "Salva modifiche",
+      "saved": "Modifiche salvate",
+      "cancel": "Annulla"
     }
   }
 }

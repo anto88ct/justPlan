@@ -20,6 +20,11 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'onboarding',
+    loadComponent: () =>
+      import('./components/onboarding/onboarding.component').then(m => m.OnboardingComponent),
+  },
+  {
     path: 'app',
     loadComponent: () =>
       import('./components/app-layout/app-layout.component').then(m => m.AppLayoutComponent),
